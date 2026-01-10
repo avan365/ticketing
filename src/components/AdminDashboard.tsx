@@ -137,7 +137,8 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
             quantity: t.quantity
           })),
           order.totalAmount,
-          'paynow'
+          'paynow',
+          true // isVerified = true, so email shows "Confirmed" status
         );
         console.log('✅ Confirmation email sent to:', order.customerEmail);
       } catch (error) {

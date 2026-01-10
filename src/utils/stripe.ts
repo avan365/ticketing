@@ -8,8 +8,8 @@ import { loadStripe, type Stripe } from "@stripe/stripe-js";
 export const STRIPE_PUBLISHABLE_KEY =
   "pk_test_51SnvrcBqx0IdgUymIqgd66nZuJLT1uHXDDGJXeFa2owUq8XwqC0h9nhFPweKsmj9S6tvulazraUn1ISK6Iz6B1zs00MhPWKU6S";
 
-// Backend API URL
-export const API_URL = "http://localhost:3001";
+// Backend API URL - Uses relative path for Vercel, localhost for dev
+export const API_URL = import.meta.env.DEV ? "http://localhost:3001" : "";
 
 // ============================================
 // PLATFORM FEE (Your profit margin)

@@ -39,6 +39,8 @@ const EMAILJS_PUBLIC_KEY = "iqADYzOIdJ2fMOOW8"; // From step 4
 /**
  * Send confirmation email to CUSTOMER (not admin)
  * Admin can view all orders in the Admin Dashboard (/admin or click Admin button)
+ *
+ * @param isVerified - Set to true when admin verifies a PayNow payment (shows "Confirmed" instead of "Pending")
  */
 export const sendCustomerConfirmation = async (
   orderNumber: string,
@@ -46,7 +48,8 @@ export const sendCustomerConfirmation = async (
   customerEmail: string,
   cart: CartItem[],
   totalAmount: number,
-  paymentMethod: "paynow" | "card"
+  paymentMethod: "paynow" | "card",
+  isVerified: boolean = false // Default false for immediate card payments, true when admin verifies PayNow
 ): Promise<boolean> => {
   const ticketDetails = cart
     .map(
@@ -57,6 +60,18 @@ export const sendCustomerConfirmation = async (
     )
     .join("\n");
 
+  // Determine payment status based on method and verification
+  const paymentStatus =
+    paymentMethod === "card" || isVerified
+      ? "Confirmed"
+      : "Pending Verification";
+  const paymentMethodLabel =
+    paymentMethod === "paynow"
+      ? isVerified
+        ? "PayNow (Verified)"
+        : "PayNow (Pending Verification)"
+      : "Credit Card";
+
   const templateParams = {
     // Customer info
     to_name: customerName,
@@ -66,12 +81,8 @@ export const sendCustomerConfirmation = async (
     order_number: orderNumber,
     tickets: ticketDetails,
     total_amount: `$${totalAmount.toFixed(2)}`,
-    payment_method:
-      paymentMethod === "paynow"
-        ? "PayNow (Pending Verification)"
-        : "Credit Card",
-    payment_status:
-      paymentMethod === "paynow" ? "Pending Verification" : "Confirmed",
+    payment_method: paymentMethodLabel,
+    payment_status: paymentStatus,
 
     // Event info
     event_name: "ADHEERAA Masquerade Night",
@@ -79,21 +90,6 @@ export const sendCustomerConfirmation = async (
     event_time: "7:00 PM",
     event_venue: "Grand Ballroom, Marina Bay Sands",
   };
-
-  // Check if EmailJS is configured
-  if (
-    EMAILJS_SERVICE_ID === "YOUR_SERVICE_ID" ||
-    EMAILJS_TEMPLATE_ID === "YOUR_TEMPLATE_ID" ||
-    EMAILJS_PUBLIC_KEY === "YOUR_PUBLIC_KEY"
-  ) {
-    console.log(
-      "📧 EmailJS not configured yet. Customer confirmation email simulated:"
-    );
-    console.log("To:", customerEmail);
-    console.log("Subject: Your ADHEERAA Ticket Order #" + orderNumber);
-    console.log("Details:", templateParams);
-    return true; // Return success to not block the flow
-  }
 
   try {
     await emailjs.send(
@@ -108,15 +104,4 @@ export const sendCustomerConfirmation = async (
     console.error("❌ Failed to send customer email:", error);
     return false;
   }
-};
-
-/**
- * Check if EmailJS is properly configured
- */
-export const isEmailConfigured = (): boolean => {
-  return (
-    EMAILJS_SERVICE_ID !== "YOUR_SERVICE_ID" &&
-    EMAILJS_TEMPLATE_ID !== "YOUR_TEMPLATE_ID" &&
-    EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY"
-  );
 };

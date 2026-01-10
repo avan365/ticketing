@@ -22,146 +22,385 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
 
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; background-color: #0a0a12; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a12; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
-          
-          <!-- Header -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #6b21a8 0%, #7c3aed 50%, #a855f7 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="margin: 0; color: #fcd34d; font-size: 36px; font-weight: 700; letter-spacing: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                ✨ ADHEERAA ✨
-              </h1>
-              <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 16px; letter-spacing: 2px;">
-                MASQUERADE NIGHT 2026
-              </p>
-            </td>
-          </tr>
-          
-          <!-- Main Content -->
-          <tr>
-            <td style="padding: 40px 30px;">
-              
-              <!-- Greeting -->
-              <p style="color: #e2e8f0; font-size: 18px; margin: 0 0 20px 0;">
-                Dear <strong style="color: #fcd34d;">{{to_name}}</strong>,
-              </p>
-              
-              <p style="color: #94a3b8; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">
-                Thank you for your ticket purchase! Your order has been received and is being processed.
-              </p>
-              
-              <!-- Order Box -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; margin-bottom: 30px;">
-                <tr>
-                  <td style="padding: 25px;">
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td style="padding-bottom: 15px; border-bottom: 1px solid rgba(139, 92, 246, 0.2);">
-                          <span style="color: #a78bfa; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Order Number</span>
-                          <p style="margin: 5px 0 0 0; color: #fcd34d; font-size: 24px; font-weight: bold; font-family: monospace;">
-                            #{{order_number}}
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding-top: 15px;">
-                          <span style="color: #a78bfa; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Status</span>
-                          <p style="margin: 5px 0 0 0; color: {{payment_status}} == 'Confirmed' ? '#22c55e' : '#eab308'; font-size: 16px; font-weight: bold;">
-                            {{payment_status}}
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- Tickets -->
-              <h3 style="color: #e2e8f0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid rgba(139, 92, 246, 0.3);">
-                🎫 Your Tickets
-              </h3>
-              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                <pre style="margin: 0; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.8; white-space: pre-wrap;">{{tickets}}</pre>
-              </div>
-              
-              <!-- Total -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
-                <tr>
-                  <td style="text-align: right;">
-                    <span style="color: #94a3b8; font-size: 14px;">Total Amount</span>
-                    <p style="margin: 5px 0 0 0; color: #22c55e; font-size: 28px; font-weight: bold;">
-                      {{total_amount}}
-                    </p>
-                    <span style="color: #64748b; font-size: 12px;">via {{payment_method}}</span>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- Event Details -->
-              <h3 style="color: #e2e8f0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid rgba(139, 92, 246, 0.3);">
-                📍 Event Details
-              </h3>
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 5px;">
-                <tr>
-                  <td style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <span style="color: #64748b; font-size: 12px;">Event</span>
-                    <p style="margin: 3px 0 0 0; color: #e2e8f0; font-size: 15px;">{{event_name}}</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <span style="color: #64748b; font-size: 12px;">Date</span>
-                    <p style="margin: 3px 0 0 0; color: #e2e8f0; font-size: 15px;">{{event_date}}</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <span style="color: #64748b; font-size: 12px;">Time</span>
-                    <p style="margin: 3px 0 0 0; color: #e2e8f0; font-size: 15px;">{{event_time}}</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 15px;">
-                    <span style="color: #64748b; font-size: 12px;">Venue</span>
-                    <p style="margin: 3px 0 0 0; color: #e2e8f0; font-size: 15px;">{{event_venue}}</p>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- Important Note -->
-              <div style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1)); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 8px; padding: 20px; margin-top: 30px;">
-                <p style="margin: 0; color: #fcd34d; font-size: 14px; font-weight: bold;">⚠️ Important</p>
-                <p style="margin: 10px 0 0 0; color: #fde68a; font-size: 13px; line-height: 1.6;">
-                  Please bring this email or your order number to the event for check-in. Don't forget your masquerade mask!
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #0a0a12;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #0a0a12; padding: 40px 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+              border-radius: 16px;
+              overflow: hidden;
+              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    #6b21a8 0%,
+                    #7c3aed 50%,
+                    #a855f7 100%
+                  );
+                  padding: 40px 30px;
+                  text-align: center;
+                "
+              >
+                <h1
+                  style="
+                    margin: 0;
+                    color: #fcd34d;
+                    font-size: 36px;
+                    font-weight: 700;
+                    letter-spacing: 4px;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                  "
+                >
+                  ✨ ADHEERAA ✨
+                </h1>
+                <p
+                  style="
+                    margin: 10px 0 0 0;
+                    color: rgba(255, 255, 255, 0.9);
+                    font-size: 16px;
+                    letter-spacing: 2px;
+                  "
+                >
+                  MASQUERADE NIGHT 2026
                 </p>
-              </div>
-              
-            </td>
-          </tr>
-          
-          <!-- Footer -->
-          <tr>
-            <td style="background: rgba(0,0,0,0.3); padding: 25px 30px; text-align: center; border-top: 1px solid rgba(139, 92, 246, 0.2);">
-              <p style="margin: 0 0 10px 0; color: #64748b; font-size: 12px;">
-                Questions? Reply to this email or contact us on Instagram
-              </p>
-              <p style="margin: 0; color: #4b5563; font-size: 11px;">
-                © 2026 ADHEERAA Events. All rights reserved.
-              </p>
-            </td>
-          </tr>
-          
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
+              </td>
+            </tr>
 
+            <!-- Main Content -->
+            <tr>
+              <td style="padding: 40px 30px">
+                <!-- Greeting -->
+                <p style="color: #e2e8f0; font-size: 18px; margin: 0 0 20px 0">
+                  Dear <strong style="color: #fcd34d">{{to_name}}</strong>,
+                </p>
+
+                <p
+                  style="
+                    color: #94a3b8;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    margin: 0 0 30px 0;
+                  "
+                >
+                  Thank you for your ticket purchase! Your order has been
+                  received and is being processed.
+                </p>
+
+                <!-- Order Box -->
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="
+                    background: rgba(139, 92, 246, 0.1);
+                    border: 1px solid rgba(139, 92, 246, 0.3);
+                    border-radius: 12px;
+                    margin-bottom: 30px;
+                  "
+                >
+                  <tr>
+                    <td style="padding: 25px">
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td
+                            style="
+                              padding-bottom: 15px;
+                              border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+                            "
+                          >
+                            <span
+                              style="
+                                color: #a78bfa;
+                                font-size: 12px;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                              "
+                              >Order Number</span
+                            >
+                            <p
+                              style="
+                                margin: 5px 0 0 0;
+                                color: #fcd34d;
+                                font-size: 24px;
+                                font-weight: bold;
+                                font-family: monospace;
+                              "
+                            >
+                              #{{order_number}}
+                            </p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding-top: 15px">
+                            <span
+                              style="
+                                color: #a78bfa;
+                                font-size: 12px;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                              "
+                              >Status</span
+                            >
+                            <p
+                              style="margin: 5px 0 0 0; color: {{payment_status}} == 'Confirmed' ? '#22c55e' : '#eab308'; font-size: 16px; font-weight: bold;"
+                            >
+                              {{payment_status}}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Tickets -->
+                <h3
+                  style="
+                    color: #e2e8f0;
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin: 0 0 15px 0;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+                  "
+                >
+                  🎫 Your Tickets
+                </h3>
+                <div
+                  style="
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 8px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                  "
+                >
+                  <pre
+                    style="
+                      margin: 0;
+                      color: #e2e8f0;
+                      font-family: 'Segoe UI', sans-serif;
+                      font-size: 15px;
+                      line-height: 1.8;
+                      white-space: pre-wrap;
+                    "
+                  >
+{{tickets}}</pre
+                  >
+                </div>
+
+                <!-- Total -->
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="margin-bottom: 30px"
+                >
+                  <tr>
+                    <td style="text-align: right">
+                      <span style="color: #94a3b8; font-size: 14px"
+                        >Total Amount</span
+                      >
+                      <p
+                        style="
+                          margin: 5px 0 0 0;
+                          color: #22c55e;
+                          font-size: 28px;
+                          font-weight: bold;
+                        "
+                      >
+                        {{total_amount}}
+                      </p>
+                      <span style="color: #64748b; font-size: 12px"
+                        >via {{payment_method}}</span
+                      >
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Event Details -->
+                <h3
+                  style="
+                    color: #e2e8f0;
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin: 0 0 15px 0;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+                  "
+                >
+                  📍 Event Details
+                </h3>
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="
+                    background: rgba(0, 0, 0, 0.2);
+                    border-radius: 8px;
+                    padding: 5px;
+                  "
+                >
+                  <tr>
+                    <td
+                      style="
+                        padding: 12px 15px;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                      "
+                    >
+                      <span style="color: #64748b; font-size: 12px">Event</span>
+                      <p
+                        style="
+                          margin: 3px 0 0 0;
+                          color: #e2e8f0;
+                          font-size: 15px;
+                        "
+                      >
+                        {{event_name}}
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      style="
+                        padding: 12px 15px;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                      "
+                    >
+                      <span style="color: #64748b; font-size: 12px">Date</span>
+                      <p
+                        style="
+                          margin: 3px 0 0 0;
+                          color: #e2e8f0;
+                          font-size: 15px;
+                        "
+                      >
+                        {{event_date}}
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      style="
+                        padding: 12px 15px;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                      "
+                    >
+                      <span style="color: #64748b; font-size: 12px">Time</span>
+                      <p
+                        style="
+                          margin: 3px 0 0 0;
+                          color: #e2e8f0;
+                          font-size: 15px;
+                        "
+                      >
+                        {{event_time}}
+                      </p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 12px 15px">
+                      <span style="color: #64748b; font-size: 12px">Venue</span>
+                      <p
+                        style="
+                          margin: 3px 0 0 0;
+                          color: #e2e8f0;
+                          font-size: 15px;
+                        "
+                      >
+                        {{event_venue}}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Important Note -->
+                <div
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      rgba(251, 191, 36, 0.1),
+                      rgba(245, 158, 11, 0.1)
+                    );
+                    border: 1px solid rgba(251, 191, 36, 0.3);
+                    border-radius: 8px;
+                    padding: 20px;
+                    margin-top: 30px;
+                  "
+                >
+                  <p
+                    style="
+                      margin: 0;
+                      color: #fcd34d;
+                      font-size: 14px;
+                      font-weight: bold;
+                    "
+                  >
+                    ⚠️ Important
+                  </p>
+                  <p
+                    style="
+                      margin: 10px 0 0 0;
+                      color: #fde68a;
+                      font-size: 13px;
+                      line-height: 1.6;
+                    "
+                  >
+                    Please bring this email or your order number to the event
+                    for check-in. Don't forget your masquerade mask!
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background: rgba(0, 0, 0, 0.3);
+                  padding: 25px 30px;
+                  text-align: center;
+                  border-top: 1px solid rgba(139, 92, 246, 0.2);
+                "
+              >
+                <p style="margin: 0 0 10px 0; color: #64748b; font-size: 12px">
+                  Questions? Reply to this email or contact us on Instagram
+                </p>
+                <p style="margin: 0; color: #4b5563; font-size: 11px">
+                  © 2026 ADHEERAA Events. All rights reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
