@@ -73,48 +73,48 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={onCheckout}
-          className="fixed top-8 right-8 z-50 bg-gradient-to-r from-yellow-500 to-amber-600 text-black p-4 rounded-full shadow-2xl hover:scale-110 transition-transform"
+          className="fixed top-4 right-4 md:top-8 md:right-8 z-50 bg-gradient-to-r from-yellow-500 to-amber-600 text-black p-3 md:p-4 rounded-full shadow-2xl hover:scale-110 transition-transform"
         >
-          <ShoppingCart className="w-6 h-6" />
-          <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+          <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+          <span className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-purple-600 text-white text-xs font-bold rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
             {totalItems}
           </span>
         </motion.button>
       )}
 
       {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Left Side - Image */}
+      <div className="relative z-10 container mx-auto px-4 py-8 md:py-0">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+          {/* Left Side - Image (hidden on very small screens, shown below text on tablet) */}
           <motion.div
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            className="relative"
+            className="relative order-2 lg:order-1"
           >
             <motion.div
               animate={{
-                scale: [1, 1.05, 1],
-                rotateZ: [0, 2, 0, -2, 0],
+                scale: [1, 1.02, 1],
+                rotateZ: [0, 1, 0, -1, 0],
               }}
               transition={{
                 duration: 8,
                 repeat: Infinity,
                 repeatType: 'reverse',
               }}
-              className="relative"
+              className="relative max-w-sm mx-auto lg:max-w-none"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-purple-600/20 rounded-3xl blur-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-purple-600/20 rounded-2xl lg:rounded-3xl blur-3xl" />
               <img
                 src="/hero-poster.jpg"
                 alt="ADHEERAA Masquerade Night"
-                className="relative rounded-3xl shadow-2xl border-4 border-yellow-500/30"
+                className="relative rounded-2xl lg:rounded-3xl shadow-2xl border-2 lg:border-4 border-yellow-500/30 w-full"
               />
             </motion.div>
           </motion.div>
 
           {/* Right Side - Text */}
-          <div className="space-y-8 mt-12">
+          <div className="space-y-6 lg:space-y-8 mt-0 lg:mt-12 order-1 lg:order-2 text-center lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -123,13 +123,13 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               <motion.div
                 animate={{ rotate: [0, 10, 0, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="inline-block mb-4"
+                className="inline-block mb-2 lg:mb-4"
               >
-                <Sparkles className="w-12 h-12 text-yellow-400" />
+                <Sparkles className="w-8 h-8 lg:w-12 lg:h-12 text-yellow-400" />
               </motion.div>
-              <h1 className="font-bold mb-4">
+              <h1 className="font-bold mb-2 lg:mb-4">
                 <motion.span
-                  className="block text-6xl lg:text-8xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent"
+                  className="block text-4xl sm:text-5xl md:text-6xl lg:text-8xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent"
                   animate={{
                     backgroundPosition: ['0%', '100%', '0%'],
                   }}
@@ -145,7 +145,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="block text-3xl lg:text-5xl text-purple-300 mt-2"
+                  className="block text-xl sm:text-2xl md:text-3xl lg:text-5xl text-purple-300 mt-1 lg:mt-2"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   Masquerade Night
@@ -157,22 +157,22 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="space-y-4"
+              className="space-y-3 lg:space-y-4"
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             >
-              <div className="flex items-center gap-4 text-xl">
-                <span className="text-4xl">📅</span>
-                <div>
-                  <p className="text-purple-300">Friday, February 21, 2026</p>
-                  <p className="text-gray-400">8:00 PM - 12:00 AM</p>
+              <div className="flex items-center gap-3 lg:gap-4 text-base lg:text-xl justify-center lg:justify-start">
+                <span className="text-2xl lg:text-4xl">📅</span>
+                <div className="text-left">
+                  <p className="text-purple-300 text-sm lg:text-base">Friday, February 21, 2026</p>
+                  <p className="text-gray-400 text-xs lg:text-base">8:00 PM - 12:00 AM</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-xl">
-                <span className="text-4xl">📍</span>
-                <div>
-                  <p className="text-purple-300">Skyfall Rooftop Bar</p>
-                  <p className="text-gray-400">HarbourFront, Singapore</p>
+              <div className="flex items-center gap-3 lg:gap-4 text-base lg:text-xl justify-center lg:justify-start">
+                <span className="text-2xl lg:text-4xl">📍</span>
+                <div className="text-left">
+                  <p className="text-purple-300 text-sm lg:text-base">Skyfall Rooftop Bar</p>
+                  <p className="text-gray-400 text-xs lg:text-base">HarbourFront, Singapore</p>
                 </div>
               </div>
             </motion.div>
@@ -184,7 +184,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               transition={{ delay: 0.8 }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-block bg-gradient-to-r from-yellow-500 to-amber-600 text-black px-12 py-5 rounded-full text-2xl font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300"
+              className="inline-block bg-gradient-to-r from-yellow-500 to-amber-600 text-black px-8 py-3 lg:px-12 lg:py-5 rounded-full text-lg lg:text-2xl font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300"
               style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
             >
               Get Your Tickets 🎭
@@ -193,11 +193,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Indicator - Hidden on mobile */}
       <motion.div
         animate={{ y: [0, 20, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2"
       >
         <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex items-start justify-center p-2">
           <motion.div

@@ -77,11 +77,11 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
   };
 
   return (
-    <div id="tickets" className="py-24 bg-[#0a0a12] relative overflow-hidden">
+    <div id="tickets" className="py-12 md:py-24 bg-[#0a0a12] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-600 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-48 md:w-96 h-48 md:h-96 bg-purple-600 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 bg-yellow-600 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -91,16 +91,16 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          className="text-center mb-10 md:mb-20"
         >
           <h2 
-            className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-6"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 md:mb-6"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
             Choose Your Experience
           </h2>
           <p 
-            className="text-xl text-purple-300 max-w-3xl mx-auto"
+            className="text-base md:text-xl text-purple-300 max-w-3xl mx-auto px-4"
             style={{ fontFamily: 'Montserrat, sans-serif' }}
           >
             Select the perfect ticket for an unforgettable night of mystery and magic
@@ -108,7 +108,7 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
         </motion.div>
 
         {/* Tickets Grid */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
           {tickets.map((ticket, index) => {
             const Icon = getIcon(ticket.id);
             const gradient = getGradient(ticket.id);
@@ -154,33 +154,33 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                     </div>
                   )}
 
-                  <div className={`p-8 flex flex-col flex-1 ${isSoldOut ? 'pt-16' : ''}`}>
+                  <div className={`p-5 md:p-8 flex flex-col flex-1 ${isSoldOut ? 'pt-14 md:pt-16' : ''}`}>
                     {/* Icon */}
                     <motion.div
                       animate={isSoldOut ? {} : { rotateY: [0, 360] }}
                       transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                      className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} ${isSoldOut ? 'grayscale opacity-50' : ''} flex items-center justify-center mb-6`}
+                      className={`w-14 h-14 md:w-20 md:h-20 rounded-full bg-gradient-to-br ${gradient} ${isSoldOut ? 'grayscale opacity-50' : ''} flex items-center justify-center mb-4 md:mb-6`}
                     >
-                      <Icon className="w-10 h-10 text-white" />
+                      <Icon className="w-7 h-7 md:w-10 md:h-10 text-white" />
                     </motion.div>
 
                     {/* Title */}
-                    <h3 className={`text-3xl font-bold mb-2 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${isSoldOut ? 'grayscale' : ''}`}>
+                    <h3 className={`text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${isSoldOut ? 'grayscale' : ''}`}>
                       {ticket.name}
                     </h3>
 
                     {/* Price */}
-                    <div className="mb-6">
-                      <span className={`text-5xl font-bold ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>${ticket.price}</span>
-                      <span className="text-purple-300 ml-2">per ticket</span>
+                    <div className="mb-4 md:mb-6">
+                      <span className={`text-3xl md:text-5xl font-bold ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>${ticket.price}</span>
+                      <span className="text-purple-300 ml-2 text-sm md:text-base">per ticket</span>
                     </div>
 
                     {/* Description */}
-                    <p className={`${isSoldOut ? 'text-gray-400' : 'text-purple-200'} mb-6 flex-1`}>{ticket.description}</p>
+                    <p className={`${isSoldOut ? 'text-gray-400' : 'text-purple-200'} mb-4 md:mb-6 flex-1 text-sm md:text-base`}>{ticket.description}</p>
 
                     {/* Availability Bar */}
-                    <div className="mb-6 flex items-center gap-2">
-                      <div className="flex-1 bg-purple-950/50 rounded-full h-2 overflow-hidden">
+                    <div className="mb-4 md:mb-6 flex items-center gap-2">
+                      <div className="flex-1 bg-purple-950/50 rounded-full h-1.5 md:h-2 overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           whileInView={{ width: `${availabilityPercent}%` }}
@@ -195,7 +195,7 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                           }`}
                         />
                       </div>
-                      <span className={`text-sm ${
+                      <span className={`text-xs md:text-sm whitespace-nowrap ${
                         isSoldOut 
                           ? 'text-red-400 font-bold' 
                           : isLowStock 
@@ -208,27 +208,27 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
 
                     {/* Quantity Selector - Hidden when sold out */}
                     {!isSoldOut && (
-                      <div className="flex items-center gap-4 mb-6">
-                        <span className="text-purple-300">Quantity:</span>
+                      <div className="flex items-center justify-between md:justify-start gap-2 md:gap-4 mb-4 md:mb-6">
+                        <span className="text-purple-300 text-sm md:text-base">Quantity:</span>
                         <div className="flex items-center gap-2">
                           <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleQuantityChange(ticket.id, -1, ticket.available)}
                             disabled={quantity === 0}
-                            className="w-10 h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                           >
-                            <Minus className="w-5 h-5" />
+                            <Minus className="w-4 h-4 md:w-5 md:h-5" />
                           </motion.button>
-                          <span className="w-12 text-center text-2xl font-bold text-white">
+                          <span className="w-10 md:w-12 text-center text-xl md:text-2xl font-bold text-white">
                             {quantity}
                           </span>
                           <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleQuantityChange(ticket.id, 1, ticket.available)}
                             disabled={quantity >= Math.min(10, ticket.available)}
-                            className="w-10 h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                           >
-                            <Plus className="w-5 h-5" />
+                            <Plus className="w-4 h-4 md:w-5 md:h-5" />
                           </motion.button>
                         </div>
                       </div>
@@ -236,11 +236,11 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
 
                     {/* Add to Cart Button */}
                     <motion.button
-                      whileHover={{ scale: isSoldOut ? 1 : 1.05 }}
-                      whileTap={{ scale: isSoldOut ? 1 : 0.95 }}
+                      whileHover={{ scale: isSoldOut ? 1 : 1.02 }}
+                      whileTap={{ scale: isSoldOut ? 1 : 0.98 }}
                       onClick={() => handleAddToCart(ticket)}
                       disabled={isSoldOut || quantity === 0}
-                      className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+                      className={`w-full py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
                         isSoldOut
                           ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
                           : isAdded
@@ -254,8 +254,8 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                         </>
                       ) : isAdded ? (
                         <>
-                          <Check className="w-5 h-5" />
-                          Added to Cart!
+                          <Check className="w-4 h-4 md:w-5 md:h-5" />
+                          Added!
                         </>
                       ) : (
                         <>
@@ -276,15 +276,15 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 max-w-4xl mx-auto"
+          className="mt-10 md:mt-20 max-w-4xl mx-auto"
         >
-          <div className="bg-gradient-to-r from-purple-900/40 to-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-500/30 p-8">
-            <h4 className="text-2xl font-bold text-yellow-400 mb-4">📋 Important Information</h4>
-            <ul className="space-y-2 text-purple-200">
+          <div className="bg-gradient-to-r from-purple-900/40 to-purple-800/40 backdrop-blur-sm rounded-xl md:rounded-2xl border border-purple-500/30 p-5 md:p-8">
+            <h4 className="text-lg md:text-2xl font-bold text-yellow-400 mb-3 md:mb-4">📋 Important Information</h4>
+            <ul className="space-y-1.5 md:space-y-2 text-purple-200 text-sm md:text-base">
               <li>• All tickets are non-refundable but transferable</li>
-              <li>• Valid ID required at entry - must match ticket holder name</li>
+              <li>• Valid ID required at entry</li>
               <li>• Masquerade mask mandatory for all attendees</li>
-              <li>• VIP tickets include complimentary coat check and parking</li>
+              <li>• VIP tickets include coat check and parking</li>
               <li>• Ages 21+ only - strict enforcement</li>
             </ul>
           </div>
