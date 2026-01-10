@@ -37,7 +37,7 @@ export function ConcertDetails() {
   ];
 
   return (
-    <div className="py-24 bg-[#0a0a12]">
+    <div className="py-8 md:py-24 bg-[#0a0a12]">
       <div className="container mx-auto px-4">
         {/* Section Title */}
         <motion.div
@@ -258,18 +258,24 @@ export function ConcertDetails() {
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="mt-8 md:mt-24 max-w-3xl mx-auto text-center"
+          className="mt-6 md:mt-24 max-w-3xl mx-auto text-center"
         >
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-purple-600/10 to-yellow-500/10 rounded-2xl md:rounded-3xl blur-2xl" />
             <div className="relative bg-gradient-to-br from-purple-900/60 to-black/60 backdrop-blur-sm p-4 md:p-12 rounded-2xl md:rounded-3xl border md:border-2 border-yellow-500/30">
-              {/* Mobile: Compact single line */}
+              {/* Mobile: Two lines */}
               <div className="md:hidden">
                 <p 
-                  className="text-base text-yellow-400 font-bold"
+                  className="text-lg text-yellow-400 font-bold"
                   style={{ fontFamily: 'Cinzel, serif' }}
                 >
-                  🎭 Dress Code: Formal Masquerade Attire
+                  🎭 Dress Code
+                </p>
+                <p 
+                  className="text-sm text-purple-200 mt-1"
+                  style={{ fontFamily: 'Playfair Display, serif' }}
+                >
+                  Formal Masquerade Attire
                 </p>
               </div>
               {/* Desktop: Full display */}

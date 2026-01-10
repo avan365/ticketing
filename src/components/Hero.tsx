@@ -33,7 +33,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background - matching poster's dark aesthetic */}
       <div className="absolute inset-0 bg-[#0a0a12]" />
 
@@ -131,7 +131,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               </motion.div>
               <h1 className="font-bold mb-2 md:mb-4">
                 <motion.span
-                  className="block text-5xl sm:text-6xl md:text-6xl lg:text-8xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent"
+                  className="block text-[12vw] md:text-6xl lg:text-8xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent w-[90vw] md:w-auto mx-auto md:mx-0"
                   animate={{
                     backgroundPosition: ['0%', '100%', '0%'],
                   }}
@@ -165,16 +165,16 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
                 <span className="text-2xl md:text-4xl">📅</span>
                 <div className="text-left">
-                  <p className="text-purple-300 text-sm md:text-base">Friday, February 21, 2026</p>
-                  <p className="text-gray-400 text-xs md:text-base">8:00 PM - 12:00 AM</p>
+                  <p className="text-purple-300 text-base md:text-base">Friday, February 21, 2026</p>
+                  <p className="text-gray-400 text-sm md:text-base">8:00 PM - 12:00 AM</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
                 <span className="text-2xl md:text-4xl">📍</span>
                 <div className="text-left">
-                  <p className="text-purple-300 text-sm md:text-base">Skyfall Rooftop Bar</p>
-                  <p className="text-gray-400 text-xs md:text-base">HarbourFront, Singapore</p>
+                  <p className="text-purple-300 text-base md:text-base">Skyfall Rooftop Bar</p>
+                  <p className="text-gray-400 text-sm md:text-base">HarbourFront, Singapore</p>
                 </div>
               </div>
             </motion.div>

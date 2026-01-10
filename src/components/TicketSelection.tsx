@@ -91,16 +91,16 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-10 md:mb-20"
+          className="text-center mb-6 md:mb-20"
         >
           <h2 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 md:mb-6"
+            className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 md:mb-6"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
             Choose Your Experience
           </h2>
           <p 
-            className="text-base md:text-xl text-purple-300 max-w-3xl mx-auto px-4"
+            className="text-sm md:text-xl text-purple-300 max-w-3xl mx-auto px-4"
             style={{ fontFamily: 'Montserrat, sans-serif' }}
           >
             Select the perfect ticket for an unforgettable night of mystery and magic
@@ -299,11 +299,11 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-10 md:mt-20 max-w-4xl mx-auto"
+          className="mt-8 md:mt-20 max-w-4xl mx-auto"
         >
-          <div className="bg-gradient-to-r from-purple-900/40 to-purple-800/40 backdrop-blur-sm rounded-xl md:rounded-2xl border border-purple-500/30 p-5 md:p-8">
-            <h4 className="text-lg md:text-2xl font-bold text-yellow-400 mb-3 md:mb-4">📋 Important Information</h4>
-            <ul className="space-y-1.5 md:space-y-2 text-purple-200 text-sm md:text-base">
+          <div className="bg-gradient-to-r from-purple-900/40 to-purple-800/40 backdrop-blur-sm rounded-xl md:rounded-2xl border border-purple-500/30 p-4 md:p-8">
+            <h4 className="text-base md:text-2xl font-bold text-yellow-400 mb-2 md:mb-4">📋 Important Information</h4>
+            <ul className="space-y-1 md:space-y-2 text-purple-200 text-xs md:text-base">
               <li>• All tickets are non-refundable but transferable</li>
               <li>• Valid ID required at entry</li>
               <li>• Masquerade mask mandatory for all attendees</li>
