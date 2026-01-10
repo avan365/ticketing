@@ -113,13 +113,25 @@ export const isStripeConfigured = (): boolean => {
 // Check if backend is available
 export const isBackendAvailable = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_URL}/`, {
-      method: "GET",
-      signal: AbortSignal.timeout(3000),
+    // Try to create a test payment intent to verify backend is working
+    const response = await fetch(`${API_URL}/api/create-payment-intent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: 1.00, // Test with $1
+        customerEmail: "test@example.com",
+        customerName: "Test",
+      }),
+      signal: AbortSignal.timeout(5000),
     });
-    const data = await response.json();
-    return data.status === "ok" && data.stripeConfigured;
-  } catch {
+    
+    if (response.ok) {
+      const data = await response.json();
+      return Boolean(data.clientSecret);
+    }
+    return false;
+  } catch (error) {
+    console.warn("Backend check failed:", error);
     return false;
   }
 };
