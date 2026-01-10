@@ -133,7 +133,7 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
           order.customerName,
           order.customerEmail,
           order.tickets.map(t => ({
-            ticket: { id: t.name.toLowerCase().replace(/\s+/g, '-'), name: t.name, price: t.price, description: '' },
+            ticket: { id: t.name.toLowerCase().replace(/\s+/g, '-'), name: t.name, price: t.price, description: '', available: 0 },
             quantity: t.quantity
           })),
           order.totalAmount,

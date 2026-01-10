@@ -6,7 +6,7 @@ import { sendCustomerConfirmation, PAYNOW_UEN } from '../utils/email';
 import { saveOrder, type Order } from '../utils/orders';
 import { StripePayment } from './StripePayment';
 import { STRIPE_FEES, PLATFORM_FEE_PERCENTAGE, getFeeBreakdown, calculatePlatformFee } from '../utils/stripe';
-import { confirmPurchase, directPurchase, checkCartAvailability } from '../utils/inventory';
+import { confirmPurchase, directPurchase } from '../utils/inventory';
 
 interface CheckoutModalProps {
   cart: CartItem[];
@@ -25,13 +25,6 @@ const ApplePayIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
     <path d="M17.72 8.2c-.1.08-1.86 1.07-1.86 3.28 0 2.55 2.24 3.46 2.3 3.48-.01.06-.36 1.24-1.18 2.45-.73 1.06-1.5 2.13-2.7 2.13s-1.57-.7-3.01-.7c-1.41 0-1.91.72-3.01.72s-1.84-1-2.69-2.21C4.5 15.9 3.65 13.46 3.65 11.14c0-3.72 2.42-5.69 4.8-5.69 1.26 0 2.32.83 3.11.83.76 0 1.94-.88 3.39-.88.55 0 2.52.05 3.77 1.9zM14.13 3.45c.54-.64.92-1.53.92-2.42 0-.12-.01-.25-.03-.35-.88.03-1.93.58-2.56 1.31-.5.57-.96 1.46-.96 2.36 0 .14.02.27.04.32.06.01.16.02.26.02.79 0 1.78-.53 2.33-1.24z"/>
   </svg>
-);
-
-// GrabPay icon component  
-const GrabPayIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <div className={`${className} rounded-full bg-[#00B14F] flex items-center justify-center`}>
-    <span className="text-white font-bold text-xs">G</span>
-  </div>
 );
 
 export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, totalPrice, onPurchaseComplete }: CheckoutModalProps) {
@@ -228,49 +221,6 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
       setTicketCount(cart.reduce((total, item) => total + item.quantity, 0));
       setIsProcessing(false);
       setStep('pending');
-    } else if (step === 'payment') {
-      if (validatePayment()) {
-        setIsProcessing(true);
-        // Simulate payment processing
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        
-        const newOrderNumber = `MASK-${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
-        setOrderNumber(newOrderNumber);
-        
-        // Save order to local storage (Admin Dashboard)
-        const order: Order = {
-          id: crypto.randomUUID(),
-          orderNumber: newOrderNumber,
-          createdAt: new Date().toISOString(),
-          status: 'verified', // Card payments are auto-verified
-          paymentMethod: 'card',
-          customerName: formData.name,
-          customerEmail: formData.email,
-          customerPhone: formData.phone,
-          tickets: cart.map(item => ({
-            name: item.ticket.name,
-            quantity: item.quantity,
-            price: item.ticket.price,
-          })),
-          totalAmount: totalPrice,
-        };
-        saveOrder(order);
-        
-        // Send confirmation email to CUSTOMER
-        await sendCustomerConfirmation(
-          newOrderNumber,
-          formData.name,
-          formData.email,
-          cart,
-          totalPrice,
-          'card'
-        );
-        
-        setIsProcessing(false);
-        setStep('success');
-        // Clear cart after successful purchase
-        onClearCart();
-      }
     }
   };
 
@@ -1043,122 +993,6 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     setErrors({ payment: error });
                   }}
                 />
-              )}
-
-              {/* Legacy payment step - kept for compatibility but not used */}
-              {step === 'payment' && (
-                <motion.form
-                  key="payment"
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  onSubmit={handleSubmit}
-                  className="space-y-4 lg:space-y-6"
-                >
-                  <h3 className="text-xl lg:text-2xl font-bold text-yellow-400 mb-4 lg:mb-6 font-bebas tracking-wide">Payment Details</h3>
-                  
-                  <div>
-                    <label className="flex items-center gap-2 text-purple-300 mb-2 font-montserrat text-sm lg:text-base">
-                      <CreditCard className="w-4 h-4 lg:w-5 lg:h-5" />
-                      Card Number
-                    </label>
-                    <input
-                      type="text"
-                      name="cardNumber"
-                      value={formData.cardNumber}
-                      onChange={handleInputChange}
-                      maxLength={19}
-                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.cardNumber ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-sm lg:text-base`}
-                      placeholder="1234 5678 9012 3456"
-                    />
-                    {errors.cardNumber && (
-                      <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.cardNumber}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 lg:gap-4">
-                    <div>
-                      <label className="text-purple-300 mb-2 block font-montserrat text-sm lg:text-base">Expiry Date</label>
-                      <input
-                        type="text"
-                        name="expiry"
-                        value={formData.expiry}
-                        onChange={handleInputChange}
-                        maxLength={5}
-                        className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.expiry ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-sm lg:text-base`}
-                        placeholder="MM/YY"
-                      />
-                      {errors.expiry && (
-                        <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          {errors.expiry}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-purple-300 mb-2 block font-montserrat text-sm lg:text-base">CVV</label>
-                      <input
-                        type="text"
-                        name="cvv"
-                        value={formData.cvv}
-                        onChange={handleInputChange}
-                        maxLength={4}
-                        className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.cvv ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-sm lg:text-base`}
-                        placeholder="123"
-                      />
-                      {errors.cvv && (
-                        <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          {errors.cvv}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-yellow-500/10 to-amber-600/10 rounded-2xl p-4 lg:p-6 border-2 border-yellow-500/30">
-                    <div className="flex items-center justify-between text-lg lg:text-xl font-bold mb-2">
-                      <span className="text-white font-montserrat">Order Total</span>
-                      <span className="text-yellow-400 font-montserrat">${totalPrice}</span>
-                    </div>
-                    <p className="text-sm text-purple-300 font-montserrat">Includes all fees and taxes</p>
-                  </div>
-
-                  <div className="flex gap-3 lg:gap-4 pt-4">
-                    <motion.button
-                      type="button"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setStep('details')}
-                      disabled={isProcessing}
-                      className="flex-1 py-3 lg:py-4 bg-purple-800/50 text-white rounded-xl font-bold hover:bg-purple-700/50 transition-colors disabled:opacity-50 font-bebas tracking-wide text-base lg:text-lg"
-                    >
-                      Back
-                    </motion.button>
-                    <motion.button
-                      type="submit"
-                      whileHover={{ scale: isProcessing ? 1 : 1.02 }}
-                      whileTap={{ scale: isProcessing ? 1 : 0.98 }}
-                      disabled={isProcessing}
-                      className="flex-1 py-3 lg:py-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black rounded-xl font-bold hover:shadow-2xl hover:shadow-yellow-500/50 transition-all disabled:opacity-70 font-bebas tracking-wide text-base lg:text-lg flex items-center justify-center gap-2"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                            className="w-5 h-5 border-2 border-black border-t-transparent rounded-full"
-                          />
-                          Processing...
-                        </>
-                      ) : (
-                        'Complete Purchase'
-                      )}
-                    </motion.button>
-                  </div>
-                </motion.form>
               )}
 
               {step === 'pending' && (

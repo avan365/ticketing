@@ -12,7 +12,7 @@ export interface TicketInventory {
 }
 
 const INVENTORY_KEY = 'adheeraa_inventory';
-const RESERVATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+// const RESERVATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes - for future use
 
 // Default inventory (initial stock)
 const DEFAULT_INVENTORY: TicketInventory = {
