@@ -1,7 +1,10 @@
-import { motion } from 'motion/react';
-import { Music, Users, Clock, Star } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Music, Users, Clock, Star, ChevronDown } from 'lucide-react';
 
 export function ConcertDetails() {
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  
   const features = [
     {
       icon: Music,
@@ -57,8 +60,8 @@ export function ConcertDetails() {
           </p>
         </motion.div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+        {/* Features Grid - Collapsible on mobile, full cards on desktop */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-24">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -70,20 +73,55 @@ export function ConcertDetails() {
               className="relative group h-full"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-purple-600/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-              <div className="relative bg-gradient-to-br from-purple-900/40 to-black/40 backdrop-blur-sm p-8 rounded-2xl border border-purple-500/20 group-hover:border-yellow-500/50 transition-all h-full flex flex-col">
-                <feature.icon className="w-12 h-12 text-yellow-400 mb-4" />
-                <h3 
-                  className="text-2xl font-bold text-white mb-3"
-                  style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+              <div className="relative bg-gradient-to-br from-purple-900/40 to-black/40 backdrop-blur-sm p-4 md:p-8 rounded-2xl border border-purple-500/20 group-hover:border-yellow-500/50 transition-all h-full flex flex-col">
+                {/* Mobile: Collapsible header */}
+                <button 
+                  className="flex items-center justify-between w-full md:hidden"
+                  onClick={() => setExpandedCard(expandedCard === index ? null : index)}
                 >
-                  {feature.title}
-                </h3>
-                <p 
-                  className="text-purple-200 flex-1"
-                  style={{ fontFamily: 'Montserrat, sans-serif' }}
-                >
-                  {feature.description}
-                </p>
+                  <div className="flex items-center gap-3">
+                    <feature.icon className="w-8 h-8 text-yellow-400" />
+                    <h3 
+                      className="text-lg font-bold text-white"
+                      style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                    >
+                      {feature.title}
+                    </h3>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 text-yellow-400 transition-transform ${expandedCard === index ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Mobile: Expandable description */}
+                <AnimatePresence>
+                  {expandedCard === index && (
+                    <motion.p 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="text-purple-200 text-sm mt-3 md:hidden overflow-hidden"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    >
+                      {feature.description}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+
+                {/* Desktop: Always visible */}
+                <div className="hidden md:block">
+                  <feature.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                  <h3 
+                    className="text-2xl font-bold text-white mb-3"
+                    style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p 
+                    className="text-purple-200 flex-1"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    {feature.description}
+                  </p>
+                </div>
               </div>
             </motion.div>
           ))}
