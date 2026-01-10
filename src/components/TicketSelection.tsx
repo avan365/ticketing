@@ -77,38 +77,38 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
   };
 
   return (
-    <div id="tickets" className="py-12 md:py-24 bg-[#0a0a12] relative overflow-hidden">
+    <div id="tickets" className="py-10 md:py-16 bg-[#0a0a12] relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-48 md:w-96 h-48 md:h-96 bg-purple-600 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 bg-yellow-600 rounded-full blur-3xl" />
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-1/4 left-1/4 w-48 md:w-72 h-48 md:h-72 bg-purple-600 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 md:w-72 h-48 md:h-72 bg-yellow-600 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Section Title */}
+        {/* Section Title - Compact */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-10 md:mb-20"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8 md:mb-12"
         >
           <h2 
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 md:mb-6"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
-            Choose Your Experience
+            Get Your Tickets
           </h2>
           <p 
-            className="text-base md:text-xl text-purple-300 max-w-3xl mx-auto px-4"
+            className="text-sm md:text-base text-purple-300 max-w-xl mx-auto"
             style={{ fontFamily: 'Montserrat, sans-serif' }}
           >
-            Select the perfect ticket for an unforgettable night of mystery and magic
+            Select the perfect ticket for an unforgettable night
           </p>
         </motion.div>
 
-        {/* Tickets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
+        {/* Tickets Grid - Tighter spacing */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 max-w-5xl mx-auto">
           {tickets.map((ticket, index) => {
             const Icon = getIcon(ticket.id);
             const gradient = getGradient(ticket.id);
@@ -141,46 +141,46 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                   
                   {/* Sold Out Badge */}
                   {isSoldOut && (
-                    <div className="absolute top-0 left-0 right-0 bg-red-600 text-white px-6 py-3 font-bold text-center z-10">
-                      🎭 SOLD OUT
+                    <div className="absolute top-0 left-0 right-0 bg-red-600 text-white px-4 py-2 font-bold text-center text-sm z-10">
+                      SOLD OUT
                     </div>
                   )}
                   
                   {/* Low Stock Badge */}
                   {isLowStock && !isSoldOut && (
-                    <div className="absolute top-0 right-0 bg-gradient-to-br from-orange-500 to-red-600 text-white px-4 py-2 rounded-bl-2xl font-bold text-sm flex items-center gap-1 z-10">
-                      <AlertTriangle className="w-4 h-4" />
-                      Only {ticket.available} left!
+                    <div className="absolute top-0 right-0 bg-gradient-to-br from-orange-500 to-red-600 text-white px-2 py-1 rounded-bl-xl font-bold text-[10px] md:text-xs flex items-center gap-0.5 z-10">
+                      <AlertTriangle className="w-3 h-3" />
+                      {ticket.available} left
                     </div>
                   )}
 
-                  <div className={`p-5 md:p-8 flex flex-col flex-1 ${isSoldOut ? 'pt-14 md:pt-16' : ''}`}>
-                    {/* Icon */}
-                    <motion.div
-                      animate={isSoldOut ? {} : { rotateY: [0, 360] }}
-                      transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                      className={`w-14 h-14 md:w-20 md:h-20 rounded-full bg-gradient-to-br ${gradient} ${isSoldOut ? 'grayscale opacity-50' : ''} flex items-center justify-center mb-4 md:mb-6`}
-                    >
-                      <Icon className="w-7 h-7 md:w-10 md:h-10 text-white" />
-                    </motion.div>
-
-                    {/* Title */}
-                    <h3 className={`text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${isSoldOut ? 'grayscale' : ''}`}>
-                      {ticket.name}
-                    </h3>
+                  <div className={`p-4 md:p-5 flex flex-col flex-1 ${isSoldOut ? 'pt-12 md:pt-14' : ''}`}>
+                    {/* Icon + Title Row */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <motion.div
+                        animate={isSoldOut ? {} : { rotateY: [0, 360] }}
+                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                        className={`w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br ${gradient} ${isSoldOut ? 'grayscale opacity-50' : ''} flex items-center justify-center shrink-0`}
+                      >
+                        <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                      </motion.div>
+                      <h3 className={`text-xl md:text-2xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${isSoldOut ? 'grayscale' : ''}`}>
+                        {ticket.name}
+                      </h3>
+                    </div>
 
                     {/* Price */}
-                    <div className="mb-4 md:mb-6">
-                      <span className={`text-3xl md:text-5xl font-bold ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>${ticket.price}</span>
-                      <span className="text-purple-300 ml-2 text-sm md:text-base">per ticket</span>
+                    <div className="mb-3">
+                      <span className={`text-2xl md:text-3xl font-bold ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>${ticket.price}</span>
+                      <span className="text-purple-300 ml-1 text-xs md:text-sm">/ticket</span>
                     </div>
 
                     {/* Description */}
-                    <p className={`${isSoldOut ? 'text-gray-400' : 'text-purple-200'} mb-4 md:mb-6 flex-1 text-sm md:text-base`}>{ticket.description}</p>
+                    <p className={`${isSoldOut ? 'text-gray-400' : 'text-purple-200'} mb-3 flex-1 text-xs md:text-sm leading-relaxed`}>{ticket.description}</p>
 
                     {/* Availability Bar */}
-                    <div className="mb-4 md:mb-6 flex items-center gap-2">
-                      <div className="flex-1 bg-purple-950/50 rounded-full h-1.5 md:h-2 overflow-hidden">
+                    <div className="mb-3 flex items-center gap-2">
+                      <div className="flex-1 bg-purple-950/50 rounded-full h-1 overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           whileInView={{ width: `${availabilityPercent}%` }}
@@ -195,7 +195,7 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                           }`}
                         />
                       </div>
-                      <span className={`text-xs md:text-sm whitespace-nowrap ${
+                      <span className={`text-[10px] md:text-xs whitespace-nowrap ${
                         isSoldOut 
                           ? 'text-red-400 font-bold' 
                           : isLowStock 
@@ -206,61 +206,58 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                       </span>
                     </div>
 
-                    {/* Quantity Selector - Hidden when sold out */}
+                    {/* Quantity Selector - Compact */}
                     {!isSoldOut && (
-                      <div className="flex items-center justify-between md:justify-start gap-2 md:gap-4 mb-4 md:mb-6">
-                        <span className="text-purple-300 text-sm md:text-base">Quantity:</span>
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-purple-300 text-xs">Qty:</span>
+                        <div className="flex items-center gap-1.5">
                           <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleQuantityChange(ticket.id, -1, ticket.available)}
                             disabled={quantity === 0}
-                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                            className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                           >
-                            <Minus className="w-4 h-4 md:w-5 md:h-5" />
+                            <Minus className="w-3 h-3 md:w-4 md:h-4" />
                           </motion.button>
-                          <span className="w-10 md:w-12 text-center text-xl md:text-2xl font-bold text-white">
+                          <span className="w-8 text-center text-lg font-bold text-white">
                             {quantity}
                           </span>
                           <motion.button
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleQuantityChange(ticket.id, 1, ticket.available)}
                             disabled={quantity >= Math.min(10, ticket.available)}
-                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                            className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                           >
-                            <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                            <Plus className="w-3 h-3 md:w-4 md:h-4" />
                           </motion.button>
                         </div>
                       </div>
                     )}
 
-                    {/* Add to Cart Button */}
+                    {/* Add to Cart Button - Compact */}
                     <motion.button
                       whileHover={{ scale: isSoldOut ? 1 : 1.02 }}
                       whileTap={{ scale: isSoldOut ? 1 : 0.98 }}
                       onClick={() => handleAddToCart(ticket)}
                       disabled={isSoldOut || quantity === 0}
-                      className={`w-full py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+                      className={`w-full py-2.5 md:py-3 rounded-lg md:rounded-xl font-bold text-sm md:text-base transition-all duration-300 flex items-center justify-center gap-1.5 ${
                         isSoldOut
                           ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
                           : isAdded
                             ? 'bg-green-500 text-white'
-                            : `bg-gradient-to-r ${gradient} text-white hover:shadow-2xl`
+                            : `bg-gradient-to-r ${gradient} text-white hover:shadow-xl`
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       {isSoldOut ? (
-                        <>
-                          🎭 Sold Out
-                        </>
+                        'Sold Out'
                       ) : isAdded ? (
                         <>
-                          <Check className="w-4 h-4 md:w-5 md:h-5" />
+                          <Check className="w-4 h-4" />
                           Added!
                         </>
                       ) : (
                         <>
-                          Add to Cart
-                          {quantity > 0 && <span>(${ticket.price * quantity})</span>}
+                          Add {quantity > 0 && `($${ticket.price * quantity})`}
                         </>
                       )}
                     </motion.button>
