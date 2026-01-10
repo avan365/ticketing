@@ -87,12 +87,12 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
         {/* Mobile: Centered single column | Desktop: Side-by-side grid */}
         <div className="flex flex-col items-center text-center md:grid md:grid-cols-2 md:gap-12 md:items-start md:text-left">
           
-          {/* Image - Mobile: smaller centered below text | Desktop: left side */}
+          {/* Image - Mobile: much smaller centered below text | Desktop: left side */}
           <motion.div
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            className="relative order-2 md:order-1 w-full max-w-xs md:max-w-none mx-auto"
+            className="relative order-2 md:order-1 w-full max-w-[180px] md:max-w-none mx-auto"
           >
             <motion.div
               animate={{
@@ -131,7 +131,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               </motion.div>
               <h1 className="font-bold mb-2 md:mb-4">
                 <motion.span
-                  className="block text-4xl sm:text-5xl md:text-6xl lg:text-8xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent"
+                  className="block text-5xl sm:text-6xl md:text-6xl lg:text-8xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent"
                   animate={{
                     backgroundPosition: ['0%', '100%', '0%'],
                   }}

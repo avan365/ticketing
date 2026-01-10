@@ -118,33 +118,33 @@ export default function App() {
       <TicketSelection tickets={tickets} onAddToCart={addToCart} />
 
       {/* Footer */}
-      <footer className="py-12 bg-[#0a0a12] border-t border-purple-500/20">
+      <footer className="py-6 md:py-12 bg-[#0a0a12] border-t border-purple-500/20">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-4"
+            className="space-y-2 md:space-y-4"
           >
             <h3 
-              className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent"
+              className="text-xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent"
               style={{ fontFamily: 'Cinzel, serif' }}
             >
               ADHEERAA
             </h3>
             <p 
-              className="text-purple-300"
+              className="text-purple-300 text-xs md:text-base"
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             >
               Masquerade Night 2026 • Skyfall Rooftop Bar, Singapore
             </p>
-            <div className="flex justify-center gap-6 text-3xl">
+            <div className="flex justify-center gap-4 md:gap-6 text-xl md:text-3xl">
               <motion.span whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer">🎭</motion.span>
               <motion.span whileHover={{ scale: 1.2, rotate: -10 }} className="cursor-pointer">✨</motion.span>
               <motion.span whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer">🎶</motion.span>
             </div>
             <p 
-              className="text-sm text-purple-400 pt-4"
+              className="text-[10px] md:text-sm text-purple-400 pt-2 md:pt-4"
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             >
               © 2026 ADHEERAA Events. All rights reserved.

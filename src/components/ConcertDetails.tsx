@@ -4,6 +4,7 @@ import { Music, Users, Clock, Star, ChevronDown } from 'lucide-react';
 
 export function ConcertDetails() {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
+  const [lineupExpanded, setLineupExpanded] = useState(false);
   
   const features = [
     {
@@ -44,16 +45,16 @@ export function ConcertDetails() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          className="text-center mb-6 md:mb-20"
         >
           <h2 
-            className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent mb-6"
+            className="text-3xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent mb-2 md:mb-6"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
             Event Highlights
           </h2>
           <p 
-            className="text-xl text-purple-300 max-w-3xl mx-auto"
+            className="text-sm md:text-xl text-purple-300 max-w-3xl mx-auto px-2"
             style={{ fontFamily: 'Montserrat, sans-serif' }}
           >
             Step into a world of mystery and elegance where music, art, and enchantment collide
@@ -61,7 +62,7 @@ export function ConcertDetails() {
         </motion.div>
 
         {/* Features Grid - Collapsible on mobile, full cards on desktop */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-24">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 mb-8 md:mb-24">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -134,56 +135,121 @@ export function ConcertDetails() {
           viewport={{ once: true }}
           className="max-w-4xl mx-auto"
         >
-          <h3 
-            className="text-4xl lg:text-6xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-12"
-            style={{ fontFamily: 'Cinzel, serif' }}
-          >
-            Artist Lineup
-          </h3>
-          
-          <div className="space-y-6">
-            {lineup.map((artist, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.02, x: 10 }}
-                className="relative group cursor-pointer"
+          {/* Mobile: Collapsible dropdown */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setLineupExpanded(!lineupExpanded)}
+              className="w-full bg-gradient-to-r from-purple-900/50 to-purple-800/30 backdrop-blur-sm p-4 rounded-xl border border-purple-500/30 flex items-center justify-between"
+            >
+              <h3 
+                className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+                style={{ fontFamily: 'Cinzel, serif' }}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                <div className="relative bg-gradient-to-r from-purple-900/50 to-purple-800/30 backdrop-blur-sm p-6 rounded-xl border border-purple-500/30 group-hover:border-yellow-500/50 transition-all flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-2xl font-bold text-black">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <h4 
-                        className="text-2xl font-bold text-white mb-1"
-                        style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                🎤 Artist Lineup
+              </h3>
+              <ChevronDown className={`w-6 h-6 text-purple-400 transition-transform ${lineupExpanded ? 'rotate-180' : ''}`} />
+            </button>
+            
+            <AnimatePresence>
+              {lineupExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-2 mt-2">
+                    {lineup.map((artist, index) => (
+                      <div
+                        key={index}
+                        className="bg-gradient-to-r from-purple-900/40 to-purple-800/20 backdrop-blur-sm p-3 rounded-lg border border-purple-500/20 flex items-center justify-between"
                       >
-                        {artist.name}
-                      </h4>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-sm font-bold text-black">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <h4 
+                              className="text-base font-bold text-white"
+                              style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '0.5px' }}
+                            >
+                              {artist.name}
+                            </h4>
+                            <p 
+                              className="text-purple-300 text-xs"
+                              style={{ fontFamily: 'Montserrat, sans-serif' }}
+                            >
+                              {artist.role}
+                            </p>
+                          </div>
+                        </div>
+                        <p 
+                          className="text-sm font-bold text-yellow-400"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        >
+                          {artist.time}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Desktop: Full lineup display */}
+          <div className="hidden md:block">
+            <h3 
+              className="text-4xl lg:text-6xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-12"
+              style={{ fontFamily: 'Cinzel, serif' }}
+            >
+              Artist Lineup
+            </h3>
+            
+            <div className="space-y-6">
+              {lineup.map((artist, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02, x: 10 }}
+                  className="relative group cursor-pointer"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
+                  <div className="relative bg-gradient-to-r from-purple-900/50 to-purple-800/30 backdrop-blur-sm p-6 rounded-xl border border-purple-500/30 group-hover:border-yellow-500/50 transition-all flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-2xl font-bold text-black">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h4 
+                          className="text-2xl font-bold text-white mb-1"
+                          style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                        >
+                          {artist.name}
+                        </h4>
+                        <p 
+                          className="text-purple-300"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        >
+                          {artist.role}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
                       <p 
-                        className="text-purple-300"
+                        className="text-xl font-bold text-yellow-400"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {artist.role}
+                        {artist.time}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p 
-                      className="text-xl font-bold text-yellow-400"
-                      style={{ fontFamily: 'Montserrat, sans-serif' }}
-                    >
-                      {artist.time}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </motion.div>
 
@@ -192,29 +258,41 @@ export function ConcertDetails() {
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="mt-24 max-w-3xl mx-auto text-center"
+          className="mt-8 md:mt-24 max-w-3xl mx-auto text-center"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-purple-600/10 to-yellow-500/10 rounded-3xl blur-2xl" />
-            <div className="relative bg-gradient-to-br from-purple-900/60 to-black/60 backdrop-blur-sm p-12 rounded-3xl border-2 border-yellow-500/30">
-              <h3 
-                className="text-4xl font-bold text-yellow-400 mb-6"
-                style={{ fontFamily: 'Cinzel, serif' }}
-              >
-                🎭 Dress Code 🎭
-              </h3>
-              <p 
-                className="text-2xl text-purple-200 mb-4"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                Formal Masquerade Attire Required
-              </p>
-              <p 
-                className="text-lg text-purple-300"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
-              >
-                Don your finest evening wear and an elegant mask. Let your mystique shine through!
-              </p>
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-purple-600/10 to-yellow-500/10 rounded-2xl md:rounded-3xl blur-2xl" />
+            <div className="relative bg-gradient-to-br from-purple-900/60 to-black/60 backdrop-blur-sm p-4 md:p-12 rounded-2xl md:rounded-3xl border md:border-2 border-yellow-500/30">
+              {/* Mobile: Compact single line */}
+              <div className="md:hidden">
+                <p 
+                  className="text-base text-yellow-400 font-bold"
+                  style={{ fontFamily: 'Cinzel, serif' }}
+                >
+                  🎭 Dress Code: Formal Masquerade Attire
+                </p>
+              </div>
+              {/* Desktop: Full display */}
+              <div className="hidden md:block">
+                <h3 
+                  className="text-4xl font-bold text-yellow-400 mb-6"
+                  style={{ fontFamily: 'Cinzel, serif' }}
+                >
+                  🎭 Dress Code 🎭
+                </h3>
+                <p 
+                  className="text-2xl text-purple-200 mb-4"
+                  style={{ fontFamily: 'Playfair Display, serif' }}
+                >
+                  Formal Masquerade Attire Required
+                </p>
+                <p 
+                  className="text-lg text-purple-300"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                >
+                  Don your finest evening wear and an elegant mask. Let your mystique shine through!
+                </p>
+              </div>
             </div>
           </div>
         </motion.div>

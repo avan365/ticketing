@@ -154,25 +154,48 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                     </div>
                   )}
 
-                  <div className={`p-5 md:p-8 flex flex-col flex-1 ${isSoldOut ? 'pt-14 md:pt-16' : ''}`}>
-                    {/* Icon */}
-                    <motion.div
-                      animate={isSoldOut ? {} : { rotateY: [0, 360] }}
-                      transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                      className={`w-14 h-14 md:w-20 md:h-20 rounded-full bg-gradient-to-br ${gradient} ${isSoldOut ? 'grayscale opacity-50' : ''} flex items-center justify-center mb-4 md:mb-6`}
-                    >
-                      <Icon className="w-7 h-7 md:w-10 md:h-10 text-white" />
-                    </motion.div>
+                  <div className={`p-4 md:p-8 flex flex-col flex-1 ${isSoldOut ? 'pt-14 md:pt-16' : ''}`}>
+                    {/* Mobile: Icon in top-right, title+price compact */}
+                    <div className="flex items-start justify-between md:hidden mb-3">
+                      <div>
+                        <h3 className={`text-xl font-bold mb-1 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${isSoldOut ? 'grayscale' : ''}`}>
+                          {ticket.name}
+                        </h3>
+                        <div>
+                          <span className={`text-2xl font-bold ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>${ticket.price}</span>
+                          <span className="text-purple-300 ml-1 text-xs">per ticket</span>
+                        </div>
+                      </div>
+                      <motion.div
+                        animate={isSoldOut ? {} : { rotateY: [0, 360] }}
+                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                        className={`w-10 h-10 rounded-full bg-gradient-to-br ${gradient} ${isSoldOut ? 'grayscale opacity-50' : ''} flex items-center justify-center flex-shrink-0`}
+                      >
+                        <Icon className="w-5 h-5 text-white" />
+                      </motion.div>
+                    </div>
 
-                    {/* Title */}
-                    <h3 className={`text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${isSoldOut ? 'grayscale' : ''}`}>
-                      {ticket.name}
-                    </h3>
+                    {/* Desktop: Original layout */}
+                    <div className="hidden md:block">
+                      {/* Icon */}
+                      <motion.div
+                        animate={isSoldOut ? {} : { rotateY: [0, 360] }}
+                        transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                        className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} ${isSoldOut ? 'grayscale opacity-50' : ''} flex items-center justify-center mb-6`}
+                      >
+                        <Icon className="w-10 h-10 text-white" />
+                      </motion.div>
 
-                    {/* Price */}
-                    <div className="mb-4 md:mb-6">
-                      <span className={`text-3xl md:text-5xl font-bold ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>${ticket.price}</span>
-                      <span className="text-purple-300 ml-2 text-sm md:text-base">per ticket</span>
+                      {/* Title */}
+                      <h3 className={`text-3xl font-bold mb-2 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${isSoldOut ? 'grayscale' : ''}`}>
+                        {ticket.name}
+                      </h3>
+
+                      {/* Price */}
+                      <div className="mb-6">
+                        <span className={`text-5xl font-bold ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>${ticket.price}</span>
+                        <span className="text-purple-300 ml-2 text-base">per ticket</span>
+                      </div>
                     </div>
 
                     {/* Description */}
