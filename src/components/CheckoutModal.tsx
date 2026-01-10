@@ -234,11 +234,11 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
           className="bg-gradient-to-br from-purple-900 to-black rounded-3xl border-2 border-yellow-500/30 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col"
         >
           {/* Header */}
-          <div className="sticky top-0 bg-gradient-to-r from-purple-900 to-purple-800 p-6 flex items-center justify-between border-b border-purple-500/30 rounded-t-3xl z-10 shrink-0">
-            <div className="flex items-center gap-3">
-              <ShoppingBag className="w-8 h-8 text-yellow-400" />
+          <div className="sticky top-0 bg-gradient-to-r from-purple-900 to-purple-800 p-4 md:p-6 flex items-center justify-between border-b border-purple-500/30 rounded-t-3xl z-10 shrink-0">
+            <div className="flex items-center gap-2 md:gap-3">
+              <ShoppingBag className="w-6 h-6 md:w-8 md:h-8 text-yellow-400" />
               <h2 
-                className="text-3xl font-bold text-white"
+                className="text-xl md:text-3xl font-bold text-white"
                 style={{ fontFamily: 'Cinzel, serif' }}
               >
                 {step === 'success' ? 'Order Confirmed!' : 'Checkout'}
@@ -256,24 +256,24 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
 
           {/* Progress Steps */}
           {step !== 'success' && step !== 'pending' && (
-            <div className="p-4 lg:p-6 border-b border-purple-500/30 shrink-0">
-              <div className="flex items-center justify-between max-w-md mx-auto">
+            <div className="p-3 md:p-6 border-b border-purple-500/30 shrink-0">
+              <div className="flex items-center justify-center max-w-xs md:max-w-md mx-auto">
                 {['Cart', 'Details', 'Payment'].map((s, index) => (
                   <div key={s} className="flex items-center flex-1">
                     <div className="flex flex-col items-center flex-1">
                       <motion.div
                         animate={{
-                          scale: progressIndex === index ? 1.15 : 1,
+                          scale: progressIndex === index ? 1.1 : 1,
                           backgroundColor: progressIndex >= index ? '#facc15' : '#581c87',
                         }}
-                        className="w-10 h-10 lg:w-12 lg:h-12 rounded-full flex items-center justify-center font-bold text-black mb-2 text-lg"
+                        className="w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-black mb-1 md:mb-2 text-sm md:text-lg"
                       >
-                        {progressIndex > index ? <Check className="w-5 h-5" /> : index + 1}
+                        {progressIndex > index ? <Check className="w-4 h-4 md:w-5 md:h-5" /> : index + 1}
                       </motion.div>
-                      <span className="text-xs lg:text-sm text-purple-300 capitalize" style={{ fontFamily: 'Montserrat, sans-serif' }}>{s}</span>
+                      <span className="text-[10px] md:text-sm text-purple-300 capitalize" style={{ fontFamily: 'Montserrat, sans-serif' }}>{s}</span>
                     </div>
                     {index < 2 && (
-                      <div className="flex-1 h-1 bg-purple-800 mx-1 lg:mx-2 mb-8 rounded-full overflow-hidden">
+                      <div className="flex-1 h-0.5 md:h-1 bg-purple-800 mx-1 md:mx-2 mb-6 md:mb-8 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{
@@ -408,7 +408,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.name ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-sm lg:text-base`}
+                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.name ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-base`}
                       placeholder="Enter your full name"
                     />
                     {errors.name && (
@@ -429,7 +429,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.email ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-sm lg:text-base`}
+                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.email ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-base`}
                       placeholder="your@email.com"
                     />
                     {errors.email && (
@@ -450,7 +450,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.phone ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-sm lg:text-base`}
+                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.phone ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-yellow-400 focus:outline-none transition-colors font-montserrat text-base`}
                       placeholder="+65 9123 4567"
                     />
                     {errors.phone && (
@@ -489,10 +489,10 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
-                  className="space-y-4"
+                  className="space-y-2 md:space-y-4"
                 >
                   <h3 
-                    className="text-2xl font-bold text-yellow-400 mb-4"
+                    className="text-lg md:text-2xl font-bold text-yellow-400 mb-2 md:mb-4"
                     style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
                   >
                     Select Payment Method
@@ -503,29 +503,29 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setPaymentMethod('paynow')}
-                    className={`w-full p-4 rounded-xl border-2 transition-all text-left flex items-center gap-3 ${
+                    className={`w-full p-3 md:p-4 rounded-xl border-2 transition-all text-left flex items-center gap-2 md:gap-3 ${
                       paymentMethod === 'paynow'
                         ? 'border-yellow-400 bg-yellow-400/10'
                         : 'border-purple-500/30 bg-purple-900/30 hover:border-purple-400'
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shrink-0">
-                      <QrCode className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shrink-0">
+                      <QrCode className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>PayNow</span>
-                        <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-bold rounded-full">NO FEES</span>
-                        <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">RECOMMENDED</span>
+                      <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+                        <span className="text-sm md:text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>PayNow</span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] md:text-xs font-bold rounded-full">NO FEES</span>
+                        <span className="hidden md:inline px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold rounded-full">RECOMMENDED</span>
                       </div>
-                      <p className="text-purple-300 text-xs mt-0.5" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                      <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                         Scan QR & upload proof • Instant Singapore bank transfer
                       </p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                       paymentMethod === 'paynow' ? 'border-yellow-400 bg-yellow-400' : 'border-purple-500'
                     }`}>
-                      {paymentMethod === 'paynow' && <Check className="w-3 h-3 text-black" />}
+                      {paymentMethod === 'paynow' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
                     </div>
                   </motion.button>
 
@@ -534,28 +534,28 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setPaymentMethod('card')}
-                    className={`w-full p-4 rounded-xl border-2 transition-all text-left flex items-center gap-3 ${
+                    className={`w-full p-3 md:p-4 rounded-xl border-2 transition-all text-left flex items-center gap-2 md:gap-3 ${
                       paymentMethod === 'card'
                         ? 'border-yellow-400 bg-yellow-400/10'
                         : 'border-purple-500/30 bg-purple-900/30 hover:border-purple-400'
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shrink-0">
-                      <CreditCard className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shrink-0">
+                      <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>Credit/Debit Card</span>
-                        <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-full">{STRIPE_FEES.card.label}</span>
+                      <div className="flex items-center gap-1 md:gap-2">
+                        <span className="text-sm md:text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>Credit/Debit Card</span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-bold rounded-full">{STRIPE_FEES.card.label}</span>
                       </div>
-                      <p className="text-purple-300 text-xs mt-0.5" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                      <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                         Visa, Mastercard, AMEX • Powered by Stripe
                       </p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                       paymentMethod === 'card' ? 'border-yellow-400 bg-yellow-400' : 'border-purple-500'
                     }`}>
-                      {paymentMethod === 'card' && <Check className="w-3 h-3 text-black" />}
+                      {paymentMethod === 'card' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
                     </div>
                   </motion.button>
 
@@ -564,28 +564,28 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setPaymentMethod('apple_pay')}
-                    className={`w-full p-4 rounded-xl border-2 transition-all text-left flex items-center gap-3 ${
+                    className={`w-full p-3 md:p-4 rounded-xl border-2 transition-all text-left flex items-center gap-2 md:gap-3 ${
                       paymentMethod === 'apple_pay'
                         ? 'border-yellow-400 bg-yellow-400/10'
                         : 'border-purple-500/30 bg-purple-900/30 hover:border-purple-400'
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-lg bg-black flex items-center justify-center shrink-0">
-                      <ApplePayIcon className="w-7 h-7 text-white" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-black flex items-center justify-center shrink-0">
+                      <ApplePayIcon className="w-5 h-5 md:w-7 md:h-7 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>Apple Pay</span>
-                        <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-full">{STRIPE_FEES.apple_pay.label}</span>
+                      <div className="flex items-center gap-1 md:gap-2">
+                        <span className="text-sm md:text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>Apple Pay</span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-bold rounded-full">{STRIPE_FEES.apple_pay.label}</span>
                       </div>
-                      <p className="text-purple-300 text-xs mt-0.5" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                      <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                         Pay with Face ID or Touch ID • Safari/iOS only
                       </p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                       paymentMethod === 'apple_pay' ? 'border-yellow-400 bg-yellow-400' : 'border-purple-500'
                     }`}>
-                      {paymentMethod === 'apple_pay' && <Check className="w-3 h-3 text-black" />}
+                      {paymentMethod === 'apple_pay' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
                     </div>
                   </motion.button>
 
@@ -594,28 +594,28 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setPaymentMethod('grabpay')}
-                    className={`w-full p-4 rounded-xl border-2 transition-all text-left flex items-center gap-3 ${
+                    className={`w-full p-3 md:p-4 rounded-xl border-2 transition-all text-left flex items-center gap-2 md:gap-3 ${
                       paymentMethod === 'grabpay'
                         ? 'border-yellow-400 bg-yellow-400/10'
                         : 'border-purple-500/30 bg-purple-900/30 hover:border-purple-400'
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-lg bg-[#00B14F] flex items-center justify-center shrink-0">
-                      <Smartphone className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-[#00B14F] flex items-center justify-center shrink-0">
+                      <Smartphone className="w-5 h-5 md:w-6 md:h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>GrabPay</span>
-                        <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-full">{STRIPE_FEES.grabpay.label}</span>
+                      <div className="flex items-center gap-1 md:gap-2">
+                        <span className="text-sm md:text-lg font-bold text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>GrabPay</span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-bold rounded-full">{STRIPE_FEES.grabpay.label}</span>
                       </div>
-                      <p className="text-purple-300 text-xs mt-0.5" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                      <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                         Pay with Grab wallet • Opens Grab app
                       </p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                       paymentMethod === 'grabpay' ? 'border-yellow-400 bg-yellow-400' : 'border-purple-500'
                     }`}>
-                      {paymentMethod === 'grabpay' && <Check className="w-3 h-3 text-black" />}
+                      {paymentMethod === 'grabpay' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
                     </div>
                   </motion.button>
 
@@ -1068,15 +1068,15 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   key="success"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="text-center space-y-6 py-4 lg:py-8"
+                  className="text-center space-y-4 md:space-y-6 py-2 md:py-8"
                 >
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1, rotate: 360 }}
                     transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                    className="w-24 h-24 lg:w-32 lg:h-32 mx-auto bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center shadow-2xl glow-gold"
+                    className="w-16 h-16 md:w-32 md:h-32 mx-auto bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center shadow-2xl glow-gold"
                   >
-                    <Check className="w-12 h-12 lg:w-16 lg:h-16 text-black" />
+                    <Check className="w-8 h-8 md:w-16 md:h-16 text-black" />
                   </motion.div>
 
                   <div>
@@ -1084,15 +1084,15 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="text-3xl lg:text-4xl font-bold text-yellow-400 mb-3 font-cinzel"
+                      className="text-xl md:text-4xl font-bold text-yellow-400 mb-2 md:mb-3 font-cinzel"
                     >
-                      Payment Successful!
+                      Order Confirmed!
                     </motion.h3>
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
-                      className="text-lg lg:text-xl text-purple-300 mb-2 font-montserrat"
+                      className="text-sm md:text-xl text-purple-300 mb-1 md:mb-2 font-montserrat"
                     >
                       Your tickets have been confirmed
                     </motion.p>
@@ -1100,7 +1100,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className="text-purple-400 font-montserrat text-sm lg:text-base"
+                      className="text-purple-400 font-montserrat text-xs md:text-base"
                     >
                       Confirmation sent to {formData.email}
                     </motion.p>
@@ -1110,9 +1110,9 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="bg-gradient-to-r from-purple-800/50 to-purple-900/50 rounded-2xl p-6 lg:p-8 border border-purple-500/30 max-w-md mx-auto"
+                    className="bg-gradient-to-r from-purple-800/50 to-purple-900/50 rounded-xl md:rounded-2xl p-4 md:p-8 border border-purple-500/30 max-w-md mx-auto"
                   >
-                    <div className="space-y-3 text-left font-montserrat text-sm lg:text-base">
+                    <div className="space-y-2 md:space-y-3 text-left font-montserrat text-xs md:text-base">
                       <div className="flex justify-between">
                         <span className="text-purple-300">Order Number:</span>
                         <span className="font-bold text-white">{orderNumber}</span>
@@ -1129,7 +1129,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                         <span className="text-purple-300">Venue:</span>
                         <span className="font-bold text-white">Skyfall Rooftop Bar</span>
                       </div>
-                      <div className="flex justify-between text-lg lg:text-xl pt-3 border-t border-purple-500/30">
+                      <div className="flex justify-between text-sm md:text-xl pt-2 md:pt-3 border-t border-purple-500/30">
                         <span className="text-yellow-400 font-bold">Total Paid:</span>
                         <span className="text-yellow-400 font-bold">${paidAmount.toFixed(2)}</span>
                       </div>
@@ -1140,10 +1140,10 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
-                    className="flex items-center justify-center gap-2 text-purple-300 font-montserrat text-sm lg:text-base"
+                    className="flex items-center justify-center gap-2 text-purple-300 font-montserrat text-xs md:text-base px-4"
                   >
-                    <Sparkles className="w-5 h-5" />
-                    <p>Check your email for your digital tickets and QR codes</p>
+                    <Sparkles className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                    <p>Check your email for your digital tickets</p>
                   </motion.div>
 
                   <motion.button
@@ -1153,7 +1153,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={onClose}
-                    className="px-10 lg:px-12 py-3 lg:py-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black rounded-xl font-bold text-base lg:text-lg hover:shadow-2xl hover:shadow-yellow-500/50 transition-all font-bebas tracking-wide"
+                    className="px-8 md:px-12 py-3 md:py-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black rounded-xl font-bold text-sm md:text-lg hover:shadow-2xl hover:shadow-yellow-500/50 transition-all font-bebas tracking-wide"
                   >
                     Done
                   </motion.button>
