@@ -118,13 +118,13 @@ export const isBackendAvailable = async (): Promise<boolean> => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: 1.00, // Test with $1
+        amount: 1.0, // Test with $1
         customerEmail: "test@example.com",
         customerName: "Test",
       }),
       signal: AbortSignal.timeout(5000),
     });
-    
+
     if (response.ok) {
       const data = await response.json();
       return Boolean(data.clientSecret);

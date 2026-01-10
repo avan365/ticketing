@@ -1,5 +1,5 @@
 // Vercel Serverless Function for Stripe PaymentIntent
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
 export default async function handler(req, res) {
   // Enable CORS
