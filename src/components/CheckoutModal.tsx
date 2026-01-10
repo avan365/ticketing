@@ -143,25 +143,6 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
     return Object.keys(newErrors).length === 0;
   };
 
-  const validatePayment = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!formData.cardNumber.trim() || formData.cardNumber.replace(/\s/g, '').length < 16) {
-      newErrors.cardNumber = 'Please enter a valid card number';
-    }
-
-    if (!formData.expiry.trim() || formData.expiry.length < 5) {
-      newErrors.expiry = 'Enter MM/YY';
-    }
-
-    if (!formData.cvv.trim() || formData.cvv.length < 3) {
-      newErrors.cvv = 'Enter CVV';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
