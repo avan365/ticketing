@@ -30,6 +30,25 @@ export function BouncerPage() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const qrCodeRegionId = "qr-reader";
 
+  // Debug helper: Log all orders on mount
+  useEffect(() => {
+    const orders = getAllOrders();
+    console.log('🔍 BOUNCER PAGE - All orders in system:', orders.length);
+    if (orders.length > 0) {
+      console.table(orders.map(o => ({
+        orderNumber: o.orderNumber,
+        status: o.status,
+        ticketCount: o.individualTickets?.length || 0,
+        hasTickets: !!o.individualTickets?.length
+      })));
+    } else {
+      console.warn('⚠️ No orders found in localStorage!');
+      console.log('localStorage keys:', Object.keys(localStorage));
+      const raw = localStorage.getItem('adheeraa_orders');
+      console.log('Raw adheeraa_orders:', raw);
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       // Cleanup scanner
@@ -229,6 +248,7 @@ export function BouncerPage() {
     const normalizedOrderNumber = orderNumber.replace(/\s+/g, '').trim().toUpperCase();
     const normalizedTicketId = ticketId.replace(/\s+/g, '').trim().toUpperCase();
     
+    console.log('=== TICKET VALIDATION DEBUG ===');
     console.log('Validating ticket:', { 
       originalOrderNumber: orderNumber,
       originalTicketId: ticketId,
@@ -236,25 +256,49 @@ export function BouncerPage() {
       normalizedTicketId 
     });
     
+    // Debug: Check localStorage directly
+    const rawStorage = localStorage.getItem('adheeraa_orders');
+    console.log('Raw localStorage data:', rawStorage ? JSON.parse(rawStorage).length + ' orders' : 'EMPTY');
+    
     // First check if order exists
     const orders = getAllOrders();
-    console.log('Available orders:', orders.map(o => o.orderNumber));
+    console.log('Total orders in system:', orders.length);
+    console.log('Available order numbers:', orders.map(o => o.orderNumber));
+    console.log('Order details:', orders.map(o => ({
+      orderNumber: o.orderNumber,
+      normalized: o.orderNumber.replace(/\s+/g, '').toUpperCase(),
+      status: o.status,
+      hasTickets: !!o.individualTickets?.length,
+      ticketCount: o.individualTickets?.length || 0,
+      ticketIds: o.individualTickets?.map(t => t.ticketId) || []
+    })));
     const order = orders.find(o => {
       const normalized = o.orderNumber.replace(/\s+/g, '').toUpperCase();
       return normalized === normalizedOrderNumber;
     });
     
     if (!order) {
-      console.error('Order not found:', normalizedOrderNumber);
-      console.log('All available orders:', orders.map(o => ({
-        orderNumber: o.orderNumber,
-        status: o.status,
-        hasTickets: !!o.individualTickets?.length,
-        ticketCount: o.individualTickets?.length || 0
+      console.error('❌ Order not found:', normalizedOrderNumber);
+      console.log('Looking for (normalized):', normalizedOrderNumber);
+      console.log('All available orders (normalized):', orders.map(o => ({
+        original: o.orderNumber,
+        normalized: o.orderNumber.replace(/\s+/g, '').toUpperCase(),
+        matches: o.orderNumber.replace(/\s+/g, '').toUpperCase() === normalizedOrderNumber
       })));
+      
+      // Try to find by partial match
+      const partialMatch = orders.find(o => {
+        const normalized = o.orderNumber.replace(/\s+/g, '').toUpperCase();
+        return normalized.includes(normalizedOrderNumber) || normalizedOrderNumber.includes(normalized);
+      });
+      
+      if (partialMatch) {
+        console.log('⚠️ Found partial match:', partialMatch.orderNumber);
+      }
+      
       setResult({
         success: false,
-        message: `Order not found: ${normalizedOrderNumber}. Please check the order number. Available orders: ${orders.map(o => o.orderNumber).join(', ')}`,
+        message: `Order not found: ${normalizedOrderNumber}. Available orders: ${orders.length > 0 ? orders.map(o => o.orderNumber).join(', ') : 'NONE - No orders in system'}`,
       });
       return;
     }
