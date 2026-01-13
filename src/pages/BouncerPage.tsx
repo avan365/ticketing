@@ -4,6 +4,7 @@ import {
   QrCode, CheckCircle, XCircle, 
   Search, Camera, X
 } from 'lucide-react';
+import { Html5Qrcode } from 'html5-qrcode';
 import { 
   findTicket, 
   updateTicketStatus, 
@@ -25,59 +26,64 @@ export function BouncerPage() {
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const [scanningQR, setScanningQR] = useState(false);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const qrCodeRegionId = "qr-reader";
 
   useEffect(() => {
     return () => {
-      // Cleanup camera stream
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+      // Cleanup scanner
+      if (scannerRef.current && scannerRef.current.isScanning) {
+        scannerRef.current.stop().catch(() => {});
       }
     };
   }, []);
 
   const startCamera = async () => {
     setCameraError(null);
+    setScanningQR(false);
+    
     try {
-      // Check if getUserMedia is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera API not supported in this browser');
-      }
+      // Create scanner instance
+      const scanner = new Html5Qrcode(qrCodeRegionId);
+      scannerRef.current = scanner;
 
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        } 
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setScanning(true);
+      // Get available cameras
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length > 0) {
+        // Use back camera if available, otherwise use first camera
+        const cameraId = devices.find(d => d.label.toLowerCase().includes('back'))?.id || devices[0].id;
         
-        // Wait for video to actually start playing
-        videoRef.current.onloadedmetadata = () => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(err => {
-              console.error('Error playing video:', err);
-              setCameraError('Camera started but video not displaying. Try refreshing the page.');
-              stopCamera();
-            });
-          }
-        };
+        setScanning(true);
+        setScanningQR(true);
 
-        // Check if video is actually playing after a delay
-        setTimeout(() => {
-          if (videoRef.current && (videoRef.current.readyState < 2 || videoRef.current.paused)) {
-            setCameraError('Camera may not be working. Try using manual entry or check camera permissions.');
+        // Start scanning
+        await scanner.start(
+          cameraId,
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+          },
+          (decodedText) => {
+            // QR code detected!
+            setScanningQR(false);
+            scanner.stop().catch(() => {});
+            setScanning(false);
+            handleQRScan(decodedText);
+          },
+          () => {
+            // Ignore scanning errors (just means no QR code detected yet)
           }
-        }, 2000);
+        );
+      } else {
+        throw new Error('No cameras found');
       }
     } catch (error: any) {
-      console.error('Error accessing camera:', error);
+      console.error('Error starting camera:', error);
+      setScanning(false);
+      setScanningQR(false);
+      
       let errorMessage = 'Unable to access camera. ';
       
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
@@ -86,6 +92,8 @@ export function BouncerPage() {
         errorMessage += 'No camera found. Please use manual entry.';
       } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
         errorMessage += 'Camera is being used by another app. Please close it and try again.';
+      } else if (error.message?.includes('No cameras')) {
+        errorMessage += 'No cameras found. Please use manual entry.';
       } else {
         errorMessage += 'Please use manual entry.';
       }
@@ -98,15 +106,17 @@ export function BouncerPage() {
     }
   };
 
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
+  const stopCamera = async () => {
+    if (scannerRef.current && scannerRef.current.isScanning) {
+      try {
+        await scannerRef.current.stop();
+      } catch (err) {
+        console.error('Error stopping scanner:', err);
+      }
+      scannerRef.current.clear();
     }
     setScanning(false);
+    setScanningQR(false);
     setCameraError(null);
   };
 
@@ -300,16 +310,13 @@ export function BouncerPage() {
             ) : (
               <div>
                 <div className="relative bg-black rounded-lg overflow-hidden mb-4">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-64 object-cover"
-                  />
-                  {!cameraError && (
+                  <div id={qrCodeRegionId} className="w-full min-h-[400px]"></div>
+                  {scanningQR && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="border-2 border-green-400 rounded-lg w-48 h-48 opacity-50"></div>
+                      <div className="border-2 border-green-400 rounded-lg w-64 h-64 opacity-50"></div>
+                      <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black/50 px-4 py-2 rounded">
+                        Scanning for QR code...
+                      </p>
                     </div>
                   )}
                   <button
