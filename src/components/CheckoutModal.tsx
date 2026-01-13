@@ -4,6 +4,7 @@ import { X, ShoppingBag, CreditCard, User, Mail, Phone, Plus, Minus, Check, Spar
 import type { CartItem } from '../App';
 import { sendCustomerConfirmation, PAYNOW_UEN } from '../utils/email';
 import { saveOrder, type Order } from '../utils/orders';
+import { generateOrderQRCodes } from '../utils/qrcode';
 import { StripePayment } from './StripePayment';
 import { STRIPE_FEES, PLATFORM_FEE_PERCENTAGE, getFeeBreakdown, calculatePlatformFee } from '../utils/stripe';
 import { confirmPurchase, directPurchase } from '../utils/inventory';
@@ -171,6 +172,17 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
       // Calculate total with platform fee (no Stripe fee for manual PayNow)
       const paynowTotal = totalPrice + calculatePlatformFee(totalPrice);
       
+      // Generate QR codes for all tickets
+      const ticketList = cart.map(item => ({
+        name: item.ticket.name,
+        quantity: item.quantity,
+      }));
+      const qrCodes = await generateOrderQRCodes(
+        newOrderNumber,
+        ticketList,
+        formData.name
+      );
+      
       // Save order to local storage (Admin Dashboard)
       const order: Order = {
         id: crypto.randomUUID(),
@@ -187,6 +199,12 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
           price: item.ticket.price,
         })),
         totalAmount: paynowTotal,
+        individualTickets: qrCodes.map(qr => ({
+          ticketId: qr.ticketId,
+          ticketType: qr.ticketType,
+          qrCodeDataUrl: qr.qrCodeDataUrl,
+          status: 'valid' as const,
+        })),
         proofOfPayment: proofOfPayment,
       };
       saveOrder(order);
@@ -924,6 +942,17 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                                         paymentMethod === 'grabpay' ? 'grabpay' : 'card';
                     const fees = getFeeBreakdown(totalPrice, stripeMethod);
                     
+                    // Generate QR codes for all tickets
+                    const ticketList = cart.map(item => ({
+                      name: item.ticket.name,
+                      quantity: item.quantity,
+                    }));
+                    const qrCodes = await generateOrderQRCodes(
+                      newOrderNumber,
+                      ticketList,
+                      formData.name
+                    );
+                    
                     // Save order to local storage (Admin Dashboard)
                     const order: Order = {
                       id: crypto.randomUUID(),
@@ -940,18 +969,26 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                         price: item.ticket.price,
                       })),
                       totalAmount: fees.total,
+                      individualTickets: qrCodes.map(qr => ({
+                        ticketId: qr.ticketId,
+                        ticketType: qr.ticketType,
+                        qrCodeDataUrl: qr.qrCodeDataUrl,
+                        status: 'valid' as const,
+                      })),
                       adminNotes: `Payment ID: ${paymentId}, Method: ${paymentMethod}, Platform Fee: $${fees.platformFee}, Stripe Fee: $${fees.stripeFee}`,
                     };
                     saveOrder(order);
                     
-                    // Send confirmation email to CUSTOMER
+                    // Send confirmation email to CUSTOMER (with QR codes)
                     await sendCustomerConfirmation(
                       newOrderNumber,
                       formData.name,
                       formData.email,
                       cart,
                       fees.total,
-                      'card'
+                      'card',
+                      true, // isVerified
+                      qrCodes // Pass QR codes to email
                     );
                     
                     // Update inventory - mark tickets as sold

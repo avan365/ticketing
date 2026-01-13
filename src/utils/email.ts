@@ -1,5 +1,7 @@
 import emailjs from "@emailjs/browser";
 import type { CartItem } from "../App";
+import type { TicketQR } from "./qrcode";
+import jsPDF from "jspdf";
 
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║                    EMAIL CONFIGURATION                            ║
@@ -37,10 +39,68 @@ const EMAILJS_PUBLIC_KEY = "iqADYzOIdJ2fMOOW8"; // From step 4
 // ============================================
 
 /**
+ * Generate PDF with all ticket QR codes
+ */
+export async function generateTicketsPDF(
+  orderNumber: string,
+  customerName: string,
+  tickets: TicketQR[]
+): Promise<string> {
+  const pdf = new jsPDF();
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 20;
+  const qrSize = 60;
+  const spacing = 80;
+
+  // Header
+  pdf.setFontSize(20);
+  pdf.text("ADHEERAA Masquerade Night", pageWidth / 2, 30, { align: "center" });
+  pdf.setFontSize(14);
+  pdf.text(`Order: ${orderNumber}`, pageWidth / 2, 40, { align: "center" });
+  pdf.text(`Customer: ${customerName}`, pageWidth / 2, 50, { align: "center" });
+
+  let yPos = 70;
+  let pageNum = 1;
+
+  for (let i = 0; i < tickets.length; i++) {
+    if (yPos + spacing > pageHeight - margin) {
+      pdf.addPage();
+      pageNum++;
+      yPos = margin;
+    }
+
+    const ticket = tickets[i];
+
+    // Ticket info
+    pdf.setFontSize(12);
+    pdf.text(`Ticket ${i + 1} of ${tickets.length}`, margin, yPos);
+    pdf.setFontSize(10);
+    pdf.text(`Type: ${ticket.ticketType}`, margin, yPos + 10);
+    pdf.text(`ID: ${ticket.ticketId}`, margin, yPos + 16);
+
+    // QR Code
+    pdf.addImage(
+      ticket.qrCodeDataUrl,
+      "PNG",
+      pageWidth - margin - qrSize,
+      yPos - 5,
+      qrSize,
+      qrSize
+    );
+
+    yPos += spacing;
+  }
+
+  return pdf.output("datauristring");
+}
+
+/**
  * Send confirmation email to CUSTOMER (not admin)
  * Admin can view all orders in the Admin Dashboard (/admin or click Admin button)
  *
  * @param isVerified - Set to true when admin verifies a PayNow payment (shows "Confirmed" instead of "Pending")
+ * @param qrCodes - Array of ticket QR codes to include in email
  */
 export const sendCustomerConfirmation = async (
   orderNumber: string,
@@ -49,7 +109,8 @@ export const sendCustomerConfirmation = async (
   cart: CartItem[],
   totalAmount: number,
   paymentMethod: "paynow" | "card",
-  isVerified: boolean = false // Default false for immediate card payments, true when admin verifies PayNow
+  isVerified: boolean = false, // Default false for immediate card payments, true when admin verifies PayNow
+  qrCodes?: TicketQR[] // QR codes for tickets
 ): Promise<boolean> => {
   const ticketDetails = cart
     .map(
@@ -72,6 +133,28 @@ export const sendCustomerConfirmation = async (
         : "PayNow (Pending Verification)"
       : "Credit Card";
 
+  // Build QR codes HTML if available
+  let qrCodesHtml = "";
+  if (qrCodes && qrCodes.length > 0) {
+    qrCodesHtml = qrCodes
+      .map(
+        (qr, index) => `
+      <div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+        <h3 style="margin: 0 0 10px 0; color: #facc15;">Ticket ${index + 1}: ${
+          qr.ticketType
+        }</h3>
+        <p style="margin: 5px 0; font-size: 12px; color: #666;">Ticket ID: ${
+          qr.ticketId
+        }</p>
+        <img src="${qr.qrCodeDataUrl}" alt="QR Code ${
+          index + 1
+        }" style="max-width: 200px; margin: 10px 0;" />
+      </div>
+    `
+      )
+      .join("");
+  }
+
   const templateParams = {
     // Customer info
     to_name: customerName,
@@ -83,6 +166,7 @@ export const sendCustomerConfirmation = async (
     total_amount: `$${totalAmount.toFixed(2)}`,
     payment_method: paymentMethodLabel,
     payment_status: paymentStatus,
+    qr_codes: qrCodesHtml, // HTML with QR code images
 
     // Event info
     event_name: "ADHEERAA Masquerade Night",

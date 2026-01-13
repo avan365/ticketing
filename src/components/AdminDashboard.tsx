@@ -30,10 +30,11 @@ const OVERRIDE_PASSWORD = 'override';
 
 interface AdminDashboardProps {
   onClose: () => void;
+  skipAuth?: boolean; // If true, skip authentication (for use in AdminPage)
 }
 
-export function AdminDashboard({ onClose }: AdminDashboardProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(skipAuth);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -65,6 +66,13 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
   useEffect(() => {
     if (isAuthenticated) {
       refreshData();
+      
+      // Auto-refresh every 5 seconds to catch bouncer scans
+      const interval = setInterval(() => {
+        refreshData();
+      }, 5000);
+      
+      return () => clearInterval(interval);
     }
   }, [isAuthenticated]);
 
@@ -73,6 +81,20 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
     setStats(getOrderStats());
     setInventory(getInventory());
     setInventoryStats(getInventoryStats());
+  };
+
+  // Calculate ticket scanning stats for an order
+  const getTicketScanStats = (order: Order) => {
+    if (!order.individualTickets || order.individualTickets.length === 0) {
+      return { scanned: 0, total: 0, percentage: 0 };
+    }
+    const scanned = order.individualTickets.filter(t => t.status === 'used').length;
+    const total = order.individualTickets.length;
+    return {
+      scanned,
+      total,
+      percentage: total > 0 ? Math.round((scanned / total) * 100) : 0,
+    };
   };
   
   const handleInventoryEdit = (ticketId: string, currentAvailable: number) => {
@@ -128,6 +150,15 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
     if (status === 'verified' && order.paymentMethod === 'paynow') {
       setSendingEmail(orderId);
       try {
+        // Convert individualTickets to TicketQR format for email
+        const qrCodes = order.individualTickets?.map(t => ({
+          ticketId: t.ticketId,
+          qrCodeDataUrl: t.qrCodeDataUrl,
+          orderNumber: order.orderNumber,
+          ticketType: t.ticketType,
+          customerName: order.customerName,
+        })) || [];
+        
         await sendCustomerConfirmation(
           order.orderNumber,
           order.customerName,
@@ -138,13 +169,15 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
           })),
           order.totalAmount,
           'paynow',
-          true // isVerified = true, so email shows "Confirmed" status
+          true, // isVerified = true, so email shows "Confirmed" status
+          qrCodes.length > 0 ? qrCodes : undefined
         );
         console.log('✅ Confirmation email sent to:', order.customerEmail);
       } catch (error) {
         console.error('Failed to send confirmation email:', error);
+      } finally {
+        setSendingEmail(null);
       }
-      setSendingEmail(null);
     }
     
     updateOrderStatus(orderId, status);
@@ -459,7 +492,7 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
                       className="p-4 flex items-center gap-4 cursor-pointer hover:bg-purple-800/20 transition-colors"
                       onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
                     >
-                      <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
+                      <div className="flex-1 grid grid-cols-2 md:grid-cols-6 gap-4">
                         <div>
                           <p className="text-purple-400 text-xs">Order #</p>
                           <p className="text-white font-mono font-bold">{order.orderNumber}</p>
@@ -482,6 +515,31 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
                             {getStatusIcon(order.status)}
                             {order.status}
                           </span>
+                        </div>
+                        <div>
+                          <p className="text-purple-400 text-xs">Tickets Scanned</p>
+                          {(() => {
+                            const scanStats = getTicketScanStats(order);
+                            if (scanStats.total === 0) {
+                              return <span className="text-purple-300 text-xs">N/A</span>;
+                            }
+                            return (
+                              <div className="flex items-center gap-2">
+                                <span className={`font-bold ${
+                                  scanStats.scanned === scanStats.total 
+                                    ? 'text-green-400' 
+                                    : scanStats.scanned > 0 
+                                    ? 'text-yellow-400' 
+                                    : 'text-purple-300'
+                                }`}>
+                                  {scanStats.scanned}/{scanStats.total}
+                                </span>
+                                <span className="text-purple-400 text-xs">
+                                  ({scanStats.percentage}%)
+                                </span>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                       {expandedOrder === order.id ? (
@@ -521,6 +579,35 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
                                   ))}
                                 </div>
                               </div>
+                              {order.individualTickets && order.individualTickets.length > 0 && (
+                                <div>
+                                  <p className="text-purple-400 text-xs mb-2">Ticket Status</p>
+                                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                                    {order.individualTickets.map((ticket) => (
+                                      <div key={ticket.ticketId} className="flex items-center justify-between p-2 bg-purple-800/20 rounded text-xs">
+                                        <div>
+                                          <p className="text-white font-mono">{ticket.ticketId}</p>
+                                          <p className="text-purple-300">{ticket.ticketType}</p>
+                                        </div>
+                                        <div className="text-right">
+                                          <span className={`px-2 py-1 rounded text-xs ${
+                                            ticket.status === 'used' ? 'bg-red-500/20 text-red-400' :
+                                            ticket.status === 'valid' ? 'bg-green-500/20 text-green-400' :
+                                            'bg-yellow-500/20 text-yellow-400'
+                                          }`}>
+                                            {ticket.status}
+                                          </span>
+                                          {ticket.scannedAt && (
+                                            <p className="text-purple-400 text-[10px] mt-1">
+                                              {new Date(ticket.scannedAt).toLocaleString()}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                               <div>
                                 <p className="text-purple-400 text-xs mb-1">Payment Method</p>
                                 <p className="text-white capitalize">{order.paymentMethod}</p>

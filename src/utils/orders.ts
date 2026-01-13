@@ -1,6 +1,15 @@
 // Order storage utility - stores orders in localStorage
 // In production, you'd use a database like Firebase, Supabase, etc.
 
+export interface IndividualTicket {
+  ticketId: string; // Unique ID for each ticket (e.g., "TKT-ABC123")
+  ticketType: string; // Ticket name (e.g., "Early Bird")
+  qrCodeDataUrl: string; // Base64 QR code image
+  status: 'valid' | 'used' | 'invalid'; // Ticket validation status
+  scannedAt?: string; // When ticket was scanned
+  scannedBy?: string; // Who scanned it (bouncer name/ID)
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
@@ -20,6 +29,9 @@ export interface Order {
     price: number;
   }[];
   totalAmount: number;
+  
+  // Individual tickets with QR codes (optional for backward compatibility)
+  individualTickets?: IndividualTicket[];
   
   // PayNow specific
   proofOfPayment?: string; // Base64 image
@@ -68,6 +80,58 @@ export function updateOrderStatus(
     }
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
   }
+}
+
+/**
+ * Find ticket by ticketId and update its status
+ */
+export function updateTicketStatus(
+  ticketId: string,
+  status: IndividualTicket['status'],
+  scannedBy?: string
+): { success: boolean; orderNumber?: string; ticketType?: string; error?: string } {
+  const orders = getAllOrders();
+  
+  for (const order of orders) {
+    const ticket = order.individualTickets?.find(t => t.ticketId === ticketId);
+    if (ticket) {
+      ticket.status = status;
+      if (status === 'used') {
+        ticket.scannedAt = new Date().toISOString();
+        ticket.scannedBy = scannedBy || 'bouncer';
+      }
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+      return {
+        success: true,
+        orderNumber: order.orderNumber,
+        ticketType: ticket.ticketType,
+      };
+    }
+  }
+  
+  return { success: false, error: 'Ticket not found' };
+}
+
+/**
+ * Find ticket by order number and ticket ID
+ */
+export function findTicket(orderNumber: string, ticketId: string): IndividualTicket | null {
+  const orders = getAllOrders();
+  const order = orders.find(o => o.orderNumber === orderNumber);
+  
+  if (!order || !order.individualTickets) {
+    return null;
+  }
+  
+  return order.individualTickets.find(t => t.ticketId === ticketId) || null;
+}
+
+/**
+ * Get order by order number
+ */
+export function getOrderByNumber(orderNumber: string): Order | null {
+  const orders = getAllOrders();
+  return orders.find(o => o.orderNumber === orderNumber) || null;
 }
 
 export function deleteOrder(orderId: string): void {

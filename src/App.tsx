@@ -4,8 +4,6 @@ import { Hero } from './components/Hero';
 import { ConcertDetails } from './components/ConcertDetails';
 import { TicketSelection } from './components/TicketSelection';
 import { CheckoutModal } from './components/CheckoutModal';
-import { AdminDashboard } from './components/AdminDashboard';
-import { Settings } from 'lucide-react';
 import { getAvailableCount } from './utils/inventory';
 
 export interface TicketType {
@@ -166,24 +164,6 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Admin Dashboard Modal */}
-      <AnimatePresence>
-        {showAdmin && (
-          <AdminDashboard onClose={() => setShowAdmin(false)} />
-        )}
-      </AnimatePresence>
-
-      {/* Admin Button (bottom left, subtle) */}
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
-        whileHover={{ opacity: 1, scale: 1.1 }}
-        onClick={() => setShowAdmin(true)}
-        className="fixed bottom-8 left-8 w-12 h-12 bg-purple-900/50 backdrop-blur-sm rounded-full flex items-center justify-center z-40 border border-purple-500/30 hover:border-purple-400 transition-all"
-        title="Admin Dashboard"
-      >
-        <Settings className="w-5 h-5 text-purple-400" />
-      </motion.button>
 
       {/* Floating Cart Button */}
       <AnimatePresence>

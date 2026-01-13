@@ -15,7 +15,6 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
       {/* Subtle background gradient - minimalistic */}
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/20 via-transparent to-transparent pointer-events-none" />
 
-
       {/* Cart Icon */}
       {totalItems > 0 && (
         <motion.button
