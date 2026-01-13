@@ -44,73 +44,104 @@ export function BouncerPage() {
     setScanningQR(false);
     
     try {
-      // Create scanner instance
+      // Clean up any existing scanner
+      if (scannerRef.current && scannerRef.current.isScanning) {
+        try {
+          await scannerRef.current.stop();
+        } catch (e) {
+          // Ignore stop errors
+        }
+        scannerRef.current.clear();
+      }
+
+      // Create new scanner instance
       const scanner = new Html5Qrcode(qrCodeRegionId);
       scannerRef.current = scanner;
 
       // Get available cameras
       const devices = await Html5Qrcode.getCameras();
-      if (devices && devices.length > 0) {
-        // Use back camera if available, otherwise use first camera
-        const cameraId = devices.find(d => d.label.toLowerCase().includes('back'))?.id || devices[0].id;
-        
-        setScanning(true);
-        setScanningQR(true);
-
-        // Start scanning
-        await scanner.start(
-          cameraId,
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0,
-          },
-          (decodedText) => {
-            // QR code detected!
-            setScanningQR(false);
-            scanner.stop().catch(() => {});
-            setScanning(false);
-            handleQRScan(decodedText);
-          },
-          () => {
-            // Ignore scanning errors (just means no QR code detected yet)
-          }
-        );
-      } else {
+      if (!devices || devices.length === 0) {
         throw new Error('No cameras found');
       }
+
+      // Try cameras in order: back camera first, then front, then any other
+      let cameraId: string | null = null;
+      const backCamera = devices.find(d => 
+        d.label.toLowerCase().includes('back') || 
+        d.label.toLowerCase().includes('rear') ||
+        d.label.toLowerCase().includes('environment')
+      );
+      const frontCamera = devices.find(d => 
+        d.label.toLowerCase().includes('front') || 
+        d.label.toLowerCase().includes('user')
+      );
+
+      // Priority: back > front > first available
+      // Prefer back camera for QR scanning (better for scanning)
+      if (backCamera) {
+        cameraId = backCamera.id;
+      } else if (frontCamera) {
+        cameraId = frontCamera.id;
+      } else {
+        cameraId = devices[0].id;
+      }
+
+      setScanning(true);
+      setScanningQR(true);
+
+      // Start scanning with optimized settings
+      await scanner.start(
+        cameraId,
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
+          // Remove videoConstraints - let html5-qrcode handle it
+        },
+        (decodedText) => {
+          // QR code detected!
+          setScanningQR(false);
+          scanner.stop().catch(() => {});
+          setScanning(false);
+          handleQRScan(decodedText);
+        },
+        () => {
+          // Ignore scanning errors (just means no QR code detected yet)
+        }
+      );
+
+      // Success - clear any previous errors
+      setCameraError(null);
     } catch (error: any) {
       console.error('Error starting camera:', error);
       setScanning(false);
       setScanningQR(false);
       
       let errorMessage = '';
-      let suggestion = 'Please use manual entry below.';
+      let retryMessage = '';
       
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
         errorMessage = 'Camera permission denied';
-        suggestion = 'Please allow camera access in your browser settings, then try again. Or use manual entry below.';
+        retryMessage = 'Click "Allow" when prompted, then click "Try Again"';
       } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
         errorMessage = 'No camera found';
-        suggestion = 'No camera detected on this device. Please use manual entry below.';
+        retryMessage = 'Make sure your device has a camera and try again';
       } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
         errorMessage = 'Camera is in use';
-        suggestion = 'Camera is being used by another app. Please close it and try again. Or use manual entry below.';
+        retryMessage = 'Close other apps using the camera, then click "Try Again"';
       } else if (error.message?.includes('No cameras')) {
         errorMessage = 'No cameras available';
-        suggestion = 'No cameras found on this device. Please use manual entry below.';
+        retryMessage = 'No camera detected. Please check your device settings';
+      } else if (error.message?.includes('start failed') || error.message?.includes('Could not start')) {
+        errorMessage = 'Camera failed to start';
+        retryMessage = 'Try again or switch to a different camera';
       } else {
         errorMessage = 'Camera access failed';
-        suggestion = 'Unable to access camera. Please use manual entry below.';
+        retryMessage = 'Try again or check browser permissions';
       }
       
-      setCameraError(`${errorMessage}. ${suggestion}`);
-      
-      // Don't set result for camera errors - that's for validation errors only
-      // Auto-switch to manual entry after showing error
-      setTimeout(() => {
-        setScanMode('manual');
-      }, 3000);
+      // Only show manual entry as last resort, don't auto-switch
+      setCameraError(`${errorMessage}. ${retryMessage}`);
     }
   };
 
@@ -389,9 +420,9 @@ export function BouncerPage() {
                     <div className="flex items-start gap-3">
                       <div className="text-yellow-400 text-xl">⚠️</div>
                       <div className="flex-1">
-                        <p className="text-yellow-400 text-sm font-semibold mb-1">Camera Not Available</p>
+                        <p className="text-yellow-400 text-sm font-semibold mb-1">Camera Issue</p>
                         <p className="text-yellow-300 text-xs mb-3">{cameraError}</p>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           <button
                             onClick={() => {
                               setCameraError(null);
@@ -399,7 +430,21 @@ export function BouncerPage() {
                             }}
                             className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-semibold transition-colors"
                           >
-                            Try Again
+                            🔄 Try Again
+                          </button>
+                          <button
+                            onClick={async () => {
+                              // Try with different camera constraints
+                              setCameraError(null);
+                              await stopCamera();
+                              // Small delay to ensure cleanup
+                              setTimeout(() => {
+                                startCamera();
+                              }, 500);
+                            }}
+                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                          >
+                            🔀 Try Different Camera
                           </button>
                           <button
                             onClick={() => {
@@ -407,9 +452,9 @@ export function BouncerPage() {
                               setCameraError(null);
                               setScanMode('manual');
                             }}
-                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                            className="px-4 py-2 bg-purple-600/50 hover:bg-purple-600 text-white rounded-lg text-sm font-semibold transition-colors"
                           >
-                            Use Manual Entry →
+                            Manual Entry (Last Resort)
                           </button>
                         </div>
                       </div>
