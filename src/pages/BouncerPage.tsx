@@ -29,17 +29,17 @@ export function BouncerPage() {
 
   // Debug helper: Log all orders on mount
   useEffect(() => {
-    getAllOrders().then(orders => {
+    getAllOrders().then((orders) => {
       console.log("🔍 BOUNCER PAGE - All orders in system:", orders.length);
-    if (orders.length > 0) {
-      console.table(
-        orders.map((o) => ({
-          orderNumber: o.orderNumber,
-          status: o.status,
-          ticketCount: o.individualTickets?.length || 0,
-          hasTickets: !!o.individualTickets?.length,
-        }))
-      );
+      if (orders.length > 0) {
+        console.table(
+          orders.map((o) => ({
+            orderNumber: o.orderNumber,
+            status: o.status,
+            ticketCount: o.individualTickets?.length || 0,
+            hasTickets: !!o.individualTickets?.length,
+          }))
+        );
       } else {
         console.warn("⚠️ No orders found in localStorage!");
         console.log("localStorage keys:", Object.keys(localStorage));
@@ -47,7 +47,7 @@ export function BouncerPage() {
         console.log("Raw adheeraa_orders:", raw);
       }
     });
-    }, []);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -260,11 +260,11 @@ export function BouncerPage() {
 
     console.log("Parsed QR code:", parsed);
     // parseQRCodeData already normalizes, so we can use directly
-    validateTicket(parsed.orderNumber, parsed.ticketId).catch(err => {
+    validateTicket(parsed.orderNumber, parsed.ticketId).catch((err) => {
       console.error("Error validating ticket:", err);
       setResult({
         success: false,
-        message: `Validation error: ${err.message || 'Unknown error'}`,
+        message: `Validation error: ${err.message || "Unknown error"}`,
       });
     });
   };

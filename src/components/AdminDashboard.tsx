@@ -184,6 +184,9 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
     
     updateOrderStatus(orderId, status).then(() => {
       refreshData();
+    }).catch((error) => {
+      console.error('Failed to update order status:', error);
+      alert(`Failed to update order status: ${error.message || 'Unknown error'}`);
     });
   };
   
@@ -192,6 +195,9 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
       if (pendingStatusChange) {
         updateOrderStatus(pendingStatusChange.orderId, pendingStatusChange.status).then(() => {
           refreshData();
+        }).catch((error) => {
+          console.error('Failed to update order status:', error);
+          setOverrideError(`Failed to update: ${error.message || 'Unknown error'}`);
         });
       }
       setShowOverrideModal(false);
