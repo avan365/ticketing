@@ -206,48 +206,73 @@ export function BouncerPage() {
   const handleQRScan = (qrData: string) => {
     // Clean the QR data
     const cleanData = qrData.trim();
-    console.log('Scanned QR data:', cleanData);
+    console.log('Scanned QR data (raw):', cleanData);
     
     const parsed = parseQRCodeData(cleanData);
     if (!parsed) {
       console.error('Failed to parse QR code:', cleanData);
       setResult({
         success: false,
-        message: `Invalid QR code format. Scanned: "${cleanData.substring(0, 50)}..."`,
+        message: `Invalid QR code format. Scanned: "${cleanData.substring(0, 50)}...". Expected format: "ORDER|TICKET" or "ORDER TICKET"`,
       });
       return;
     }
 
     console.log('Parsed QR code:', parsed);
-    validateTicket(parsed.orderNumber.trim(), parsed.ticketId.trim());
+    // parseQRCodeData already normalizes, so we can use directly
+    validateTicket(parsed.orderNumber, parsed.ticketId);
   };
 
   const validateTicket = (orderNumber: string, ticketId: string) => {
-    // Normalize inputs (uppercase, trim)
-    const normalizedOrderNumber = orderNumber.trim().toUpperCase();
-    const normalizedTicketId = ticketId.trim().toUpperCase();
+    // Normalize inputs (remove all spaces, uppercase, trim)
+    // parseQRCodeData already does this, but double-check for manual entry
+    const normalizedOrderNumber = orderNumber.replace(/\s+/g, '').trim().toUpperCase();
+    const normalizedTicketId = ticketId.replace(/\s+/g, '').trim().toUpperCase();
     
-    console.log('Validating ticket:', { normalizedOrderNumber, normalizedTicketId });
+    console.log('Validating ticket:', { 
+      originalOrderNumber: orderNumber,
+      originalTicketId: ticketId,
+      normalizedOrderNumber, 
+      normalizedTicketId 
+    });
     
     // First check if order exists
     const orders = getAllOrders();
-    const order = orders.find(o => o.orderNumber.toUpperCase() === normalizedOrderNumber);
+    console.log('Available orders:', orders.map(o => o.orderNumber));
+    const order = orders.find(o => {
+      const normalized = o.orderNumber.replace(/\s+/g, '').toUpperCase();
+      return normalized === normalizedOrderNumber;
+    });
     
     if (!order) {
       console.error('Order not found:', normalizedOrderNumber);
+      console.log('All available orders:', orders.map(o => ({
+        orderNumber: o.orderNumber,
+        status: o.status,
+        hasTickets: !!o.individualTickets?.length,
+        ticketCount: o.individualTickets?.length || 0
+      })));
       setResult({
         success: false,
-        message: `Order not found: ${normalizedOrderNumber}. Please check the order number.`,
+        message: `Order not found: ${normalizedOrderNumber}. Please check the order number. Available orders: ${orders.map(o => o.orderNumber).join(', ')}`,
       });
       return;
     }
+    
+    console.log('Order found:', {
+      orderNumber: order.orderNumber,
+      status: order.status,
+      hasIndividualTickets: !!order.individualTickets,
+      ticketCount: order.individualTickets?.length || 0,
+      ticketIds: order.individualTickets?.map(t => t.ticketId) || []
+    });
     
     // Check if order is verified
     if (order.status !== 'verified') {
       console.error('Order not verified:', order.status);
       setResult({
         success: false,
-        message: `Order ${normalizedOrderNumber} is ${order.status}. Only verified orders can be scanned.`,
+        message: `Order ${normalizedOrderNumber} is ${order.status}. Only verified orders can be scanned. Please verify the order in the admin panel first.`,
       });
       return;
     }
@@ -255,20 +280,34 @@ export function BouncerPage() {
     // Check if order has individual tickets
     if (!order.individualTickets || order.individualTickets.length === 0) {
       console.error('Order has no individual tickets');
+      console.log('Order details:', {
+        orderNumber: order.orderNumber,
+        tickets: order.tickets,
+        individualTickets: order.individualTickets
+      });
       setResult({
         success: false,
-        message: `Order ${normalizedOrderNumber} has no tickets. This may be an old order format.`,
+        message: `Order ${normalizedOrderNumber} has no individual tickets. This may be an old order format. Order needs to be recreated with QR codes.`,
       });
       return;
     }
     
     // Find ticket (case-insensitive)
     const ticket = order.individualTickets.find(
-      t => t.ticketId.toUpperCase() === normalizedTicketId
+      t => {
+        const normalized = t.ticketId.replace(/\s+/g, '').toUpperCase();
+        return normalized === normalizedTicketId;
+      }
     );
     
     if (!ticket) {
       console.error('Ticket not found in order:', normalizedTicketId);
+      console.log('Looking for:', normalizedTicketId);
+      console.log('Available tickets:', order.individualTickets.map(t => ({
+        ticketId: t.ticketId,
+        normalized: t.ticketId.replace(/\s+/g, '').toUpperCase(),
+        status: t.status
+      })));
       const availableTickets = order.individualTickets.map(t => t.ticketId).join(', ');
       setResult({
         success: false,

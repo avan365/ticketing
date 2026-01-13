@@ -73,15 +73,36 @@ export async function generateOrderQRCodes(
 /**
  * Parse QR code data
  * Returns { orderNumber, ticketId } or null if invalid
+ * Handles various formats and normalizes whitespace
  */
 export function parseQRCodeData(qrData: string): { orderNumber: string; ticketId: string } | null {
-  const parts = qrData.split('|');
+  // Clean the data: remove all extra whitespace
+  const cleaned = qrData.trim().replace(/\s+/g, ' ');
+  
+  // Try splitting by pipe first (standard format: "ORDER|TICKET")
+  let parts = cleaned.split('|');
+  
+  // If no pipe, try other separators
+  if (parts.length !== 2) {
+    // Try space as separator (in case pipe was lost)
+    parts = cleaned.split(/\s+/);
+    if (parts.length >= 2) {
+      // Take first part as order, rest as ticket ID
+      parts = [parts[0], parts.slice(1).join('')];
+    }
+  }
+  
   if (parts.length === 2) {
+    // Normalize: remove all spaces, uppercase
+    const orderNumber = parts[0].replace(/\s+/g, '').toUpperCase();
+    const ticketId = parts[1].replace(/\s+/g, '').toUpperCase();
+    
     return {
-      orderNumber: parts[0],
-      ticketId: parts[1],
+      orderNumber,
+      ticketId,
     };
   }
+  
   return null;
 }
 
