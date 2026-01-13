@@ -15,19 +15,6 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
       {/* Subtle background gradient - minimalistic */}
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/20 via-transparent to-transparent pointer-events-none" />
 
-      {/* Logo - Top Left */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-        className="fixed top-4 left-4 md:top-8 md:left-8 z-50"
-      >
-        <img
-          src="/logo.png"
-          alt="ADHEERAA Logo"
-          className="h-12 md:h-16 w-auto object-contain"
-        />
-      </motion.div>
 
       {/* Cart Icon */}
       {totalItems > 0 && (
