@@ -14,9 +14,7 @@ export interface TicketQR {
  */
 export async function generateTicketQR(
   orderNumber: string,
-  ticketId: string,
-  ticketType: string,
-  customerName: string
+  ticketId: string
 ): Promise<string> {
   // QR code data format: orderNumber|ticketId
   const qrData = `${orderNumber}|${ticketId}`;
@@ -24,8 +22,6 @@ export async function generateTicketQR(
   try {
     const dataUrl = await QRCode.toDataURL(qrData, {
       errorCorrectionLevel: 'M',
-      type: 'image/png',
-      quality: 0.92,
       margin: 1,
       color: {
         dark: '#000000',
@@ -58,9 +54,7 @@ export async function generateOrderQRCodes(
       
       const qrDataUrl = await generateTicketQR(
         orderNumber,
-        ticketId,
-        ticket.name,
-        customerName
+        ticketId
       );
       
       qrCodes.push({

@@ -45,7 +45,6 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showCartButton, setShowCartButton] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
   const [inventoryVersion, setInventoryVersion] = useState(0); // Trigger re-render when inventory changes
 
   // Get tickets with live availability from inventory

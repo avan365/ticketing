@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  QrCode, CheckCircle, XCircle, AlertCircle, 
-  Search, Camera, X, RefreshCw 
+  QrCode, CheckCircle, XCircle, 
+  Search, Camera, X
 } from 'lucide-react';
 import { 
   findTicket, 
   updateTicketStatus, 
-  getOrderByNumber,
   type IndividualTicket 
 } from '../utils/orders';
 import { parseQRCodeData } from '../utils/qrcode';
