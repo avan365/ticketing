@@ -54,7 +54,24 @@ export function BouncerPage() {
         scannerRef.current.clear();
       }
 
-      // Create new scanner instance
+      // IMPORTANT: Set scanning to true FIRST so the div renders
+      setScanning(true);
+      
+      // Wait for React to render the div before creating scanner
+      // Use requestAnimationFrame to ensure DOM is updated
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
+
+      // Verify the element exists
+      const element = document.getElementById(qrCodeRegionId);
+      if (!element) {
+        throw new Error('QR code scanner element not found in DOM');
+      }
+
+      // Create new scanner instance AFTER div exists
       const scanner = new Html5Qrcode(qrCodeRegionId);
       scannerRef.current = scanner;
 
@@ -86,29 +103,56 @@ export function BouncerPage() {
         cameraId = devices[0].id;
       }
 
-      setScanning(true);
       setScanningQR(true);
 
       // Start scanning with optimized settings
-      await scanner.start(
-        cameraId,
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0,
-          // Remove videoConstraints - let html5-qrcode handle it
-        },
-        (decodedText) => {
-          // QR code detected!
-          setScanningQR(false);
-          scanner.stop().catch(() => {});
-          setScanning(false);
-          handleQRScan(decodedText);
-        },
-        () => {
-          // Ignore scanning errors (just means no QR code detected yet)
+      // Try with specific camera ID first
+      try {
+        await scanner.start(
+          cameraId,
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+          },
+          (decodedText) => {
+            // QR code detected!
+            setScanningQR(false);
+            scanner.stop().catch(() => {});
+            setScanning(false);
+            handleQRScan(decodedText);
+          },
+          () => {
+            // Ignore scanning errors (just means no QR code detected yet)
+          }
+        );
+      } catch (startError: any) {
+        // If specific camera fails, try with facingMode constraint
+        console.log('Camera ID failed, trying with facingMode constraint:', startError);
+        try {
+          await scanner.start(
+            { facingMode: backCamera ? 'environment' : 'user' },
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 },
+              aspectRatio: 1.0,
+            },
+            (decodedText) => {
+              // QR code detected!
+              setScanningQR(false);
+              scanner.stop().catch(() => {});
+              setScanning(false);
+              handleQRScan(decodedText);
+            },
+            () => {
+              // Ignore scanning errors (just means no QR code detected yet)
+            }
+          );
+        } catch (fallbackError: any) {
+          // Both methods failed, throw the original error
+          throw startError;
         }
-      );
+      }
 
       // Success - clear any previous errors
       setCameraError(null);
