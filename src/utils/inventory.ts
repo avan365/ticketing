@@ -22,12 +22,54 @@ const DEFAULT_INVENTORY: TicketInventory = {
   'table': { name: 'Table for 4', price: 200, available: 20, sold: 0, reserved: 0 },
 };
 
+// Sync inventory prices and names with BASE_TICKETS (from App.tsx)
+// This ensures inventory always matches the actual ticket prices
+function syncInventoryWithBaseTickets(inventory: TicketInventory): TicketInventory {
+  // BASE_TICKETS from App.tsx - keep in sync!
+  const BASE_TICKETS = [
+    { id: 'early-bird', name: 'Early Bird', price: 25 },
+    { id: 'regular', name: 'Regular Admission', price: 35 },
+    { id: 'table', name: 'Table for 4', price: 200 },
+  ];
+
+  const synced: TicketInventory = {};
+  
+  // Update existing tickets with correct prices/names, preserve counts
+  for (const ticket of BASE_TICKETS) {
+    if (inventory[ticket.id]) {
+      synced[ticket.id] = {
+        ...inventory[ticket.id],
+        name: ticket.name, // Update name
+        price: ticket.price, // Update price
+      };
+    } else {
+      // New ticket type - use defaults
+      synced[ticket.id] = DEFAULT_INVENTORY[ticket.id] || {
+        name: ticket.name,
+        price: ticket.price,
+        available: 0,
+        sold: 0,
+        reserved: 0,
+      };
+    }
+  }
+  
+  return synced;
+}
+
 // Get current inventory from localStorage
 export function getInventory(): TicketInventory {
   try {
     const stored = localStorage.getItem(INVENTORY_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const inventory = JSON.parse(stored);
+      // Sync prices and names with BASE_TICKETS
+      const synced = syncInventoryWithBaseTickets(inventory);
+      // Save synced version if it changed
+      if (JSON.stringify(inventory) !== JSON.stringify(synced)) {
+        saveInventory(synced);
+      }
+      return synced;
     }
   } catch (error) {
     console.error('Error reading inventory:', error);
