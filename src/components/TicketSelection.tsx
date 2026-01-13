@@ -78,11 +78,8 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
 
   return (
     <div id="tickets" className="py-12 md:py-24 bg-[#0a0a12] relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-48 md:w-96 h-48 md:h-96 bg-purple-600/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 bg-amber-600/20 rounded-full blur-3xl" />
-      </div>
+      {/* Minimal background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-950/5 to-transparent" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Title */}
@@ -132,11 +129,11 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                 <div className={`absolute inset-0 bg-gradient-to-br ${gradient} ${isSoldOut ? 'opacity-5' : 'opacity-20 group-hover:opacity-40'} rounded-3xl blur-2xl transition-all duration-500`} />
                 
                 {/* Card */}
-                <div className={`relative bg-gradient-to-br from-purple-900/40 to-black/70 backdrop-blur-xl rounded-2xl border ${
+                <div className={`relative bg-white/5 backdrop-blur-sm rounded-xl border ${
                   isSoldOut 
                     ? 'border-gray-600/20 opacity-60' 
-                    : 'border-purple-500/10 group-hover:border-amber-500/30'
-                } transition-all duration-300 overflow-hidden h-full flex flex-col shadow-sm hover:shadow-lg`}>
+                    : 'border-white/10 group-hover:border-amber-500/30'
+                } transition-all duration-200 overflow-hidden h-full flex flex-col hover:bg-white/10`}>
                   
                   {/* Sold Out Badge */}
                   {isSoldOut && (
@@ -300,7 +297,7 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
           viewport={{ once: true }}
           className="mt-8 md:mt-20 max-w-4xl mx-auto"
         >
-          <div className="bg-gradient-to-r from-purple-900/20 to-purple-800/20 backdrop-blur-sm rounded-xl md:rounded-2xl border border-purple-500/10 p-4 md:p-8 shadow-sm">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 md:p-8">
             <h4 className="text-base md:text-2xl font-semibold text-amber-500/90 mb-2 md:mb-4 font-sans">📋 Important Information</h4>
             <ul className="space-y-1 md:space-y-2 text-purple-200 text-xs md:text-base font-sans">
               <li>• All tickets are non-refundable but transferable</li>

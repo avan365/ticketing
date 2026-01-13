@@ -31,7 +31,7 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
       margin: 0;
       padding: 0;
       background-color: #0a0a12;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     "
   >
     <table
@@ -70,11 +70,12 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                 <h1
                   style="
                     margin: 0;
-                    color: #fcd34d;
+                    color: #fbbf24;
                     font-size: 36px;
                     font-weight: 700;
-                    letter-spacing: 4px;
-                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                    letter-spacing: 2px;
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                   "
                 >
                   ✨ ADHEERAA ✨
@@ -82,9 +83,11 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                 <p
                   style="
                     margin: 10px 0 0 0;
-                    color: rgba(255, 255, 255, 0.9);
+                    color: #ffffff;
                     font-size: 16px;
-                    letter-spacing: 2px;
+                    letter-spacing: 1px;
+                    font-weight: 500;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                   "
                 >
                   MASQUERADE NIGHT 2026
@@ -96,16 +99,17 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
             <tr>
               <td style="padding: 40px 30px">
                 <!-- Greeting -->
-                <p style="color: #e2e8f0; font-size: 18px; margin: 0 0 20px 0">
-                  Dear <strong style="color: #fcd34d">{{to_name}}</strong>,
+                <p style="color: #f1f5f9; font-size: 18px; margin: 0 0 20px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                  Dear <strong style="color: #fbbf24; font-weight: 600;">{{to_name}}</strong>,
                 </p>
 
                 <p
                   style="
-                    color: #94a3b8;
+                    color: #cbd5e1;
                     font-size: 16px;
                     line-height: 1.6;
                     margin: 0 0 30px 0;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                   "
                 >
                   Thank you for your ticket purchase! Your order has been
@@ -136,20 +140,23 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                           >
                             <span
                               style="
-                                color: #a78bfa;
+                                color: #c4b5fd;
                                 font-size: 12px;
                                 text-transform: uppercase;
                                 letter-spacing: 1px;
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                                font-weight: 500;
                               "
                               >Order Number</span
                             >
                             <p
                               style="
                                 margin: 5px 0 0 0;
-                                color: #fcd34d;
+                                color: #fbbf24;
                                 font-size: 24px;
-                                font-weight: bold;
-                                font-family: monospace;
+                                font-weight: 700;
+                                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+                                letter-spacing: 1px;
                               "
                             >
                               #{{order_number}}
@@ -160,15 +167,17 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                           <td style="padding-top: 15px">
                             <span
                               style="
-                                color: #a78bfa;
+                                color: #c4b5fd;
                                 font-size: 12px;
                                 text-transform: uppercase;
                                 letter-spacing: 1px;
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                                font-weight: 500;
                               "
                               >Status</span
                             >
                             <p
-                              style="margin: 5px 0 0 0; color: {{payment_status}} == 'Confirmed' ? '#22c55e' : '#eab308'; font-size: 16px; font-weight: bold;"
+                              style="margin: 5px 0 0 0; color: {{payment_status}} == 'Confirmed' ? '#10b981' : '#f59e0b'; font-size: 16px; font-weight: 600; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"
                             >
                               {{payment_status}}
                             </p>
@@ -182,13 +191,15 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                 <!-- Tickets -->
                 <h3
                   style="
-                    color: #e2e8f0;
+                    color: #f1f5f9;
                     font-size: 14px;
                     text-transform: uppercase;
                     letter-spacing: 2px;
                     margin: 0 0 15px 0;
                     padding-bottom: 10px;
                     border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    font-weight: 600;
                   "
                 >
                   🎫 Your Tickets
@@ -204,8 +215,8 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                   <pre
                     style="
                       margin: 0;
-                      color: #e2e8f0;
-                      font-family: 'Segoe UI', sans-serif;
+                      color: #f1f5f9;
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                       font-size: 15px;
                       line-height: 1.8;
                       white-space: pre-wrap;
@@ -224,20 +235,21 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                 >
                   <tr>
                     <td style="text-align: right">
-                      <span style="color: #94a3b8; font-size: 14px"
+                      <span style="color: #cbd5e1; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"
                         >Total Amount</span
                       >
                       <p
                         style="
                           margin: 5px 0 0 0;
-                          color: #22c55e;
+                          color: #10b981;
                           font-size: 28px;
-                          font-weight: bold;
+                          font-weight: 700;
+                          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                         "
                       >
                         {{total_amount}}
                       </p>
-                      <span style="color: #64748b; font-size: 12px"
+                      <span style="color: #94a3b8; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"
                         >via {{payment_method}}</span
                       >
                     </td>
@@ -247,13 +259,15 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                 <!-- Event Details -->
                 <h3
                   style="
-                    color: #e2e8f0;
+                    color: #f1f5f9;
                     font-size: 14px;
                     text-transform: uppercase;
                     letter-spacing: 2px;
                     margin: 0 0 15px 0;
                     padding-bottom: 10px;
                     border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    font-weight: 600;
                   "
                 >
                   📍 Event Details
@@ -275,12 +289,13 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
                       "
                     >
-                      <span style="color: #64748b; font-size: 12px">Event</span>
+                      <span style="color: #94a3b8; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Event</span>
                       <p
                         style="
                           margin: 3px 0 0 0;
-                          color: #e2e8f0;
+                          color: #f1f5f9;
                           font-size: 15px;
+                          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                         "
                       >
                         {{event_name}}
@@ -294,12 +309,13 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
                       "
                     >
-                      <span style="color: #64748b; font-size: 12px">Date</span>
+                      <span style="color: #94a3b8; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Date</span>
                       <p
                         style="
                           margin: 3px 0 0 0;
-                          color: #e2e8f0;
+                          color: #f1f5f9;
                           font-size: 15px;
+                          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                         "
                       >
                         {{event_date}}
@@ -313,12 +329,13 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
                       "
                     >
-                      <span style="color: #64748b; font-size: 12px">Time</span>
+                      <span style="color: #94a3b8; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Time</span>
                       <p
                         style="
                           margin: 3px 0 0 0;
-                          color: #e2e8f0;
+                          color: #f1f5f9;
                           font-size: 15px;
+                          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                         "
                       >
                         {{event_time}}
@@ -327,12 +344,13 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                   </tr>
                   <tr>
                     <td style="padding: 12px 15px">
-                      <span style="color: #64748b; font-size: 12px">Venue</span>
+                      <span style="color: #94a3b8; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">Venue</span>
                       <p
                         style="
                           margin: 3px 0 0 0;
-                          color: #e2e8f0;
+                          color: #f1f5f9;
                           font-size: 15px;
+                          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                         "
                       >
                         {{event_venue}}
@@ -358,9 +376,10 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                   <p
                     style="
                       margin: 0;
-                      color: #fcd34d;
+                      color: #fbbf24;
                       font-size: 14px;
-                      font-weight: bold;
+                      font-weight: 600;
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                     "
                   >
                     ⚠️ Important
@@ -368,9 +387,10 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                   <p
                     style="
                       margin: 10px 0 0 0;
-                      color: #fde68a;
+                      color: #fcd34d;
                       font-size: 13px;
                       line-height: 1.6;
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
                     "
                   >
                     Please bring this email or your order number to the event
@@ -390,10 +410,10 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                   border-top: 1px solid rgba(139, 92, 246, 0.2);
                 "
               >
-                <p style="margin: 0 0 10px 0; color: #64748b; font-size: 12px">
+                <p style="margin: 0 0 10px 0; color: #94a3b8; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
                   Questions? Reply to this email or contact us on Instagram
                 </p>
-                <p style="margin: 0; color: #4b5563; font-size: 11px">
+                <p style="margin: 0; color: #64748b; font-size: 11px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
                   © 2026 ADHEERAA Events. All rights reserved.
                 </p>
               </td>

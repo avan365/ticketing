@@ -195,7 +195,7 @@ export default function App() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowCheckout(true)}
-            className="fixed bottom-8 right-8 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white px-8 py-4 rounded-full shadow-md hover:shadow-lg transition-all duration-300 z-50 font-semibold flex items-center gap-3 font-sans backdrop-blur-sm border border-amber-500/20"
+            className="fixed bottom-8 right-8 bg-amber-600 text-white px-8 py-4 rounded-lg shadow-md hover:bg-amber-700 transition-colors duration-200 z-50 font-medium flex items-center gap-3 font-sans"
           >
             <span className="text-lg">🎭</span>
             <span>View Cart ({getTotalItems()})</span>

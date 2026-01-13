@@ -72,15 +72,14 @@ export function ConcertDetails() {
               whileHover={{ scale: 1.05, y: -10 }}
               className="relative group h-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-purple-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-              <div className="relative bg-gradient-to-br from-purple-900/30 to-black/50 backdrop-blur-sm p-4 md:p-8 rounded-2xl border border-purple-500/10 group-hover:border-amber-500/30 transition-all h-full flex flex-col shadow-sm hover:shadow-md">
+              <div className="relative bg-white/5 backdrop-blur-sm p-4 md:p-8 rounded-xl border border-white/10 group-hover:border-amber-500/30 transition-all h-full flex flex-col hover:bg-white/10">
                 {/* Mobile: Collapsible header */}
                 <button 
                   className="flex items-center justify-between w-full md:hidden"
                   onClick={() => setExpandedCard(expandedCard === index ? null : index)}
                 >
                   <div className="flex items-center gap-3">
-                    <feature.icon className="w-8 h-8 text-amber-500/80" />
+                    <feature.icon className="w-6 h-6 text-amber-500/70" />
                     <h3 
                       className="text-lg font-semibold text-white font-sans"
                     >
@@ -106,7 +105,7 @@ export function ConcertDetails() {
 
                 {/* Desktop: Always visible */}
                 <div className="hidden md:block">
-                  <feature.icon className="w-12 h-12 text-amber-500/80 mb-4" />
+                  <feature.icon className="w-10 h-10 text-amber-500/70 mb-4" />
                   <h3 
                     className="text-2xl font-semibold text-white mb-3 font-sans"
                   >
@@ -250,8 +249,7 @@ export function ConcertDetails() {
           className="mt-6 md:mt-24 max-w-3xl mx-auto text-center"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-purple-600/5 to-amber-500/5 rounded-2xl md:rounded-3xl blur-2xl" />
-            <div className="relative bg-gradient-to-br from-purple-900/40 to-black/60 backdrop-blur-sm p-4 md:p-12 rounded-2xl md:rounded-3xl border border-amber-500/20 shadow-sm">
+            <div className="relative bg-white/5 backdrop-blur-sm p-4 md:p-12 rounded-xl border border-white/10">
               {/* Mobile: Two lines */}
               <div className="md:hidden">
                 <p 
