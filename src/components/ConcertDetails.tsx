@@ -48,14 +48,13 @@ export function ConcertDetails() {
           className="text-center mb-6 md:mb-20"
         >
           <h2 
-            className="text-3xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent mb-2 md:mb-6"
+            className="text-3xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mb-2 md:mb-6"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
             Event Highlights
           </h2>
           <p 
-            className="text-sm md:text-xl text-purple-300 max-w-3xl mx-auto px-2"
-            style={{ fontFamily: 'Montserrat, sans-serif' }}
+            className="text-sm md:text-xl text-purple-300 max-w-3xl mx-auto px-2 font-sans"
           >
             Step into a world of mystery and elegance where music, art, and enchantment collide
           </p>
@@ -73,23 +72,22 @@ export function ConcertDetails() {
               whileHover={{ scale: 1.05, y: -10 }}
               className="relative group h-full"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-purple-600/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-              <div className="relative bg-gradient-to-br from-purple-900/40 to-black/40 backdrop-blur-sm p-4 md:p-8 rounded-2xl border border-purple-500/20 group-hover:border-yellow-500/50 transition-all h-full flex flex-col">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-purple-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
+              <div className="relative bg-gradient-to-br from-purple-900/30 to-black/50 backdrop-blur-sm p-4 md:p-8 rounded-2xl border border-purple-500/10 group-hover:border-amber-500/30 transition-all h-full flex flex-col shadow-sm hover:shadow-md">
                 {/* Mobile: Collapsible header */}
                 <button 
                   className="flex items-center justify-between w-full md:hidden"
                   onClick={() => setExpandedCard(expandedCard === index ? null : index)}
                 >
                   <div className="flex items-center gap-3">
-                    <feature.icon className="w-8 h-8 text-yellow-400" />
+                    <feature.icon className="w-8 h-8 text-amber-500/80" />
                     <h3 
-                      className="text-lg font-bold text-white"
-                      style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                      className="text-lg font-semibold text-white font-sans"
                     >
                       {feature.title}
                     </h3>
                   </div>
-                  <ChevronDown className={`w-5 h-5 text-yellow-400 transition-transform ${expandedCard === index ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-5 h-5 text-amber-500/80 transition-transform ${expandedCard === index ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {/* Mobile: Expandable description */}
@@ -99,8 +97,7 @@ export function ConcertDetails() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="text-purple-200 text-sm mt-3 md:hidden overflow-hidden"
-                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      className="text-purple-200 text-sm mt-3 md:hidden overflow-hidden font-sans"
                     >
                       {feature.description}
                     </motion.p>
@@ -109,16 +106,14 @@ export function ConcertDetails() {
 
                 {/* Desktop: Always visible */}
                 <div className="hidden md:block">
-                  <feature.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                  <feature.icon className="w-12 h-12 text-amber-500/80 mb-4" />
                   <h3 
-                    className="text-2xl font-bold text-white mb-3"
-                    style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                    className="text-2xl font-semibold text-white mb-3 font-sans"
                   >
                     {feature.title}
                   </h3>
                   <p 
-                    className="text-purple-200 flex-1"
-                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    className="text-purple-200 flex-1 font-sans"
                   >
                     {feature.description}
                   </p>
@@ -139,7 +134,7 @@ export function ConcertDetails() {
           <div className="md:hidden">
             <button
               onClick={() => setLineupExpanded(!lineupExpanded)}
-              className="w-full bg-gradient-to-r from-purple-900/50 to-purple-800/30 backdrop-blur-sm p-4 rounded-xl border border-purple-500/30 flex items-center justify-between"
+              className="w-full bg-gradient-to-r from-purple-900/50 to-purple-800/30 backdrop-blur-sm p-4 rounded-xl border border-purple-500/10 hover:border-purple-500/30 flex items-center justify-between shadow-sm transition-all"
             >
               <h3 
                 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
@@ -162,30 +157,27 @@ export function ConcertDetails() {
                     {lineup.map((artist, index) => (
                       <div
                         key={index}
-                        className="bg-gradient-to-r from-purple-900/40 to-purple-800/20 backdrop-blur-sm p-3 rounded-lg border border-purple-500/20 flex items-center justify-between"
+                        className="bg-gradient-to-r from-purple-900/40 to-purple-800/20 backdrop-blur-sm p-3 rounded-lg border border-purple-500/10 flex items-center justify-between shadow-sm"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-sm font-bold text-black">
+                          <div className="w-8 h-8 bg-gradient-to-br from-amber-500/80 to-amber-600/80 rounded-full flex items-center justify-center text-sm font-bold text-white border border-amber-400/30">
                             {index + 1}
                           </div>
                           <div>
                             <h4 
-                              className="text-base font-bold text-white"
-                              style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '0.5px' }}
+                              className="text-base font-semibold text-white font-sans"
                             >
                               {artist.name}
                             </h4>
                             <p 
-                              className="text-purple-300 text-xs"
-                              style={{ fontFamily: 'Montserrat, sans-serif' }}
+                              className="text-purple-300 text-xs font-sans"
                             >
                               {artist.role}
                             </p>
                           </div>
                         </div>
                         <p 
-                          className="text-sm font-bold text-yellow-400"
-                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                          className="text-sm font-semibold text-amber-500/90 font-sans"
                         >
                           {artist.time}
                         </p>
@@ -218,21 +210,19 @@ export function ConcertDetails() {
                   className="relative group cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                  <div className="relative bg-gradient-to-r from-purple-900/50 to-purple-800/30 backdrop-blur-sm p-6 rounded-xl border border-purple-500/30 group-hover:border-yellow-500/50 transition-all flex items-center justify-between">
+                  <div className="relative bg-gradient-to-r from-purple-900/50 to-purple-800/30 backdrop-blur-sm p-6 rounded-xl border border-purple-500/10 group-hover:border-purple-500/30 transition-all flex items-center justify-between shadow-sm hover:shadow-md">
                     <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full flex items-center justify-center text-2xl font-bold text-black">
+                      <div className="w-16 h-16 bg-gradient-to-br from-amber-500/80 to-amber-600/80 rounded-full flex items-center justify-center text-2xl font-bold text-white border border-amber-400/30">
                         {index + 1}
                       </div>
                       <div>
                         <h4 
-                          className="text-2xl font-bold text-white mb-1"
-                          style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+                          className="text-2xl font-semibold text-white mb-1 font-sans"
                         >
                           {artist.name}
                         </h4>
                         <p 
-                          className="text-purple-300"
-                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                          className="text-purple-300 font-sans"
                         >
                           {artist.role}
                         </p>
@@ -240,8 +230,7 @@ export function ConcertDetails() {
                     </div>
                     <div className="text-right">
                       <p 
-                        className="text-xl font-bold text-yellow-400"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        className="text-xl font-semibold text-amber-500/90 font-sans"
                       >
                         {artist.time}
                       </p>
@@ -261,12 +250,12 @@ export function ConcertDetails() {
           className="mt-6 md:mt-24 max-w-3xl mx-auto text-center"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-purple-600/10 to-yellow-500/10 rounded-2xl md:rounded-3xl blur-2xl" />
-            <div className="relative bg-gradient-to-br from-purple-900/60 to-black/60 backdrop-blur-sm p-4 md:p-12 rounded-2xl md:rounded-3xl border md:border-2 border-yellow-500/30">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 via-purple-600/5 to-amber-500/5 rounded-2xl md:rounded-3xl blur-2xl" />
+            <div className="relative bg-gradient-to-br from-purple-900/40 to-black/60 backdrop-blur-sm p-4 md:p-12 rounded-2xl md:rounded-3xl border border-amber-500/20 shadow-sm">
               {/* Mobile: Two lines */}
               <div className="md:hidden">
                 <p 
-                  className="text-lg text-yellow-400 font-bold"
+                  className="text-lg text-amber-500/90 font-bold"
                   style={{ fontFamily: 'Cinzel, serif' }}
                 >
                   🎭 Dress Code
@@ -281,7 +270,7 @@ export function ConcertDetails() {
               {/* Desktop: Full display */}
               <div className="hidden md:block">
                 <h3 
-                  className="text-4xl font-bold text-yellow-400 mb-6"
+                  className="text-4xl font-bold text-amber-500/90 mb-6"
                   style={{ fontFamily: 'Cinzel, serif' }}
                 >
                   🎭 Dress Code 🎭
@@ -293,8 +282,7 @@ export function ConcertDetails() {
                   Formal Masquerade Attire Required
                 </p>
                 <p 
-                  className="text-lg text-purple-300"
-                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  className="text-lg text-purple-300 font-sans"
                 >
                   Don your finest evening wear and an elegant mask. Let your mystique shine through!
                 </p>

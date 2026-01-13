@@ -305,11 +305,11 @@ function StripePaymentForm({
 
       {/* Backend status warning */}
       {backendAvailable === false && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-500/90 mt-0.5 shrink-0" />
           <div className="text-sm" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-            <p className="text-amber-300 font-semibold">Demo Mode</p>
-            <p className="text-amber-200/70">
+            <p className="text-amber-500/80 font-semibold">Demo Mode</p>
+            <p className="text-amber-500/60">
               Backend server not running. Payments will be simulated.
             </p>
           </div>
@@ -383,7 +383,7 @@ function StripePaymentForm({
       )}
 
       {/* Price Summary */}
-      <div className="bg-gradient-to-r from-yellow-500/10 to-amber-600/10 rounded-2xl p-5 border-2 border-yellow-500/30">
+      <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/10 rounded-2xl p-5 border-2 border-amber-500/20">
         <div className="space-y-2 text-sm" style={{ fontFamily: 'Montserrat, sans-serif' }}>
           <div className="flex justify-between text-purple-300">
             <span>Tickets</span>
@@ -421,7 +421,7 @@ function StripePaymentForm({
           whileTap={{ scale: isProcessing ? 1 : 0.98 }}
           onClick={handleSubmit}
           disabled={isProcessing || (selectedMethod === 'card' && !cardComplete && backendAvailable !== false)}
-          className="flex-1 py-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black rounded-xl font-bold hover:shadow-2xl hover:shadow-yellow-500/50 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+          className="flex-1 py-4 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white rounded-xl font-bold hover:shadow-2xl hover:shadow-amber-500/20 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
           style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
         >
           {isProcessing ? (

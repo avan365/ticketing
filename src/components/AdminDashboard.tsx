@@ -262,7 +262,7 @@ export function AdminDashboard({ onClose }: AdminDashboardProps) {
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-black rounded-xl font-bold hover:shadow-lg transition-all"
+                className="flex-1 py-3 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white rounded-xl font-bold hover:shadow-lg transition-all"
                 style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
               >
                 Login

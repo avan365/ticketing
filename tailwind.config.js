@@ -7,10 +7,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         'cinzel': ['Cinzel', 'serif'],
         'playfair': ['Playfair Display', 'serif'],
-        'bebas': ['Bebas Neue', 'sans-serif'],
-        'montserrat': ['Montserrat', 'sans-serif'],
+        'display': ['Inter', 'sans-serif'],
       },
       colors: {
         gold: {
@@ -42,4 +42,5 @@ export default {
   },
   plugins: [],
 }
+
 

@@ -127,14 +127,13 @@ export default function App() {
             className="space-y-1 md:space-y-4"
           >
             <h3 
-              className="text-lg md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent"
+              className="text-lg md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent"
               style={{ fontFamily: 'Cinzel, serif' }}
             >
               ADHEERAA
             </h3>
             <p 
-              className="text-purple-300 text-[10px] md:text-base"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
+              className="text-purple-300 text-[10px] md:text-base font-sans"
             >
               Masquerade Night 2026 • Skyfall Rooftop Bar, Singapore
             </p>
@@ -145,8 +144,7 @@ export default function App() {
               <motion.span whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer">🎶</motion.span>
             </div>
             <p 
-              className="text-[9px] md:text-sm text-purple-400 pt-1 md:pt-4"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
+              className="text-[9px] md:text-sm text-purple-400 pt-1 md:pt-4 font-sans"
             >
               © 2026 ADHEERAA Events. All rights reserved.
             </p>
@@ -197,8 +195,7 @@ export default function App() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowCheckout(true)}
-            className="fixed bottom-8 right-8 bg-gradient-to-r from-yellow-500 to-amber-600 text-black px-8 py-4 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 z-50 font-bold flex items-center gap-3"
-            style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+            className="fixed bottom-8 right-8 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white px-8 py-4 rounded-full shadow-md hover:shadow-lg transition-all duration-300 z-50 font-semibold flex items-center gap-3 font-sans backdrop-blur-sm border border-amber-500/20"
           >
             <span className="text-lg">🎭</span>
             <span>View Cart ({getTotalItems()})</span>

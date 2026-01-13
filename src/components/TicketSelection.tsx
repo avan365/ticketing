@@ -39,7 +39,7 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
       case 'regular':
         return 'from-blue-400 via-cyan-500 to-blue-600';
       case 'table':
-        return 'from-yellow-400 via-amber-500 to-yellow-600';
+        return 'from-amber-500 via-amber-600 to-amber-700';
       default:
         return 'from-purple-400 via-pink-500 to-purple-600';
     }
@@ -80,8 +80,8 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
     <div id="tickets" className="py-12 md:py-24 bg-[#0a0a12] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-1/4 left-1/4 w-48 md:w-96 h-48 md:h-96 bg-purple-600 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 bg-yellow-600 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-48 md:w-96 h-48 md:h-96 bg-purple-600/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 md:w-96 h-48 md:h-96 bg-amber-600/20 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -94,14 +94,13 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
           className="text-center mb-6 md:mb-20"
         >
           <h2 
-            className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 md:mb-6"
+            className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-amber-400 via-purple-300/60 to-amber-500 bg-clip-text text-transparent mb-2 md:mb-6"
             style={{ fontFamily: 'Cinzel, serif' }}
           >
             Choose Your Experience
           </h2>
           <p 
-            className="text-sm md:text-xl text-purple-300 max-w-3xl mx-auto px-4"
-            style={{ fontFamily: 'Montserrat, sans-serif' }}
+            className="text-sm md:text-xl text-purple-300 max-w-3xl mx-auto px-4 font-sans"
           >
             Select the perfect ticket for an unforgettable night of mystery and magic
           </p>
@@ -133,11 +132,11 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                 <div className={`absolute inset-0 bg-gradient-to-br ${gradient} ${isSoldOut ? 'opacity-5' : 'opacity-20 group-hover:opacity-40'} rounded-3xl blur-2xl transition-all duration-500`} />
                 
                 {/* Card */}
-                <div className={`relative bg-gradient-to-br from-purple-900/80 to-black/80 backdrop-blur-xl rounded-3xl border-2 ${
+                <div className={`relative bg-gradient-to-br from-purple-900/40 to-black/70 backdrop-blur-xl rounded-2xl border ${
                   isSoldOut 
-                    ? 'border-gray-600/30 opacity-60' 
-                    : 'border-purple-500/30 group-hover:border-yellow-400/50'
-                } transition-all duration-500 overflow-hidden h-full flex flex-col`}>
+                    ? 'border-gray-600/20 opacity-60' 
+                    : 'border-purple-500/10 group-hover:border-amber-500/30'
+                } transition-all duration-300 overflow-hidden h-full flex flex-col shadow-sm hover:shadow-lg`}>
                   
                   {/* Sold Out Badge */}
                   {isSoldOut && (
@@ -238,7 +237,7 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleQuantityChange(ticket.id, -1, ticket.available)}
                             disabled={quantity === 0}
-                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/30 hover:bg-purple-700/40 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                           >
                             <Minus className="w-4 h-4 md:w-5 md:h-5" />
                           </motion.button>
@@ -249,7 +248,7 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleQuantityChange(ticket.id, 1, ticket.available)}
                             disabled={quantity >= Math.min(10, ticket.available)}
-                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/50 hover:bg-purple-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-purple-800/30 hover:bg-purple-700/40 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
                           >
                             <Plus className="w-4 h-4 md:w-5 md:h-5" />
                           </motion.button>
@@ -259,16 +258,16 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
 
                     {/* Add to Cart Button */}
                     <motion.button
-                      whileHover={{ scale: isSoldOut ? 1 : 1.02 }}
-                      whileTap={{ scale: isSoldOut ? 1 : 0.98 }}
+                      whileHover={{ scale: isSoldOut ? 1 : 1.01 }}
+                      whileTap={{ scale: isSoldOut ? 1 : 0.99 }}
                       onClick={() => handleAddToCart(ticket)}
                       disabled={isSoldOut || quantity === 0}
-                      className={`w-full py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+                      className={`w-full py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all duration-200 flex items-center justify-center gap-2 font-sans ${
                         isSoldOut
                           ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
                           : isAdded
                             ? 'bg-green-500 text-white'
-                            : `bg-gradient-to-r ${gradient} text-white hover:shadow-2xl`
+                            : `bg-gradient-to-r ${gradient} text-white hover:shadow-lg`
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       {isSoldOut ? (
@@ -301,9 +300,9 @@ export function TicketSelection({ tickets, onAddToCart }: TicketSelectionProps) 
           viewport={{ once: true }}
           className="mt-8 md:mt-20 max-w-4xl mx-auto"
         >
-          <div className="bg-gradient-to-r from-purple-900/40 to-purple-800/40 backdrop-blur-sm rounded-xl md:rounded-2xl border border-purple-500/30 p-4 md:p-8">
-            <h4 className="text-base md:text-2xl font-bold text-yellow-400 mb-2 md:mb-4">📋 Important Information</h4>
-            <ul className="space-y-1 md:space-y-2 text-purple-200 text-xs md:text-base">
+          <div className="bg-gradient-to-r from-purple-900/20 to-purple-800/20 backdrop-blur-sm rounded-xl md:rounded-2xl border border-purple-500/10 p-4 md:p-8 shadow-sm">
+            <h4 className="text-base md:text-2xl font-semibold text-amber-500/90 mb-2 md:mb-4 font-sans">📋 Important Information</h4>
+            <ul className="space-y-1 md:space-y-2 text-purple-200 text-xs md:text-base font-sans">
               <li>• All tickets are non-refundable but transferable</li>
               <li>• Valid ID required at entry</li>
               <li>• Masquerade mask mandatory for all attendees</li>

@@ -42,7 +42,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
-            className="absolute rounded-full bg-yellow-400"
+            className="absolute rounded-full bg-amber-400/40"
             style={{
               left: `${particle.x}%`,
               top: `${particle.y}%`,
@@ -73,7 +73,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={onCheckout}
-          className="fixed top-4 right-4 md:top-8 md:right-8 z-50 bg-gradient-to-r from-yellow-500 to-amber-600 text-black p-3 md:p-4 rounded-full shadow-2xl hover:scale-110 transition-transform"
+          className="fixed top-4 right-4 md:top-8 md:right-8 z-50 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 transition-transform backdrop-blur-sm border border-amber-500/20"
         >
           <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
           <span className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-purple-600 text-white text-xs font-bold rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
@@ -106,11 +106,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-purple-600/20 rounded-2xl md:rounded-3xl blur-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-purple-600/10 rounded-2xl md:rounded-3xl blur-3xl" />
               <img
-                src="/hero-poster.jpg"
+                src="/poster.png"
                 alt="ADHEERAA Masquerade Night"
-                className="relative rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-yellow-500/30 w-full"
+                className="relative rounded-2xl md:rounded-3xl shadow-xl border border-amber-500/20 w-full"
               />
             </motion.div>
           </motion.div>
@@ -127,11 +127,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
                 transition={{ duration: 2, repeat: Infinity }}
                 className="inline-block mb-2 md:mb-4"
               >
-                <Sparkles className="w-8 h-8 md:w-12 md:h-12 text-yellow-400" />
+                <Sparkles className="w-8 h-8 md:w-12 md:h-12 text-amber-500/80" />
               </motion.div>
               <h1 className="font-bold mb-2 md:mb-4">
                 <motion.span
-                  className="block text-[12vw] md:text-6xl lg:text-8xl bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent w-[90vw] md:w-auto mx-auto md:mx-0"
+                  className="block text-[12vw] md:text-6xl lg:text-8xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent w-[90vw] md:w-auto mx-auto md:mx-0"
                   animate={{
                     backgroundPosition: ['0%', '100%', '0%'],
                   }}
@@ -159,8 +159,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="space-y-3 md:space-y-4"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
+              className="space-y-3 md:space-y-4 font-sans"
             >
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
                 <span className="text-2xl md:text-4xl">📅</span>
@@ -186,8 +185,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               transition={{ delay: 0.8 }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-block bg-gradient-to-r from-yellow-500 to-amber-600 text-black px-8 py-3 md:px-12 md:py-5 rounded-full text-lg md:text-2xl font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300"
-              style={{ fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '1px' }}
+              className="inline-block bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white px-8 py-3 md:px-12 md:py-5 rounded-full text-lg md:text-xl font-semibold shadow-md hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 font-sans backdrop-blur-sm border border-amber-500/20"
             >
               Get Your Tickets 🎭
             </motion.a>
@@ -201,11 +199,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
         transition={{ duration: 2, repeat: Infinity }}
         className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2"
       >
-        <div className="w-6 h-10 border-2 border-yellow-400 rounded-full flex items-start justify-center p-2">
+        <div className="w-6 h-10 border border-amber-500/40 rounded-full flex items-start justify-center p-2">
           <motion.div
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1.5 h-1.5 bg-yellow-400 rounded-full"
+            className="w-1.5 h-1.5 bg-amber-500/60 rounded-full"
           />
         </div>
       </motion.div>
