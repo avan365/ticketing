@@ -55,7 +55,32 @@ export function getAdminPassword(): string {
   return ADMIN_PASSWORD;
 }
 
-export function getAllOrders(): Order[] {
+// API URL - Uses relative path for Vercel, localhost for dev
+const API_URL = import.meta.env.DEV ? "http://localhost:3001" : "";
+
+export async function getAllOrders(): Promise<Order[]> {
+  // In production (Vercel), fetch from API
+  if (!import.meta.env.DEV) {
+    try {
+      const response = await fetch(`${API_URL}/api/orders`);
+      if (!response.ok) {
+        console.error('Failed to fetch orders from API');
+        return [];
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching orders from API:', error);
+      // Fallback to localStorage if API fails
+      try {
+        const stored = localStorage.getItem(ORDERS_KEY);
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+  }
+  
+  // In development, use localStorage
   try {
     const stored = localStorage.getItem(ORDERS_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -64,18 +89,41 @@ export function getAllOrders(): Order[] {
   }
 }
 
-export function saveOrder(order: Order): void {
-  const orders = getAllOrders();
+export async function saveOrder(order: Order): Promise<void> {
+  // In production (Vercel), save to API
+  if (!import.meta.env.DEV) {
+    try {
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save order');
+      }
+      // Also save to localStorage as backup
+      const orders = await getAllOrders();
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+      return;
+    } catch (error) {
+      console.error('Error saving order to API:', error);
+      // Fallback to localStorage
+    }
+  }
+  
+  // In development, use localStorage
+  const orders = await getAllOrders();
   orders.unshift(order); // Add to beginning (newest first)
   localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
 }
 
-export function updateOrderStatus(
+export async function updateOrderStatus(
   orderId: string, 
   status: Order['status'], 
   adminNotes?: string
-): void {
-  const orders = getAllOrders();
+): Promise<void> {
+  const orders = await getAllOrders();
   const index = orders.findIndex(o => o.id === orderId);
   
   if (index !== -1) {
@@ -91,12 +139,46 @@ export function updateOrderStatus(
 /**
  * Find ticket by ticketId and update its status (case-insensitive)
  */
-export function updateTicketStatus(
+export async function updateTicketStatus(
   ticketId: string,
   status: IndividualTicket['status'],
   scannedBy?: string
-): { success: boolean; orderNumber?: string; ticketType?: string; error?: string } {
-  const orders = getAllOrders();
+): Promise<{ success: boolean; orderNumber?: string; ticketType?: string; error?: string }> {
+  // In production (Vercel), update via API
+  if (!import.meta.env.DEV) {
+    try {
+      const params = new URLSearchParams({ ticketId, status });
+      if (scannedBy) params.append('scannedBy', scannedBy);
+      
+      const response = await fetch(`${API_URL}/api/orders/ticket?${params}`, {
+        method: 'PATCH',
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        return { success: false, error: error.error || 'Failed to update ticket' };
+      }
+      
+      // Fetch updated order to get details
+      const ticketResponse = await fetch(`${API_URL}/api/orders?ticketId=${ticketId}`);
+      if (ticketResponse.ok) {
+        const { order, ticket } = await ticketResponse.json();
+        return {
+          success: true,
+          orderNumber: order.orderNumber,
+          ticketType: ticket.ticketType,
+        };
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating ticket via API:', error);
+      // Fallback to localStorage
+    }
+  }
+  
+  // In development, use localStorage
+  const orders = await getAllOrders();
   const normalizedTicketId = ticketId.trim().toUpperCase();
   
   for (const order of orders) {
@@ -124,8 +206,8 @@ export function updateTicketStatus(
 /**
  * Find ticket by order number and ticket ID (case-insensitive)
  */
-export function findTicket(orderNumber: string, ticketId: string): IndividualTicket | null {
-  const orders = getAllOrders();
+export async function findTicket(orderNumber: string, ticketId: string): Promise<IndividualTicket | null> {
+  const orders = await getAllOrders();
   const normalizedOrderNumber = orderNumber.trim().toUpperCase();
   const normalizedTicketId = ticketId.trim().toUpperCase();
   
@@ -143,18 +225,18 @@ export function findTicket(orderNumber: string, ticketId: string): IndividualTic
 /**
  * Get order by order number
  */
-export function getOrderByNumber(orderNumber: string): Order | null {
-  const orders = getAllOrders();
+export async function getOrderByNumber(orderNumber: string): Promise<Order | null> {
+  const orders = await getAllOrders();
   return orders.find(o => o.orderNumber === orderNumber) || null;
 }
 
-export function deleteOrder(orderId: string): void {
-  const orders = getAllOrders().filter(o => o.id !== orderId);
+export async function deleteOrder(orderId: string): Promise<void> {
+  const orders = (await getAllOrders()).filter(o => o.id !== orderId);
   localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
 }
 
-export function getOrderStats() {
-  const orders = getAllOrders();
+export async function getOrderStats() {
+  const orders = await getAllOrders();
   
   // Calculate revenue without platform fees (just ticket prices)
   const totalRevenue = orders
@@ -188,8 +270,8 @@ export function getOrderStats() {
   };
 }
 
-export function exportOrdersToCSV(): string {
-  const orders = getAllOrders();
+export async function exportOrdersToCSV(): Promise<string> {
+  const orders = await getAllOrders();
   
   const headers = [
     'Order Number',
@@ -225,8 +307,8 @@ export function exportOrdersToCSV(): string {
   return csvContent;
 }
 
-export function downloadCSV(): void {
-  const csv = exportOrdersToCSV();
+export async function downloadCSV(): Promise<void> {
+  const csv = await exportOrdersToCSV();
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

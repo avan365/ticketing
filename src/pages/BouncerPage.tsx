@@ -1,22 +1,19 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-  QrCode, CheckCircle, XCircle, 
-  Search, Camera, X
-} from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
-import { 
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { QrCode, CheckCircle, XCircle, Search, Camera, X } from "lucide-react";
+import { Html5Qrcode } from "html5-qrcode";
+import {
   updateTicketStatus,
   getAllOrders,
-  type IndividualTicket 
-} from '../utils/orders';
-import { parseQRCodeData } from '../utils/qrcode';
+  type IndividualTicket,
+} from "../utils/orders";
+import { parseQRCodeData } from "../utils/qrcode";
 
 export function BouncerPage() {
-  const [scanMode, setScanMode] = useState<'qr' | 'manual'>('qr');
-  const [scannedData, setScannedData] = useState<string>('');
-  const [manualOrderNumber, setManualOrderNumber] = useState('');
-  const [manualTicketId, setManualTicketId] = useState('');
+  const [scanMode, setScanMode] = useState<"qr" | "manual">("qr");
+  const [scannedData, setScannedData] = useState<string>("");
+  const [manualOrderNumber, setManualOrderNumber] = useState("");
+  const [manualTicketId, setManualTicketId] = useState("");
   const [result, setResult] = useState<{
     success: boolean;
     message: string;
@@ -32,22 +29,25 @@ export function BouncerPage() {
 
   // Debug helper: Log all orders on mount
   useEffect(() => {
-    const orders = getAllOrders();
-    console.log('🔍 BOUNCER PAGE - All orders in system:', orders.length);
+    getAllOrders().then(orders => {
+      console.log("🔍 BOUNCER PAGE - All orders in system:", orders.length);
     if (orders.length > 0) {
-      console.table(orders.map(o => ({
-        orderNumber: o.orderNumber,
-        status: o.status,
-        ticketCount: o.individualTickets?.length || 0,
-        hasTickets: !!o.individualTickets?.length
-      })));
-    } else {
-      console.warn('⚠️ No orders found in localStorage!');
-      console.log('localStorage keys:', Object.keys(localStorage));
-      const raw = localStorage.getItem('adheeraa_orders');
-      console.log('Raw adheeraa_orders:', raw);
-    }
-  }, []);
+      console.table(
+        orders.map((o) => ({
+          orderNumber: o.orderNumber,
+          status: o.status,
+          ticketCount: o.individualTickets?.length || 0,
+          hasTickets: !!o.individualTickets?.length,
+        }))
+      );
+      } else {
+        console.warn("⚠️ No orders found in localStorage!");
+        console.log("localStorage keys:", Object.keys(localStorage));
+        const raw = localStorage.getItem("adheeraa_orders");
+        console.log("Raw adheeraa_orders:", raw);
+      }
+    });
+    }, []);
 
   useEffect(() => {
     return () => {
@@ -61,7 +61,7 @@ export function BouncerPage() {
   const startCamera = async () => {
     setCameraError(null);
     setScanningQR(false);
-    
+
     try {
       // Clean up any existing scanner
       if (scannerRef.current && scannerRef.current.isScanning) {
@@ -75,10 +75,10 @@ export function BouncerPage() {
 
       // IMPORTANT: Set scanning to true FIRST so the div renders
       setScanning(true);
-      
+
       // Wait for React to render the div before creating scanner
       // Use requestAnimationFrame to ensure DOM is updated
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         requestAnimationFrame(() => {
           requestAnimationFrame(resolve);
         });
@@ -87,7 +87,7 @@ export function BouncerPage() {
       // Verify the element exists
       const element = document.getElementById(qrCodeRegionId);
       if (!element) {
-        throw new Error('QR code scanner element not found in DOM');
+        throw new Error("QR code scanner element not found in DOM");
       }
 
       // Create new scanner instance AFTER div exists
@@ -97,19 +97,21 @@ export function BouncerPage() {
       // Get available cameras
       const devices = await Html5Qrcode.getCameras();
       if (!devices || devices.length === 0) {
-        throw new Error('No cameras found');
+        throw new Error("No cameras found");
       }
 
       // Try cameras in order: back camera first, then front, then any other
       let cameraId: string | null = null;
-      const backCamera = devices.find(d => 
-        d.label.toLowerCase().includes('back') || 
-        d.label.toLowerCase().includes('rear') ||
-        d.label.toLowerCase().includes('environment')
+      const backCamera = devices.find(
+        (d) =>
+          d.label.toLowerCase().includes("back") ||
+          d.label.toLowerCase().includes("rear") ||
+          d.label.toLowerCase().includes("environment")
       );
-      const frontCamera = devices.find(d => 
-        d.label.toLowerCase().includes('front') || 
-        d.label.toLowerCase().includes('user')
+      const frontCamera = devices.find(
+        (d) =>
+          d.label.toLowerCase().includes("front") ||
+          d.label.toLowerCase().includes("user")
       );
 
       // Priority: back > front > first available
@@ -147,10 +149,13 @@ export function BouncerPage() {
         );
       } catch (startError: any) {
         // If specific camera fails, try with facingMode constraint
-        console.log('Camera ID failed, trying with facingMode constraint:', startError);
+        console.log(
+          "Camera ID failed, trying with facingMode constraint:",
+          startError
+        );
         try {
           await scanner.start(
-            { facingMode: backCamera ? 'environment' : 'user' },
+            { facingMode: backCamera ? "environment" : "user" },
             {
               fps: 10,
               qrbox: { width: 250, height: 250 },
@@ -176,33 +181,46 @@ export function BouncerPage() {
       // Success - clear any previous errors
       setCameraError(null);
     } catch (error: any) {
-      console.error('Error starting camera:', error);
+      console.error("Error starting camera:", error);
       setScanning(false);
       setScanningQR(false);
-      
-      let errorMessage = '';
-      let retryMessage = '';
-      
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage = 'Camera permission denied';
+
+      let errorMessage = "";
+      let retryMessage = "";
+
+      if (
+        error.name === "NotAllowedError" ||
+        error.name === "PermissionDeniedError"
+      ) {
+        errorMessage = "Camera permission denied";
         retryMessage = 'Click "Allow" when prompted, then click "Try Again"';
-      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-        errorMessage = 'No camera found';
-        retryMessage = 'Make sure your device has a camera and try again';
-      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-        errorMessage = 'Camera is in use';
-        retryMessage = 'Close other apps using the camera, then click "Try Again"';
-      } else if (error.message?.includes('No cameras')) {
-        errorMessage = 'No cameras available';
-        retryMessage = 'No camera detected. Please check your device settings';
-      } else if (error.message?.includes('start failed') || error.message?.includes('Could not start')) {
-        errorMessage = 'Camera failed to start';
-        retryMessage = 'Try again or switch to a different camera';
+      } else if (
+        error.name === "NotFoundError" ||
+        error.name === "DevicesNotFoundError"
+      ) {
+        errorMessage = "No camera found";
+        retryMessage = "Make sure your device has a camera and try again";
+      } else if (
+        error.name === "NotReadableError" ||
+        error.name === "TrackStartError"
+      ) {
+        errorMessage = "Camera is in use";
+        retryMessage =
+          'Close other apps using the camera, then click "Try Again"';
+      } else if (error.message?.includes("No cameras")) {
+        errorMessage = "No cameras available";
+        retryMessage = "No camera detected. Please check your device settings";
+      } else if (
+        error.message?.includes("start failed") ||
+        error.message?.includes("Could not start")
+      ) {
+        errorMessage = "Camera failed to start";
+        retryMessage = "Try again or switch to a different camera";
       } else {
-        errorMessage = 'Camera access failed';
-        retryMessage = 'Try again or check browser permissions';
+        errorMessage = "Camera access failed";
+        retryMessage = "Try again or check browser permissions";
       }
-      
+
       // Only show manual entry as last resort, don't auto-switch
       setCameraError(`${errorMessage}. ${retryMessage}`);
     }
@@ -213,7 +231,7 @@ export function BouncerPage() {
       try {
         await scannerRef.current.stop();
       } catch (err) {
-        console.error('Error stopping scanner:', err);
+        console.error("Error stopping scanner:", err);
       }
       scannerRef.current.clear();
     }
@@ -225,109 +243,145 @@ export function BouncerPage() {
   const handleQRScan = (qrData: string) => {
     // Clean the QR data
     const cleanData = qrData.trim();
-    console.log('Scanned QR data (raw):', cleanData);
-    
+    console.log("Scanned QR data (raw):", cleanData);
+
     const parsed = parseQRCodeData(cleanData);
     if (!parsed) {
-      console.error('Failed to parse QR code:', cleanData);
+      console.error("Failed to parse QR code:", cleanData);
       setResult({
         success: false,
-        message: `Invalid QR code format. Scanned: "${cleanData.substring(0, 50)}...". Expected format: "ORDER|TICKET" or "ORDER TICKET"`,
+        message: `Invalid QR code format. Scanned: "${cleanData.substring(
+          0,
+          50
+        )}...". Expected format: "ORDER|TICKET" or "ORDER TICKET"`,
       });
       return;
     }
 
-    console.log('Parsed QR code:', parsed);
+    console.log("Parsed QR code:", parsed);
     // parseQRCodeData already normalizes, so we can use directly
-    validateTicket(parsed.orderNumber, parsed.ticketId);
+    validateTicket(parsed.orderNumber, parsed.ticketId).catch(err => {
+      console.error("Error validating ticket:", err);
+      setResult({
+        success: false,
+        message: `Validation error: ${err.message || 'Unknown error'}`,
+      });
+    });
   };
 
-  const validateTicket = (orderNumber: string, ticketId: string) => {
+  const validateTicket = async (orderNumber: string, ticketId: string) => {
     // Normalize inputs (remove all spaces, uppercase, trim)
     // parseQRCodeData already does this, but double-check for manual entry
-    const normalizedOrderNumber = orderNumber.replace(/\s+/g, '').trim().toUpperCase();
-    const normalizedTicketId = ticketId.replace(/\s+/g, '').trim().toUpperCase();
-    
-    console.log('=== TICKET VALIDATION DEBUG ===');
-    console.log('Validating ticket:', { 
+    const normalizedOrderNumber = orderNumber
+      .replace(/\s+/g, "")
+      .trim()
+      .toUpperCase();
+    const normalizedTicketId = ticketId
+      .replace(/\s+/g, "")
+      .trim()
+      .toUpperCase();
+
+    console.log("=== TICKET VALIDATION DEBUG ===");
+    console.log("Validating ticket:", {
       originalOrderNumber: orderNumber,
       originalTicketId: ticketId,
-      normalizedOrderNumber, 
-      normalizedTicketId 
+      normalizedOrderNumber,
+      normalizedTicketId,
     });
-    
+
     // Debug: Check localStorage directly
-    const rawStorage = localStorage.getItem('adheeraa_orders');
-    console.log('Raw localStorage data:', rawStorage ? JSON.parse(rawStorage).length + ' orders' : 'EMPTY');
-    
+    const rawStorage = localStorage.getItem("adheeraa_orders");
+    console.log(
+      "Raw localStorage data:",
+      rawStorage ? JSON.parse(rawStorage).length + " orders" : "EMPTY"
+    );
+
     // First check if order exists
-    const orders = getAllOrders();
-    console.log('Total orders in system:', orders.length);
-    console.log('Available order numbers:', orders.map(o => o.orderNumber));
-    console.log('Order details:', orders.map(o => ({
-      orderNumber: o.orderNumber,
-      normalized: o.orderNumber.replace(/\s+/g, '').toUpperCase(),
-      status: o.status,
-      hasTickets: !!o.individualTickets?.length,
-      ticketCount: o.individualTickets?.length || 0,
-      ticketIds: o.individualTickets?.map(t => t.ticketId) || []
-    })));
-    const order = orders.find(o => {
-      const normalized = o.orderNumber.replace(/\s+/g, '').toUpperCase();
+    const orders = await getAllOrders();
+    console.log("Total orders in system:", orders.length);
+    console.log(
+      "Available order numbers:",
+      orders.map((o) => o.orderNumber)
+    );
+    console.log(
+      "Order details:",
+      orders.map((o) => ({
+        orderNumber: o.orderNumber,
+        normalized: o.orderNumber.replace(/\s+/g, "").toUpperCase(),
+        status: o.status,
+        hasTickets: !!o.individualTickets?.length,
+        ticketCount: o.individualTickets?.length || 0,
+        ticketIds: o.individualTickets?.map((t) => t.ticketId) || [],
+      }))
+    );
+    const order = orders.find((o) => {
+      const normalized = o.orderNumber.replace(/\s+/g, "").toUpperCase();
       return normalized === normalizedOrderNumber;
     });
-    
+
     if (!order) {
-      console.error('❌ Order not found:', normalizedOrderNumber);
-      console.log('Looking for (normalized):', normalizedOrderNumber);
-      console.log('All available orders (normalized):', orders.map(o => ({
-        original: o.orderNumber,
-        normalized: o.orderNumber.replace(/\s+/g, '').toUpperCase(),
-        matches: o.orderNumber.replace(/\s+/g, '').toUpperCase() === normalizedOrderNumber
-      })));
-      
+      console.error("❌ Order not found:", normalizedOrderNumber);
+      console.log("Looking for (normalized):", normalizedOrderNumber);
+      console.log(
+        "All available orders (normalized):",
+        orders.map((o) => ({
+          original: o.orderNumber,
+          normalized: o.orderNumber.replace(/\s+/g, "").toUpperCase(),
+          matches:
+            o.orderNumber.replace(/\s+/g, "").toUpperCase() ===
+            normalizedOrderNumber,
+        }))
+      );
+
       // Try to find by partial match
-      const partialMatch = orders.find(o => {
-        const normalized = o.orderNumber.replace(/\s+/g, '').toUpperCase();
-        return normalized.includes(normalizedOrderNumber) || normalizedOrderNumber.includes(normalized);
+      const partialMatch = orders.find((o) => {
+        const normalized = o.orderNumber.replace(/\s+/g, "").toUpperCase();
+        return (
+          normalized.includes(normalizedOrderNumber) ||
+          normalizedOrderNumber.includes(normalized)
+        );
       });
-      
+
       if (partialMatch) {
-        console.log('⚠️ Found partial match:', partialMatch.orderNumber);
+        console.log("⚠️ Found partial match:", partialMatch.orderNumber);
       }
-      
+
       setResult({
         success: false,
-        message: `Order not found: ${normalizedOrderNumber}. Available orders: ${orders.length > 0 ? orders.map(o => o.orderNumber).join(', ') : 'NONE - No orders in system'}`,
+        message: `Order not found: ${normalizedOrderNumber}. Available orders: ${
+          orders.length > 0
+            ? orders.map((o) => o.orderNumber).join(", ")
+            : "NONE - No orders in system"
+        }`,
       });
       return;
     }
-    
-    console.log('Order found:', {
+
+    console.log("Order found:", {
       orderNumber: order.orderNumber,
       status: order.status,
       hasIndividualTickets: !!order.individualTickets,
       ticketCount: order.individualTickets?.length || 0,
-      ticketIds: order.individualTickets?.map(t => t.ticketId) || []
+      ticketIds: order.individualTickets?.map((t) => t.ticketId) || [],
     });
-    
+
     // Check if order is verified
-    if (order.status !== 'verified') {
-      console.error('Order not verified:', order.status);
+    if (order.status !== "verified") {
+      console.error("Order not verified:", order.status);
       setResult({
         success: false,
         message: `Order ${normalizedOrderNumber} is ${order.status}. Only verified orders can be scanned. Please verify the order in the admin panel first.`,
       });
       return;
     }
-    
+
     // Check if order has individual tickets
     if (!order.individualTickets || order.individualTickets.length === 0) {
-      console.error('Order has no individual tickets');
-      console.log('Order details:', {
+      console.error("Order has no individual tickets");
+      console.log("Order details:", {
         orderNumber: order.orderNumber,
         tickets: order.tickets,
-        individualTickets: order.individualTickets
+        individualTickets: order.individualTickets,
       });
       setResult({
         success: false,
@@ -335,24 +389,27 @@ export function BouncerPage() {
       });
       return;
     }
-    
+
     // Find ticket (case-insensitive)
-    const ticket = order.individualTickets.find(
-      t => {
-        const normalized = t.ticketId.replace(/\s+/g, '').toUpperCase();
-        return normalized === normalizedTicketId;
-      }
-    );
-    
+    const ticket = order.individualTickets.find((t) => {
+      const normalized = t.ticketId.replace(/\s+/g, "").toUpperCase();
+      return normalized === normalizedTicketId;
+    });
+
     if (!ticket) {
-      console.error('Ticket not found in order:', normalizedTicketId);
-      console.log('Looking for:', normalizedTicketId);
-      console.log('Available tickets:', order.individualTickets.map(t => ({
-        ticketId: t.ticketId,
-        normalized: t.ticketId.replace(/\s+/g, '').toUpperCase(),
-        status: t.status
-      })));
-      const availableTickets = order.individualTickets.map(t => t.ticketId).join(', ');
+      console.error("Ticket not found in order:", normalizedTicketId);
+      console.log("Looking for:", normalizedTicketId);
+      console.log(
+        "Available tickets:",
+        order.individualTickets.map((t) => ({
+          ticketId: t.ticketId,
+          normalized: t.ticketId.replace(/\s+/g, "").toUpperCase(),
+          status: t.status,
+        }))
+      );
+      const availableTickets = order.individualTickets
+        .map((t) => t.ticketId)
+        .join(", ");
       setResult({
         success: false,
         message: `Ticket ${normalizedTicketId} not found in order ${normalizedOrderNumber}. Available tickets: ${availableTickets}`,
@@ -360,20 +417,24 @@ export function BouncerPage() {
       return;
     }
 
-    if (ticket.status === 'used') {
+    if (ticket.status === "used") {
       setResult({
         success: false,
-        message: `Ticket already used${ticket.scannedAt ? ` on ${new Date(ticket.scannedAt).toLocaleString()}` : ''}`,
+        message: `Ticket already used${
+          ticket.scannedAt
+            ? ` on ${new Date(ticket.scannedAt).toLocaleString()}`
+            : ""
+        }`,
         ticket,
         orderNumber,
       });
       return;
     }
 
-    if (ticket.status === 'invalid') {
+    if (ticket.status === "invalid") {
       setResult({
         success: false,
-        message: 'Ticket is invalid',
+        message: "Ticket is invalid",
         ticket,
         orderNumber,
       });
@@ -381,35 +442,35 @@ export function BouncerPage() {
     }
 
     // Mark ticket as used
-    const updateResult = updateTicketStatus(ticketId, 'used', 'bouncer');
-    
+    const updateResult = await updateTicketStatus(ticketId, "used", "bouncer");
+
     if (updateResult.success) {
       // Show success popup
       setShowSuccessPopup(true);
-      
+
       setResult({
         success: true,
         message: `Ticket validated! Type: ${ticket.ticketType}`,
-        ticket: { ...ticket, status: 'used' },
+        ticket: { ...ticket, status: "used" },
         orderNumber,
       });
-      
+
       // Auto-clear success popup after 2 seconds
       setTimeout(() => {
         setShowSuccessPopup(false);
       }, 2000);
-      
+
       // Auto-clear result after 4 seconds
       setTimeout(() => {
         setResult(null);
-        setScannedData('');
-        setManualOrderNumber('');
-        setManualTicketId('');
+        setScannedData("");
+        setManualOrderNumber("");
+        setManualTicketId("");
       }, 4000);
     } else {
       setResult({
         success: false,
-        message: 'Failed to update ticket status',
+        message: "Failed to update ticket status",
         ticket,
         orderNumber,
       });
@@ -421,11 +482,14 @@ export function BouncerPage() {
     if (!manualOrderNumber || !manualTicketId) {
       setResult({
         success: false,
-        message: 'Please enter both order number and ticket ID',
+        message: "Please enter both order number and ticket ID",
       });
       return;
     }
-    validateTicket(manualOrderNumber.trim(), manualTicketId.trim().toUpperCase());
+    validateTicket(
+      manualOrderNumber.trim(),
+      manualTicketId.trim().toUpperCase()
+    );
   };
 
   return (
@@ -453,9 +517,9 @@ export function BouncerPage() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 
+          <h1
             className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent"
-            style={{ fontFamily: 'Cinzel, serif' }}
+            style={{ fontFamily: "Cinzel, serif" }}
           >
             Ticket Scanner
           </h1>
@@ -468,14 +532,14 @@ export function BouncerPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              setScanMode('qr');
+              setScanMode("qr");
               stopCamera();
               setResult(null);
             }}
             className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              scanMode === 'qr'
-                ? 'bg-amber-600 text-white'
-                : 'bg-purple-900/50 text-purple-300 hover:bg-purple-800/50'
+              scanMode === "qr"
+                ? "bg-amber-600 text-white"
+                : "bg-purple-900/50 text-purple-300 hover:bg-purple-800/50"
             }`}
           >
             <QrCode className="w-5 h-5 inline mr-2" />
@@ -485,14 +549,14 @@ export function BouncerPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              setScanMode('manual');
+              setScanMode("manual");
               stopCamera();
               setResult(null);
             }}
             className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              scanMode === 'manual'
-                ? 'bg-amber-600 text-white'
-                : 'bg-purple-900/50 text-purple-300 hover:bg-purple-800/50'
+              scanMode === "manual"
+                ? "bg-amber-600 text-white"
+                : "bg-purple-900/50 text-purple-300 hover:bg-purple-800/50"
             }`}
           >
             <Search className="w-5 h-5 inline mr-2" />
@@ -501,7 +565,7 @@ export function BouncerPage() {
         </div>
 
         {/* QR Scan Mode */}
-        {scanMode === 'qr' && (
+        {scanMode === "qr" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -526,7 +590,10 @@ export function BouncerPage() {
             ) : (
               <div>
                 <div className="relative bg-black rounded-lg overflow-hidden mb-4">
-                  <div id={qrCodeRegionId} className="w-full min-h-[400px]"></div>
+                  <div
+                    id={qrCodeRegionId}
+                    className="w-full min-h-[400px]"
+                  ></div>
                   {scanningQR && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="border-2 border-green-400 rounded-lg w-64 h-64 opacity-50"></div>
@@ -547,8 +614,12 @@ export function BouncerPage() {
                     <div className="flex items-start gap-3">
                       <div className="text-yellow-400 text-xl">⚠️</div>
                       <div className="flex-1">
-                        <p className="text-yellow-400 text-sm font-semibold mb-1">Camera Issue</p>
-                        <p className="text-yellow-300 text-xs mb-3">{cameraError}</p>
+                        <p className="text-yellow-400 text-sm font-semibold mb-1">
+                          Camera Issue
+                        </p>
+                        <p className="text-yellow-300 text-xs mb-3">
+                          {cameraError}
+                        </p>
                         <div className="flex gap-2 flex-wrap">
                           <button
                             onClick={() => {
@@ -577,7 +648,7 @@ export function BouncerPage() {
                             onClick={() => {
                               stopCamera();
                               setCameraError(null);
-                              setScanMode('manual');
+                              setScanMode("manual");
                             }}
                             className="px-4 py-2 bg-purple-600/50 hover:bg-purple-600 text-white rounded-lg text-sm font-semibold transition-colors"
                           >
@@ -601,7 +672,7 @@ export function BouncerPage() {
                     value={scannedData}
                     onChange={(e) => setScannedData(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter' && scannedData) {
+                      if (e.key === "Enter" && scannedData) {
                         handleQRScan(scannedData);
                       }
                     }}
@@ -627,7 +698,7 @@ export function BouncerPage() {
         )}
 
         {/* Manual Entry Mode */}
-        {scanMode === 'manual' && (
+        {scanMode === "manual" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -641,7 +712,9 @@ export function BouncerPage() {
                 <input
                   type="text"
                   value={manualOrderNumber}
-                  onChange={(e) => setManualOrderNumber(e.target.value.toUpperCase())}
+                  onChange={(e) =>
+                    setManualOrderNumber(e.target.value.toUpperCase())
+                  }
                   placeholder="e.g., ORD-12345"
                   className="w-full px-4 py-3 bg-purple-900/50 border border-purple-500/30 rounded-lg text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none"
                   autoFocus
@@ -654,7 +727,9 @@ export function BouncerPage() {
                 <input
                   type="text"
                   value={manualTicketId}
-                  onChange={(e) => setManualTicketId(e.target.value.toUpperCase())}
+                  onChange={(e) =>
+                    setManualTicketId(e.target.value.toUpperCase())
+                  }
                   placeholder="e.g., TKT-ABC123"
                   className="w-full px-4 py-3 bg-purple-900/50 border border-purple-500/30 rounded-lg text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none"
                 />
@@ -680,8 +755,8 @@ export function BouncerPage() {
               exit={{ opacity: 0, y: -20 }}
               className={`mt-6 p-6 rounded-xl border-2 ${
                 result.success
-                  ? 'bg-green-900/20 border-green-500/50'
-                  : 'bg-red-900/20 border-red-500/50'
+                  ? "bg-green-900/20 border-green-500/50"
+                  : "bg-red-900/20 border-red-500/50"
               }`}
             >
               <div className="flex items-start gap-4">
@@ -691,10 +766,14 @@ export function BouncerPage() {
                   <XCircle className="w-8 h-8 text-red-400 flex-shrink-0" />
                 )}
                 <div className="flex-1">
-                  <h3 className={`text-lg font-bold mb-2 ${
-                    result.success ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    {result.success ? 'Ticket Scanned Successfully!' : 'Ticket Validation Failed'}
+                  <h3
+                    className={`text-lg font-bold mb-2 ${
+                      result.success ? "text-green-400" : "text-red-400"
+                    }`}
+                  >
+                    {result.success
+                      ? "Ticket Scanned Successfully!"
+                      : "Ticket Validation Failed"}
                   </h3>
                   <p className="text-white mb-2">{result.message}</p>
                   {result.ticket && (
@@ -703,7 +782,10 @@ export function BouncerPage() {
                       <p>Ticket ID: {result.ticket.ticketId}</p>
                       <p>Type: {result.ticket.ticketType}</p>
                       {result.ticket.scannedAt && (
-                        <p>Scanned: {new Date(result.ticket.scannedAt).toLocaleString()}</p>
+                        <p>
+                          Scanned:{" "}
+                          {new Date(result.ticket.scannedAt).toLocaleString()}
+                        </p>
                       )}
                     </div>
                   )}
@@ -711,9 +793,9 @@ export function BouncerPage() {
                 <button
                   onClick={() => {
                     setResult(null);
-                    setScannedData('');
-                    setManualOrderNumber('');
-                    setManualTicketId('');
+                    setScannedData("");
+                    setManualOrderNumber("");
+                    setManualTicketId("");
                   }}
                   className="text-purple-400 hover:text-purple-300"
                 >
@@ -727,7 +809,7 @@ export function BouncerPage() {
         {/* Stats */}
         <div className="mt-8 text-center">
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = "/")}
             className="text-purple-400 hover:text-purple-300 text-sm"
           >
             ← Back to Home
@@ -737,4 +819,3 @@ export function BouncerPage() {
     </div>
   );
 }
-

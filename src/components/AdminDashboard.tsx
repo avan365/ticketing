@@ -44,7 +44,7 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
   
   // Orders state
   const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState(getOrderStats());
+  const [stats, setStats] = useState<Awaited<ReturnType<typeof getOrderStats>>>({ total: 0, pending: 0, verified: 0, rejected: 0, totalRevenue: 0, pendingRevenue: 0 });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | Order['status']>('all');
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
@@ -76,9 +76,11 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
     }
   }, [isAuthenticated]);
 
-  const refreshData = () => {
-    setOrders(getAllOrders());
-    setStats(getOrderStats());
+  const refreshData = async () => {
+    const orders = await getAllOrders();
+    setOrders(orders);
+    const statsData = await getOrderStats();
+    setStats(statsData);
     setInventory(getInventory());
     setInventoryStats(getInventoryStats());
   };
@@ -180,15 +182,17 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
       }
     }
     
-    updateOrderStatus(orderId, status);
-    refreshData();
+    updateOrderStatus(orderId, status).then(() => {
+      refreshData();
+    });
   };
   
   const handleOverrideConfirm = () => {
     if (overridePassword === OVERRIDE_PASSWORD) {
       if (pendingStatusChange) {
-        updateOrderStatus(pendingStatusChange.orderId, pendingStatusChange.status);
-        refreshData();
+        updateOrderStatus(pendingStatusChange.orderId, pendingStatusChange.status).then(() => {
+          refreshData();
+        });
       }
       setShowOverrideModal(false);
       setPendingStatusChange(null);
@@ -199,9 +203,9 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
     }
   };
 
-  const handleDelete = (orderId: string) => {
+  const handleDelete = async (orderId: string) => {
     if (confirm('Are you sure you want to delete this order?')) {
-      deleteOrder(orderId);
+      await deleteOrder(orderId);
       refreshData();
     }
   };

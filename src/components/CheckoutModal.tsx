@@ -212,7 +212,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
         })),
         proofOfPayment: proofOfPayment,
       };
-      saveOrder(order);
+      await saveOrder(order);
       
       // NOTE: Email will be sent AFTER admin verifies the payment
       // (Not sent immediately for PayNow - see AdminDashboard.tsx)
@@ -986,7 +986,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       })),
                       adminNotes: `Payment ID: ${paymentId}, Method: ${paymentMethod}, Platform Fee: $${fees.platformFee}, Stripe Fee: $${fees.stripeFee}`,
                     };
-                    saveOrder(order);
+                    await saveOrder(order);
                     
                     // Send confirmation email to CUSTOMER (with QR codes)
                     await sendCustomerConfirmation(
