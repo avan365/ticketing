@@ -170,7 +170,8 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
       setOrderNumber(newOrderNumber);
       
       // Calculate total with platform fee (no Stripe fee for manual PayNow)
-      const paynowTotal = totalPrice + calculatePlatformFee(totalPrice);
+      const platformFee = calculatePlatformFee(totalPrice);
+      const paynowTotal = totalPrice + platformFee;
       
       // Generate QR codes for all tickets
       const ticketList = cart.map(item => ({
@@ -199,6 +200,10 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
           price: item.ticket.price,
         })),
         totalAmount: paynowTotal,
+        ticketSubtotal: totalPrice,
+        platformFee: platformFee,
+        stripeFee: 0, // No Stripe fee for PayNow
+        customerPays: paynowTotal, // For PayNow, customer pays ticket + platform fee
         individualTickets: qrCodes.map(qr => ({
           ticketId: qr.ticketId,
           ticketType: qr.ticketType,
@@ -969,6 +974,10 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                         price: item.ticket.price,
                       })),
                       totalAmount: fees.total,
+                      ticketSubtotal: fees.ticketPrice,
+                      platformFee: fees.platformFee,
+                      stripeFee: fees.stripeFee,
+                      customerPays: fees.subtotal, // Customer pays: ticket + platform fee (excludes Stripe fee)
                       individualTickets: qrCodes.map(qr => ({
                         ticketId: qr.ticketId,
                         ticketType: qr.ticketType,

@@ -28,7 +28,13 @@ export interface Order {
     quantity: number;
     price: number;
   }[];
-  totalAmount: number;
+  totalAmount: number; // Total amount customer paid (includes all fees)
+  
+  // Fee breakdown (for calculating revenue)
+  ticketSubtotal?: number; // Sum of ticket prices (before any fees)
+  platformFee?: number; // Platform fee amount
+  stripeFee?: number; // Stripe processing fee (if applicable)
+  customerPays?: number; // Amount customer pays (ticketSubtotal + platformFee, excludes Stripe fees)
   
   // Individual tickets with QR codes (optional for backward compatibility)
   individualTickets?: IndividualTicket[];
@@ -149,17 +155,36 @@ export function deleteOrder(orderId: string): void {
 
 export function getOrderStats() {
   const orders = getAllOrders();
+  
+  // Calculate revenue without platform fees (just ticket prices)
+  const totalRevenue = orders
+    .filter(o => o.status === 'verified')
+    .reduce((sum, o) => {
+      // If fee breakdown exists, use ticketSubtotal (revenue without platform fees)
+      // Otherwise, calculate from tickets array (backward compatibility)
+      if (o.ticketSubtotal !== undefined) {
+        return sum + o.ticketSubtotal;
+      }
+      // Fallback: sum ticket prices
+      return sum + o.tickets.reduce((ticketSum, t) => ticketSum + (t.price * t.quantity), 0);
+    }, 0);
+  
+  const pendingRevenue = orders
+    .filter(o => o.status === 'pending')
+    .reduce((sum, o) => {
+      if (o.ticketSubtotal !== undefined) {
+        return sum + o.ticketSubtotal;
+      }
+      return sum + o.tickets.reduce((ticketSum, t) => ticketSum + (t.price * t.quantity), 0);
+    }, 0);
+  
   return {
     total: orders.length,
     pending: orders.filter(o => o.status === 'pending').length,
     verified: orders.filter(o => o.status === 'verified').length,
     rejected: orders.filter(o => o.status === 'rejected').length,
-    totalRevenue: orders
-      .filter(o => o.status === 'verified')
-      .reduce((sum, o) => sum + o.totalAmount, 0),
-    pendingRevenue: orders
-      .filter(o => o.status === 'pending')
-      .reduce((sum, o) => sum + o.totalAmount, 0),
+    totalRevenue,
+    pendingRevenue,
   };
 }
 

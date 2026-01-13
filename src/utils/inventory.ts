@@ -15,10 +15,11 @@ const INVENTORY_KEY = 'adheeraa_inventory';
 // const RESERVATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes - for future use
 
 // Default inventory (initial stock)
+// NOTE: Prices should match BASE_TICKETS in App.tsx
 const DEFAULT_INVENTORY: TicketInventory = {
-  'early-bird': { name: 'Early Bird', price: 45, available: 150, sold: 0, reserved: 0 },
-  'regular': { name: 'Regular', price: 65, available: 300, sold: 0, reserved: 0 },
-  'table': { name: 'Table (8 pax)', price: 600, available: 20, sold: 0, reserved: 0 },
+  'early-bird': { name: 'Early Bird', price: 25, available: 150, sold: 0, reserved: 0 },
+  'regular': { name: 'Regular Admission', price: 35, available: 300, sold: 0, reserved: 0 },
+  'table': { name: 'Table for 4', price: 200, available: 20, sold: 0, reserved: 0 },
 };
 
 // Get current inventory from localStorage

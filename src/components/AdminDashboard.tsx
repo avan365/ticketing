@@ -506,8 +506,17 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
                           <p className="text-white text-sm truncate">{order.customerEmail}</p>
                         </div>
                         <div>
-                          <p className="text-purple-400 text-xs">Amount</p>
-                          <p className="text-yellow-400 font-bold">${order.totalAmount}</p>
+                          <p className="text-purple-400 text-xs">Customer Pays</p>
+                          <p className="text-yellow-400 font-bold">
+                            ${order.customerPays !== undefined 
+                              ? order.customerPays.toFixed(2) 
+                              : order.totalAmount.toFixed(2)}
+                          </p>
+                          {order.stripeFee && order.stripeFee > 0 && (
+                            <p className="text-purple-400 text-[10px] mt-0.5">
+                              (incl. ${order.stripeFee.toFixed(2)} processing)
+                            </p>
+                          )}
                         </div>
                         <div>
                           <p className="text-purple-400 text-xs">Status</p>
@@ -574,10 +583,27 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
                                 <div className="space-y-1">
                                   {order.tickets.map((ticket, i) => (
                                     <p key={i} className="text-white">
-                                      {ticket.name} x{ticket.quantity} = ${ticket.price * ticket.quantity}
+                                      {ticket.name} x{ticket.quantity} @ ${ticket.price} = ${(ticket.price * ticket.quantity).toFixed(2)}
                                     </p>
                                   ))}
                                 </div>
+                                {order.ticketSubtotal !== undefined && (
+                                  <div className="mt-2 pt-2 border-t border-purple-500/20">
+                                    <p className="text-purple-300 text-xs">Subtotal: ${order.ticketSubtotal.toFixed(2)}</p>
+                                    {order.platformFee !== undefined && order.platformFee > 0 && (
+                                      <p className="text-purple-300 text-xs">Platform Fee: ${order.platformFee.toFixed(2)}</p>
+                                    )}
+                                    {order.stripeFee !== undefined && order.stripeFee > 0 && (
+                                      <p className="text-purple-300 text-xs">Processing Fee: ${order.stripeFee.toFixed(2)}</p>
+                                    )}
+                                    <p className="text-yellow-400 text-sm font-semibold mt-1">
+                                      Customer Pays: ${order.customerPays !== undefined ? order.customerPays.toFixed(2) : order.totalAmount.toFixed(2)}
+                                    </p>
+                                    <p className="text-green-400 text-sm font-semibold mt-1">
+                                      Revenue: ${order.ticketSubtotal.toFixed(2)}
+                                    </p>
+                                  </div>
+                                )}
                               </div>
                               {order.individualTickets && order.individualTickets.length > 0 && (
                                 <div>
