@@ -6,8 +6,8 @@ import {
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { 
-  findTicket, 
-  updateTicketStatus, 
+  updateTicketStatus,
+  getAllOrders,
   type IndividualTicket 
 } from '../utils/orders';
 import { parseQRCodeData } from '../utils/qrcode';
@@ -121,25 +121,75 @@ export function BouncerPage() {
   };
 
   const handleQRScan = (qrData: string) => {
-    const parsed = parseQRCodeData(qrData);
+    // Clean the QR data
+    const cleanData = qrData.trim();
+    console.log('Scanned QR data:', cleanData);
+    
+    const parsed = parseQRCodeData(cleanData);
     if (!parsed) {
+      console.error('Failed to parse QR code:', cleanData);
       setResult({
         success: false,
-        message: 'Invalid QR code format',
+        message: `Invalid QR code format. Scanned: "${cleanData.substring(0, 50)}..."`,
       });
       return;
     }
 
-    validateTicket(parsed.orderNumber, parsed.ticketId);
+    console.log('Parsed QR code:', parsed);
+    validateTicket(parsed.orderNumber.trim(), parsed.ticketId.trim());
   };
 
   const validateTicket = (orderNumber: string, ticketId: string) => {
-    const ticket = findTicket(orderNumber, ticketId);
+    // Normalize inputs (uppercase, trim)
+    const normalizedOrderNumber = orderNumber.trim().toUpperCase();
+    const normalizedTicketId = ticketId.trim().toUpperCase();
     
-    if (!ticket) {
+    console.log('Validating ticket:', { normalizedOrderNumber, normalizedTicketId });
+    
+    // First check if order exists
+    const orders = getAllOrders();
+    const order = orders.find(o => o.orderNumber.toUpperCase() === normalizedOrderNumber);
+    
+    if (!order) {
+      console.error('Order not found:', normalizedOrderNumber);
       setResult({
         success: false,
-        message: `Ticket not found: ${ticketId}`,
+        message: `Order not found: ${normalizedOrderNumber}. Please check the order number.`,
+      });
+      return;
+    }
+    
+    // Check if order is verified
+    if (order.status !== 'verified') {
+      console.error('Order not verified:', order.status);
+      setResult({
+        success: false,
+        message: `Order ${normalizedOrderNumber} is ${order.status}. Only verified orders can be scanned.`,
+      });
+      return;
+    }
+    
+    // Check if order has individual tickets
+    if (!order.individualTickets || order.individualTickets.length === 0) {
+      console.error('Order has no individual tickets');
+      setResult({
+        success: false,
+        message: `Order ${normalizedOrderNumber} has no tickets. This may be an old order format.`,
+      });
+      return;
+    }
+    
+    // Find ticket (case-insensitive)
+    const ticket = order.individualTickets.find(
+      t => t.ticketId.toUpperCase() === normalizedTicketId
+    );
+    
+    if (!ticket) {
+      console.error('Ticket not found in order:', normalizedTicketId);
+      const availableTickets = order.individualTickets.map(t => t.ticketId).join(', ');
+      setResult({
+        success: false,
+        message: `Ticket ${normalizedTicketId} not found in order ${normalizedOrderNumber}. Available tickets: ${availableTickets}`,
       });
       return;
     }

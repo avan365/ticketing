@@ -83,7 +83,7 @@ export function updateOrderStatus(
 }
 
 /**
- * Find ticket by ticketId and update its status
+ * Find ticket by ticketId and update its status (case-insensitive)
  */
 export function updateTicketStatus(
   ticketId: string,
@@ -91,9 +91,12 @@ export function updateTicketStatus(
   scannedBy?: string
 ): { success: boolean; orderNumber?: string; ticketType?: string; error?: string } {
   const orders = getAllOrders();
+  const normalizedTicketId = ticketId.trim().toUpperCase();
   
   for (const order of orders) {
-    const ticket = order.individualTickets?.find(t => t.ticketId === ticketId);
+    const ticket = order.individualTickets?.find(
+      t => t.ticketId.toUpperCase() === normalizedTicketId
+    );
     if (ticket) {
       ticket.status = status;
       if (status === 'used') {
@@ -113,17 +116,22 @@ export function updateTicketStatus(
 }
 
 /**
- * Find ticket by order number and ticket ID
+ * Find ticket by order number and ticket ID (case-insensitive)
  */
 export function findTicket(orderNumber: string, ticketId: string): IndividualTicket | null {
   const orders = getAllOrders();
-  const order = orders.find(o => o.orderNumber === orderNumber);
+  const normalizedOrderNumber = orderNumber.trim().toUpperCase();
+  const normalizedTicketId = ticketId.trim().toUpperCase();
+  
+  const order = orders.find(o => o.orderNumber.toUpperCase() === normalizedOrderNumber);
   
   if (!order || !order.individualTickets) {
     return null;
   }
   
-  return order.individualTickets.find(t => t.ticketId === ticketId) || null;
+  return order.individualTickets.find(
+    t => t.ticketId.toUpperCase() === normalizedTicketId
+  ) || null;
 }
 
 /**
