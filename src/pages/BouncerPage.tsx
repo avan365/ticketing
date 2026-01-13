@@ -84,25 +84,33 @@ export function BouncerPage() {
       setScanning(false);
       setScanningQR(false);
       
-      let errorMessage = 'Unable to access camera. ';
+      let errorMessage = '';
+      let suggestion = 'Please use manual entry below.';
       
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage += 'Please allow camera access in your browser settings.';
+        errorMessage = 'Camera permission denied';
+        suggestion = 'Please allow camera access in your browser settings, then try again. Or use manual entry below.';
       } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-        errorMessage += 'No camera found. Please use manual entry.';
+        errorMessage = 'No camera found';
+        suggestion = 'No camera detected on this device. Please use manual entry below.';
       } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
-        errorMessage += 'Camera is being used by another app. Please close it and try again.';
+        errorMessage = 'Camera is in use';
+        suggestion = 'Camera is being used by another app. Please close it and try again. Or use manual entry below.';
       } else if (error.message?.includes('No cameras')) {
-        errorMessage += 'No cameras found. Please use manual entry.';
+        errorMessage = 'No cameras available';
+        suggestion = 'No cameras found on this device. Please use manual entry below.';
       } else {
-        errorMessage += 'Please use manual entry.';
+        errorMessage = 'Camera access failed';
+        suggestion = 'Unable to access camera. Please use manual entry below.';
       }
       
-      setCameraError(errorMessage);
-      setResult({
-        success: false,
-        message: errorMessage,
-      });
+      setCameraError(`${errorMessage}. ${suggestion}`);
+      
+      // Don't set result for camera errors - that's for validation errors only
+      // Auto-switch to manual entry after showing error
+      setTimeout(() => {
+        setScanMode('manual');
+      }, 3000);
     }
   };
 
@@ -377,24 +385,41 @@ export function BouncerPage() {
                   </button>
                 </div>
                 {cameraError ? (
-                  <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 mb-4">
-                    <p className="text-red-400 text-sm mb-2">⚠️ Camera Error</p>
-                    <p className="text-red-300 text-xs">{cameraError}</p>
-                    <button
-                      onClick={() => {
-                        stopCamera();
-                        setScanMode('manual');
-                      }}
-                      className="mt-3 text-red-400 hover:text-red-300 text-sm underline"
-                    >
-                      Switch to Manual Entry →
-                    </button>
+                  <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-3">
+                      <div className="text-yellow-400 text-xl">⚠️</div>
+                      <div className="flex-1">
+                        <p className="text-yellow-400 text-sm font-semibold mb-1">Camera Not Available</p>
+                        <p className="text-yellow-300 text-xs mb-3">{cameraError}</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setCameraError(null);
+                              startCamera();
+                            }}
+                            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                          >
+                            Try Again
+                          </button>
+                          <button
+                            onClick={() => {
+                              stopCamera();
+                              setCameraError(null);
+                              setScanMode('manual');
+                            }}
+                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                          >
+                            Use Manual Entry →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                ) : (
+                ) : scanningQR ? (
                   <p className="text-center text-purple-300 text-sm mb-4">
                     Point camera at QR code
                   </p>
-                )}
+                ) : null}
                 <div className="bg-purple-900/30 p-4 rounded-lg">
                   <label className="block text-purple-300 text-sm mb-2">
                     Or paste QR code data:
@@ -474,9 +499,9 @@ export function BouncerPage() {
           </motion.div>
         )}
 
-        {/* Result Display */}
+        {/* Result Display - Only show for ticket validation, not camera errors */}
         <AnimatePresence>
-          {result && (
+          {result && !cameraError && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -497,7 +522,7 @@ export function BouncerPage() {
                   <h3 className={`text-lg font-bold mb-2 ${
                     result.success ? 'text-green-400' : 'text-red-400'
                   }`}>
-                    {result.success ? 'Ticket Valid!' : 'Validation Failed'}
+                    {result.success ? 'Ticket Scanned Successfully!' : 'Ticket Validation Failed'}
                   </h3>
                   <p className="text-white mb-2">{result.message}</p>
                   {result.ticket && (
