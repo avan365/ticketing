@@ -23,6 +23,8 @@ export function BouncerPage() {
     orderNumber?: string;
   } | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -36,20 +38,62 @@ export function BouncerPage() {
   }, []);
 
   const startCamera = async () => {
+    setCameraError(null);
     try {
+      // Check if getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API not supported in this browser');
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
       });
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
         setScanning(true);
+        
+        // Wait for video to actually start playing
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play().catch(err => {
+              console.error('Error playing video:', err);
+              setCameraError('Camera started but video not displaying. Try refreshing the page.');
+              stopCamera();
+            });
+          }
+        };
+
+        // Check if video is actually playing after a delay
+        setTimeout(() => {
+          if (videoRef.current && (videoRef.current.readyState < 2 || videoRef.current.paused)) {
+            setCameraError('Camera may not be working. Try using manual entry or check camera permissions.');
+          }
+        }, 2000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error accessing camera:', error);
+      let errorMessage = 'Unable to access camera. ';
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage += 'Please allow camera access in your browser settings.';
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMessage += 'No camera found. Please use manual entry.';
+      } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+        errorMessage += 'Camera is being used by another app. Please close it and try again.';
+      } else {
+        errorMessage += 'Please use manual entry.';
+      }
+      
+      setCameraError(errorMessage);
       setResult({
         success: false,
-        message: 'Unable to access camera. Please use manual entry.',
+        message: errorMessage,
       });
     }
   };
@@ -63,6 +107,7 @@ export function BouncerPage() {
       videoRef.current.srcObject = null;
     }
     setScanning(false);
+    setCameraError(null);
   };
 
   const handleQRScan = (qrData: string) => {
@@ -113,6 +158,9 @@ export function BouncerPage() {
     const updateResult = updateTicketStatus(ticketId, 'used', 'bouncer');
     
     if (updateResult.success) {
+      // Show success popup
+      setShowSuccessPopup(true);
+      
       setResult({
         success: true,
         message: `Ticket validated! Type: ${ticket.ticketType}`,
@@ -120,11 +168,18 @@ export function BouncerPage() {
         orderNumber,
       });
       
-      // Auto-clear after 3 seconds
+      // Auto-clear success popup after 2 seconds
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+      }, 2000);
+      
+      // Auto-clear result after 4 seconds
       setTimeout(() => {
         setResult(null);
         setScannedData('');
-      }, 3000);
+        setManualOrderNumber('');
+        setManualTicketId('');
+      }, 4000);
     } else {
       setResult({
         success: false,
@@ -150,6 +205,26 @@ export function BouncerPage() {
   return (
     <div className="min-h-screen bg-[#0a0a12] text-white p-4">
       <div className="max-w-4xl mx-auto">
+        {/* Success Popup */}
+        <AnimatePresence>
+          {showSuccessPopup && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: -50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -50 }}
+              className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-600 text-white px-8 py-6 rounded-xl shadow-2xl border-2 border-green-400"
+            >
+              <div className="flex items-center gap-4">
+                <CheckCircle className="w-12 h-12" />
+                <div>
+                  <h3 className="text-2xl font-bold">Ticket Scanned!</h3>
+                  <p className="text-green-100">Successfully registered</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 
@@ -229,18 +304,40 @@ export function BouncerPage() {
                     ref={videoRef}
                     autoPlay
                     playsInline
+                    muted
                     className="w-full h-64 object-cover"
                   />
+                  {!cameraError && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="border-2 border-green-400 rounded-lg w-48 h-48 opacity-50"></div>
+                    </div>
+                  )}
                   <button
                     onClick={stopCamera}
-                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full"
+                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full z-10"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <p className="text-center text-purple-300 text-sm mb-4">
-                  Point camera at QR code
-                </p>
+                {cameraError ? (
+                  <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4 mb-4">
+                    <p className="text-red-400 text-sm mb-2">⚠️ Camera Error</p>
+                    <p className="text-red-300 text-xs">{cameraError}</p>
+                    <button
+                      onClick={() => {
+                        stopCamera();
+                        setScanMode('manual');
+                      }}
+                      className="mt-3 text-red-400 hover:text-red-300 text-sm underline"
+                    >
+                      Switch to Manual Entry →
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-center text-purple-300 text-sm mb-4">
+                    Point camera at QR code
+                  </p>
+                )}
                 <div className="bg-purple-900/30 p-4 rounded-lg">
                   <label className="block text-purple-300 text-sm mb-2">
                     Or paste QR code data:
