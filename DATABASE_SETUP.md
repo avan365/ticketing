@@ -6,19 +6,29 @@
    - Visit https://vercel.com/dashboard
    - Select your project
 
-2. **Create KV Database**
-   - Go to **Storage** tab
-   - Click **Create Database**
-   - Select **KV** (Redis)
+2. **Create KV Database via Marketplace**
+   - Go to your project
+   - Click on **Storage** tab (or look for **Marketplace**)
+   - Click **Browse Marketplace** or **Add Integration**
+   - Search for **"KV"** or **"Redis"**
+   - Click on **Vercel KV** (or **Upstash Redis**)
+   - Click **Add Integration** or **Install**
    - Choose a name (e.g., `adheeraa-kv`)
    - Select a region closest to you
-   - Click **Create**
+   - Click **Create** or **Add**
 
 3. **Get Connection Details**
-   - After creation, you'll see:
+   - After creation, you'll see connection details
+   - Look for:
      - `KV_REST_API_URL`
      - `KV_REST_API_TOKEN`
-   - Copy both values (you'll need them in Step 2)
+   - These may be auto-added to your environment variables
+   - If not, copy both values (you'll need them in Step 2)
+
+**Alternative Method (if Marketplace doesn't show):**
+- Go to https://vercel.com/integrations
+- Search for "KV" or "Upstash Redis"
+- Click on it and follow the installation instructions
 
 ## Step 2: Add Environment Variables
 
@@ -79,8 +89,9 @@ The `@vercel/kv` package has been added to `api/package.json`. Vercel will autom
 - Redeploy after adding environment variables
 
 ### Orders not persisting
-- Check Vercel Dashboard → Storage → Your KV database
+- Check Vercel Dashboard → Storage → Your KV database (or Marketplace integrations)
 - Verify environment variables are correct
+- Make sure KV integration is properly connected to your project
 - Check deployment logs for errors
 
 ### Cannot read property 'get' of undefined
