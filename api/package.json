@@ -1,5 +1,8 @@
 {
-  "type": "commonjs"
+  "name": "adheeraa-api",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "@vercel/kv": "^0.2.1"
+  }
 }
-
-
