@@ -19,19 +19,23 @@
 Set these in **Vercel Dashboard → Settings → Environment Variables**:
 
 #### Already Set:
+
 - ✅ `REDIS_URL` - Your Redis connection string
 
 #### Still Need:
+
 - [ ] `STRIPE_SECRET_KEY` - Your Stripe **live** secret key (starts with `sk_live_`)
+
   - Get from: https://dashboard.stripe.com/apikeys
   - **Important:** Switch from test mode (`sk_test_`) to live mode (`sk_live_`) for production
 
 - [ ] `STRIPE_PUBLISHABLE_KEY` - Update in code (see Step 2)
+
   - Currently hardcoded in `src/utils/stripe.ts`
   - Should use live key: `pk_live_...`
 
 - [ ] `EMAILJS_PUBLIC_KEY` - Your EmailJS public key
-- [ ] `EMAILJS_SERVICE_ID` - Your EmailJS service ID  
+- [ ] `EMAILJS_SERVICE_ID` - Your EmailJS service ID
 - [ ] `EMAILJS_TEMPLATE_ID` - Your EmailJS template ID
   - Get from: https://dashboard.emailjs.com/admin
 
@@ -40,16 +44,19 @@ Set these in **Vercel Dashboard → Settings → Environment Variables**:
 **Before going live, you MUST switch from test to live mode:**
 
 1. **Get Live Keys:**
+
    - Go to Stripe Dashboard → API Keys
    - Toggle "Test mode" OFF (switches to Live mode)
    - Copy the **live** secret key (`sk_live_...`)
    - Copy the **live** publishable key (`pk_live_...`)
 
 2. **Update Environment Variables:**
+
    - Add `STRIPE_SECRET_KEY` = `sk_live_...` in Vercel
    - Set for **Production** environment
 
 3. **Update Code:**
+
    - Edit `src/utils/stripe.ts`
    - Change `STRIPE_PUBLISHABLE_KEY` to your live key
    - Commit and push
@@ -62,6 +69,7 @@ Set these in **Vercel Dashboard → Settings → Environment Variables**:
 ### 3. 🟡 MEDIUM PRIORITY: Security
 
 - [ ] **Change Admin Password**
+
   - Currently: `adheeraa2026`
   - Edit: `src/utils/orders.ts` → `ADMIN_PASSWORD`
   - Change to something secure
@@ -75,12 +83,14 @@ Set these in **Vercel Dashboard → Settings → Environment Variables**:
 Test the complete flow:
 
 - [ ] **Customer Purchase:**
+
   - [ ] Customer buys ticket on phone
   - [ ] Order appears in admin dashboard
   - [ ] Email received with QR codes
   - [ ] QR codes display correctly in email
 
 - [ ] **Admin Verification:**
+
   - [ ] Admin verifies PayNow order
   - [ ] Status updates to "verified"
   - [ ] Email sent to customer after verification
@@ -135,26 +145,26 @@ Test the complete flow:
 
 ## 📊 Current Status
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Database | ✅ Working | Redis connection established |
-| Order Storage | ✅ Working | Orders persist across devices |
-| QR Codes | ✅ Working | Individual codes per ticket |
-| Email | ✅ Working | QR codes in emails |
-| Admin Dashboard | ✅ Working | Order management |
-| Bouncer Portal | ✅ Working | QR scanning works |
-| Stripe Payments | ⚠️ Test Mode | Need to switch to live |
-| Security | ⚠️ Default Passwords | Should change |
-| Monitoring | ❌ Not Set | Optional |
+| Feature         | Status               | Notes                         |
+| --------------- | -------------------- | ----------------------------- |
+| Database        | ✅ Working           | Redis connection established  |
+| Order Storage   | ✅ Working           | Orders persist across devices |
+| QR Codes        | ✅ Working           | Individual codes per ticket   |
+| Email           | ✅ Working           | QR codes in emails            |
+| Admin Dashboard | ✅ Working           | Order management              |
+| Bouncer Portal  | ✅ Working           | QR scanning works             |
+| Stripe Payments | ⚠️ Test Mode         | Need to switch to live        |
+| Security        | ⚠️ Default Passwords | Should change                 |
+| Monitoring      | ❌ Not Set           | Optional                      |
 
 ---
 
 ## 🎉 You're Almost Ready!
 
 The core functionality is working. Just need to:
+
 1. Switch to Stripe live keys
 2. Change admin passwords
 3. Do a final end-to-end test
 
 Then you're ready to go live! 🚀
-

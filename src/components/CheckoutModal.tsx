@@ -8,6 +8,7 @@ import { generateOrderQRCodes } from '../utils/qrcode';
 import { StripePayment } from './StripePayment';
 import { STRIPE_FEES, PLATFORM_FEE_PERCENTAGE, getFeeBreakdown, calculatePlatformFee } from '../utils/stripe';
 import { confirmPurchase, directPurchase } from '../utils/inventory';
+import { EventConfig } from '../config/eventConfig';
 
 interface CheckoutModalProps {
   cart: CartItem[];
@@ -686,7 +687,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                           </div>
                           
                           <p className="text-xs text-purple-400 mt-2 font-sans">
-                            {getTotalItems()} ticket{getTotalItems() > 1 ? 's' : ''} for ADHEERAA Masquerade Night
+                            {getTotalItems()} ticket{getTotalItems() > 1 ? 's' : ''} for {EventConfig.event.fullTitle}
                           </p>
                         </>
                       );
@@ -753,7 +754,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     </div>
                     
                     <div className="mt-4 text-center">
-                      <p className="text-gray-600 text-sm font-medium">ADHEERAA Events</p>
+                      <p className="text-gray-600 text-sm font-medium">{EventConfig.branding.companyName}</p>
                     </div>
 
                     {/* UEN Copy Section */}
@@ -1061,7 +1062,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Event:</span>
-                        <span className="font-bold text-white">ADHEERAA Masquerade</span>
+                        <span className="font-bold text-white">{EventConfig.event.name} {EventConfig.event.subtitle}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Date:</span>
@@ -1155,7 +1156,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Event:</span>
-                        <span className="font-bold text-white">ADHEERAA Masquerade</span>
+                        <span className="font-bold text-white">{EventConfig.event.name} {EventConfig.event.subtitle}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Date:</span>

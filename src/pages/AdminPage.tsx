@@ -1,9 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import { AdminDashboard } from '../components/AdminDashboard';
 import { getAdminPassword } from '../utils/orders';
+
+const ADMIN_SESSION_KEY = 'admin_authenticated';
+const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+// Check if admin session is still valid
+function isSessionValid(): boolean {
+  const sessionData = sessionStorage.getItem(ADMIN_SESSION_KEY);
+  if (!sessionData) return false;
+  
+  try {
+    const { timestamp } = JSON.parse(sessionData);
+    const now = Date.now();
+    const isValid = (now - timestamp) < SESSION_DURATION;
+    
+    if (!isValid) {
+      // Session expired, clear it
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+    
+    return isValid;
+  } catch {
+    return false;
+  }
+}
+
+// Save admin session
+function saveSession(): void {
+  sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({
+    timestamp: Date.now(),
+  }));
+}
 
 export function AdminPage() {
   const navigate = useNavigate();
@@ -12,9 +43,17 @@ export function AdminPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
+  // Check for existing valid session on mount
+  useEffect(() => {
+    if (isSessionValid()) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === getAdminPassword()) {
+      saveSession();
       setIsAuthenticated(true);
       setError('');
     } else {

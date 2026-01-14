@@ -5,6 +5,7 @@ import { ConcertDetails } from './components/ConcertDetails';
 import { TicketSelection } from './components/TicketSelection';
 import { CheckoutModal } from './components/CheckoutModal';
 import { getAvailableCount } from './utils/inventory';
+import { EventConfig } from './config/eventConfig';
 
 export interface TicketType {
   id: string;
@@ -19,27 +20,8 @@ export interface CartItem {
   quantity: number;
 }
 
-// Base ticket info (static)
-const BASE_TICKETS = [
-  {
-    id: 'early-bird',
-    name: 'Early Bird',
-    price: 25,
-    description: 'Limited time offer, full venue access. Get in before the crowd!',
-  },
-  {
-    id: 'regular',
-    name: 'Regular Admission',
-    price: 35,
-    description: 'General admission with full venue access and all performances.',
-  },
-  {
-    id: 'table',
-    name: 'Table for 4',
-    price: 200,
-    description: 'Reserved table seating, includes 1 premium bottle & priority service.',
-  },
-];
+// Base ticket info from config
+const BASE_TICKETS = EventConfig.tickets;
 
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -109,13 +91,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white overflow-x-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: EventConfig.colors.background }}>
       <Hero totalItems={getTotalItems()} onCheckout={() => setShowCheckout(true)} />
       <ConcertDetails />
       <TicketSelection tickets={tickets} onAddToCart={addToCart} />
 
       {/* Footer */}
-      <footer className="py-4 md:py-12 bg-[#0a0a12] border-t border-purple-500/20">
+      <footer className="py-4 md:py-12 border-t" style={{ backgroundColor: EventConfig.colors.background, borderColor: EventConfig.colors.border.primary }}>
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -124,26 +106,34 @@ export default function App() {
             className="space-y-1 md:space-y-4"
           >
             <h3 
-              className="text-lg md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent"
-              style={{ fontFamily: 'Cinzel, serif' }}
+              className={`text-lg md:text-3xl lg:text-4xl font-bold bg-gradient-to-r ${EventConfig.colors.primary.gradient} bg-clip-text text-transparent`}
+              style={{ fontFamily: EventConfig.fonts.display }}
             >
-              ADHEERAA
+              {EventConfig.event.name}
             </h3>
             <p 
-              className="text-purple-300 text-[10px] md:text-base font-sans"
+              className="text-[10px] md:text-base font-sans"
+              style={{ color: EventConfig.colors.text.secondary }}
             >
-              Masquerade Night 2026 • Skyfall Rooftop Bar, Singapore
+              {EventConfig.event.subtitle} {EventConfig.event.year} • {EventConfig.venue.name}, {EventConfig.venue.location.split(', ')[1]}
             </p>
             {/* Emojis - hidden on mobile */}
             <div className="hidden md:flex justify-center gap-6 text-3xl">
-              <motion.span whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer">🎭</motion.span>
-              <motion.span whileHover={{ scale: 1.2, rotate: -10 }} className="cursor-pointer">✨</motion.span>
-              <motion.span whileHover={{ scale: 1.2, rotate: 10 }} className="cursor-pointer">🎶</motion.span>
+              {EventConfig.branding.footerEmojis.map((emoji, index) => (
+                <motion.span 
+                  key={index}
+                  whileHover={{ scale: 1.2, rotate: index % 2 === 0 ? 10 : -10 }} 
+                  className="cursor-pointer"
+                >
+                  {emoji}
+                </motion.span>
+              ))}
             </div>
             <p 
-              className="text-[9px] md:text-sm text-purple-400 pt-1 md:pt-4 font-sans"
+              className="text-[9px] md:text-sm pt-1 md:pt-4 font-sans"
+              style={{ color: EventConfig.colors.text.muted }}
             >
-              © 2026 ADHEERAA Events. All rights reserved.
+              {EventConfig.branding.copyright}
             </p>
           </motion.div>
         </div>
@@ -174,7 +164,10 @@ export default function App() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowCheckout(true)}
-            className="fixed bottom-8 right-8 bg-amber-600 text-white px-8 py-4 rounded-lg shadow-md hover:bg-amber-700 transition-colors duration-200 z-50 font-medium flex items-center gap-3 font-sans"
+            className="fixed bottom-8 right-8 text-white px-8 py-4 rounded-lg shadow-md transition-colors duration-200 z-50 font-medium flex items-center gap-3 font-sans"
+            style={{ backgroundColor: EventConfig.colors.primary.base }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
           >
             <span className="text-lg">🎭</span>
             <span>View Cart ({getTotalItems()})</span>

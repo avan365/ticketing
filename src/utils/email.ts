@@ -2,6 +2,7 @@ import emailjs from "@emailjs/browser";
 import type { CartItem } from "../App";
 import type { TicketQR } from "./qrcode";
 import jsPDF from "jspdf";
+import { EventConfig } from "../config/eventConfig";
 
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║                    EMAIL CONFIGURATION                            ║
@@ -55,7 +56,7 @@ export async function generateTicketsPDF(
 
   // Header
   pdf.setFontSize(20);
-  pdf.text("ADHEERAA Masquerade Night", pageWidth / 2, 30, { align: "center" });
+  pdf.text(EventConfig.event.fullTitle, pageWidth / 2, 30, { align: "center" });
   pdf.setFontSize(14);
   pdf.text(`Order: ${orderNumber}`, pageWidth / 2, 40, { align: "center" });
   pdf.text(`Customer: ${customerName}`, pageWidth / 2, 50, { align: "center" });
@@ -169,7 +170,7 @@ export const sendCustomerConfirmation = async (
     qr_codes: qrCodesHtml, // HTML with QR code images
 
     // Event info
-    event_name: "ADHEERAA Masquerade Night",
+    event_name: EventConfig.event.fullTitle,
     event_date: "February 14, 2026",
     event_time: "7:00 PM",
     event_venue: "Grand Ballroom, Marina Bay Sands",

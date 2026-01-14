@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { ShoppingCart } from "lucide-react";
+import { EventConfig } from "../config/eventConfig";
 
 interface HeroProps {
   totalItems: number;
@@ -10,7 +11,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
   return (
     <div className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background - matching poster's dark aesthetic */}
-      <div className="absolute inset-0 bg-[#0a0a12]" />
+      <div className="absolute inset-0" style={{ backgroundColor: EventConfig.colors.background }} />
 
       {/* Subtle background gradient - minimalistic */}
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/20 via-transparent to-transparent pointer-events-none" />
@@ -23,7 +24,13 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           onClick={onCheckout}
-          className="fixed top-4 right-4 md:top-8 md:right-8 z-50 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 transition-transform backdrop-blur-sm border border-amber-500/20"
+          className="fixed top-4 right-4 md:top-8 md:right-8 z-50 text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 transition-transform backdrop-blur-sm"
+          style={{ 
+            background: `linear-gradient(to right, ${EventConfig.colors.primary.base}E6, ${EventConfig.colors.primary.dark}E6)`,
+            borderColor: EventConfig.colors.border.secondary,
+            borderWidth: '1px',
+            borderStyle: 'solid',
+          }}
         >
           <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
           <span className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-purple-600 text-white text-xs font-bold rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
@@ -56,8 +63,8 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               className="relative"
             >
               <img
-                src="/poster.png"
-                alt="ADHEERAA Masquerade Night"
+                src={EventConfig.images.poster}
+                alt={EventConfig.images.posterAlt}
                 className="relative rounded-xl md:rounded-2xl shadow-lg w-[90%] md:w-[80%] mx-auto"
               />
             </motion.div>
@@ -72,7 +79,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
             >
               <h1 className="font-bold mb-2 md:mb-4">
                 <motion.span
-                  className="block text-[12vw] md:text-6xl lg:text-8xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent w-[90vw] md:w-auto mx-auto md:mx-0"
+                  className={`block text-[12vw] md:text-6xl lg:text-8xl bg-gradient-to-r ${EventConfig.colors.primary.gradientFull} bg-clip-text text-transparent w-[90vw] md:w-auto mx-auto md:mx-0`}
                   animate={{
                     backgroundPosition: ["0%", "100%", "0%"],
                   }}
@@ -82,19 +89,22 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
                   }}
                   style={{
                     backgroundSize: "100%",
-                    fontFamily: "Cinzel, serif",
+                    fontFamily: EventConfig.fonts.display,
                   }}
                 >
-                  ADHEERAA
+                  {EventConfig.event.name}
                 </motion.span>
                 <motion.span
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="block text-xl sm:text-2xl md:text-3xl lg:text-6xl text-purple-300 mt-1 md:mt-2"
-                  style={{ fontFamily: "Playfair Display, serif" }}
+                  className="block text-xl sm:text-2xl md:text-3xl lg:text-6xl mt-1 md:mt-2"
+                  style={{ 
+                    fontFamily: EventConfig.fonts.accent,
+                    color: EventConfig.colors.text.secondary,
+                  }}
                 >
-                  Masquerade Night
+                  {EventConfig.event.subtitle}
                 </motion.span>
               </h1>
             </motion.div>
@@ -108,11 +118,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
                 <span className="text-2xl md:text-5xl">📅</span>
                 <div className="text-left">
-                  <p className="text-purple-300 text-lg md:text-xl">
-                    Friday, February 21, 2026
+                  <p className="text-lg md:text-xl" style={{ color: EventConfig.colors.text.secondary }}>
+                    {EventConfig.dateTime.date}
                   </p>
-                  <p className="text-gray-400 text-base md:text-lg">
-                    8:00 PM - 12:00 AM
+                  <p className="text-base md:text-lg" style={{ color: EventConfig.colors.text.muted }}>
+                    {EventConfig.dateTime.time}
                   </p>
                 </div>
               </div>
@@ -120,11 +130,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
                 <span className="text-2xl md:text-5xl">📍</span>
                 <div className="text-left">
-                  <p className="text-purple-300 text-lg md:text-xl">
-                    Skyfall Rooftop Bar
+                  <p className="text-lg md:text-xl" style={{ color: EventConfig.colors.text.secondary }}>
+                    {EventConfig.venue.name}
                   </p>
-                  <p className="text-gray-400 text-base md:text-lg">
-                    HarbourFront, Singapore
+                  <p className="text-base md:text-lg" style={{ color: EventConfig.colors.text.muted }}>
+                    {EventConfig.venue.location}
                   </p>
                 </div>
               </div>
@@ -137,9 +147,12 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               transition={{ delay: 0.8 }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-block bg-amber-600 text-white px-8 py-3 md:px-12 md:py-4 rounded-lg text-lg md:text-xl font-medium hover:bg-amber-700 transition-colors duration-200 font-sans"
+              className="inline-block text-white px-8 py-3 md:px-12 md:py-4 rounded-lg text-lg md:text-xl font-medium transition-colors duration-200 font-sans"
+              style={{ backgroundColor: EventConfig.colors.primary.base }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
             >
-              Get Your Tickets 🎭
+              {EventConfig.branding.ctaButton}
             </motion.a>
           </div>
         </div>

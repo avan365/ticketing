@@ -8,6 +8,7 @@ import {
   type IndividualTicket,
 } from "../utils/orders";
 import { parseQRCodeData } from "../utils/qrcode";
+import { EventConfig } from "../config/eventConfig";
 
 export function BouncerPage() {
   const [scanMode, setScanMode] = useState<"qr" | "manual">("qr");
@@ -523,7 +524,7 @@ export function BouncerPage() {
           >
             Ticket Scanner
           </h1>
-          <p className="text-purple-300">ADHEERAA Masquerade Night</p>
+          <p className="text-purple-300">{EventConfig.event.fullTitle}</p>
         </div>
 
         {/* Mode Toggle */}
