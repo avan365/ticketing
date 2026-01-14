@@ -12,11 +12,33 @@ function initKV() {
   if (kv) return kv; // Already initialized
   
   // Try different environment variable formats
-  const url = process.env.KV_REST_API_URL || process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.REDIS_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  // Format 1: Separate URL and TOKEN
+  let url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  let token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  
+  // Format 2: Single REDIS_URL (connection string)
+  // If REDIS_URL exists, it might be a connection string or just the URL
+  if (process.env.REDIS_URL && !url) {
+    const redisUrl = process.env.REDIS_URL;
+    // Check if it's a full connection string (redis:// or https://)
+    if (redisUrl.startsWith('https://') || redisUrl.startsWith('http://')) {
+      url = redisUrl;
+      // Token might be in a separate variable or in the URL
+      token = process.env.REDIS_TOKEN || process.env.REDIS_PASSWORD;
+    }
+  }
+  
+  // Log available env vars for debugging
+  const availableVars = Object.keys(process.env).filter(k => 
+    k.includes('REDIS') || k.includes('KV') || k.includes('UPSTASH')
+  );
+  console.log('🔍 Available Redis/KV env vars:', availableVars);
   
   if (!url || !token) {
-    console.warn('⚠️ Vercel KV not configured. Available env vars:', Object.keys(process.env).filter(k => k.includes('REDIS') || k.includes('KV')));
+    console.warn('⚠️ Vercel KV not configured. Need URL and TOKEN.');
+    console.warn('   Looking for: KV_REST_API_URL + KV_REST_API_TOKEN');
+    console.warn('   Or: REDIS_URL + REDIS_TOKEN');
+    console.warn('   Or: UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN');
     return null;
   }
   
@@ -25,7 +47,7 @@ function initKV() {
       url: url,
       token: token,
     });
-    console.log('✅ KV client initialized');
+    console.log('✅ KV client initialized with URL:', url.substring(0, 30) + '...');
     return kv;
   } catch (error) {
     console.error('❌ Error initializing KV client:', error);
