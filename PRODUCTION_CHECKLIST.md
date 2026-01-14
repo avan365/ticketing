@@ -1,6 +1,7 @@
 # Production Deployment Checklist
 
 ## ✅ What's Working Now
+
 - ✅ Orders stored server-side (via `/api/orders.js`)
 - ✅ Cross-device order access (bouncer can scan tickets from any device)
 - ✅ Order verification updates status correctly
@@ -18,6 +19,7 @@
 ### Recommended Options:
 
 #### Option 1: Vercel KV (Easiest for Vercel)
+
 ```bash
 # In Vercel Dashboard:
 1. Go to Storage → Create Database → KV
@@ -26,6 +28,7 @@
 ```
 
 #### Option 2: MongoDB Atlas (Free tier available)
+
 ```bash
 # 1. Sign up at mongodb.com/atlas
 # 2. Create free cluster
@@ -34,6 +37,7 @@
 ```
 
 #### Option 3: Supabase (PostgreSQL, free tier)
+
 ```bash
 # 1. Sign up at supabase.com
 # 2. Create project
@@ -48,6 +52,7 @@
 ## 📋 Pre-Production Checklist
 
 ### 1. Environment Variables (Vercel Dashboard)
+
 Set these in Vercel → Your Project → Settings → Environment Variables:
 
 - [ ] `STRIPE_SECRET_KEY` - Your Stripe **live** secret key (starts with `sk_live_`)
@@ -59,6 +64,7 @@ Set these in Vercel → Your Project → Settings → Environment Variables:
 - [ ] Database connection variables (if using database)
 
 ### 2. Stripe Configuration
+
 - [ ] Switch from test mode to live mode
 - [ ] Update `STRIPE_PUBLISHABLE_KEY` in `src/utils/stripe.ts` to use live key
 - [ ] Set up webhook endpoint in Stripe Dashboard:
@@ -67,18 +73,22 @@ Set these in Vercel → Your Project → Settings → Environment Variables:
 - [ ] Test with real payment (small amount)
 
 ### 3. EmailJS Setup
+
 - [ ] Verify EmailJS template has `{{{qr_codes}}}` (triple braces) for HTML rendering
 - [ ] Test email delivery with real email address
 - [ ] Check spam folder if emails not arriving
 
 ### 4. Testing Checklist
+
 - [ ] **Customer Flow:**
+
   - [ ] Customer can purchase tickets on phone
   - [ ] Order appears in admin dashboard
   - [ ] Email with QR codes is received
   - [ ] QR codes are visible in email
 
 - [ ] **Admin Flow:**
+
   - [ ] Can access admin page with password
   - [ ] Can verify PayNow orders
   - [ ] Status updates correctly after verification
@@ -92,16 +102,19 @@ Set these in Vercel → Your Project → Settings → Environment Variables:
   - [ ] Status updates in admin dashboard after scan
 
 ### 5. Security
+
 - [ ] Change admin password in `src/utils/orders.ts` (currently `adheeraa2026`)
 - [ ] Change override password in `src/components/AdminDashboard.tsx` (if used)
 - [ ] Ensure admin and bouncer pages are not publicly accessible (password protected)
 
 ### 6. Domain & URLs
+
 - [ ] Update `FRONTEND_URL` in environment variables to your production domain
 - [ ] Update CORS settings in `/api/orders.js` if needed
 - [ ] Test API endpoints are accessible
 
 ### 7. Performance
+
 - [ ] Test on slow mobile connection
 - [ ] Verify QR code scanning works in low light
 - [ ] Check page load times
@@ -111,19 +124,23 @@ Set these in Vercel → Your Project → Settings → Environment Variables:
 ## 🚀 Deployment Steps
 
 1. **Push to GitHub** (if not already)
+
    ```bash
    git push origin main
    ```
 
 2. **Deploy to Vercel**
+
    - Connect GitHub repo to Vercel
    - Vercel will auto-deploy on push
 
 3. **Set Environment Variables**
+
    - Go to Vercel Dashboard → Project → Settings → Environment Variables
    - Add all required variables (see checklist above)
 
 4. **Test Production**
+
    - Test full flow on production URL
    - Verify orders persist (after database migration)
 
@@ -165,4 +182,3 @@ Set these in Vercel → Your Project → Settings → Environment Variables:
 4. **🟢 MEDIUM:** Test full flow end-to-end
 5. **🟢 MEDIUM:** Change admin passwords
 6. **🟢 LOW:** Set up monitoring/error tracking
-

@@ -1,32 +1,43 @@
 // Vercel Serverless Function for Order Management
-// Stores orders in a JSON file (in production, use a database like Vercel KV, MongoDB, etc.)
+// Uses Vercel KV (Redis) for persistent storage
 
-const fs = require('fs').promises;
-const path = require('path');
+const { kv } = require('@vercel/kv');
 
-// In-memory cache (resets on serverless function restart)
-let ordersCache = null;
-const ORDERS_FILE = path.join('/tmp', 'adheeraa_orders.json');
+const ORDERS_KEY = 'adheeraa_orders';
 
-// Helper to read orders
+// Helper to read orders from Vercel KV
 async function getOrders() {
   try {
-    // Try to read from file
-    const data = await fs.readFile(ORDERS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    // File doesn't exist, return empty array
-    if (error.code === 'ENOENT') {
+    // Check if KV is available (environment variables set)
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+      console.warn('⚠️ Vercel KV not configured, falling back to empty array');
       return [];
     }
-    throw error;
+
+    const orders = await kv.get(ORDERS_KEY);
+    return orders || [];
+  } catch (error) {
+    console.error('Error reading orders from KV:', error);
+    // Return empty array on error
+    return [];
   }
 }
 
-// Helper to save orders
+// Helper to save orders to Vercel KV
 async function saveOrders(orders) {
-  await fs.writeFile(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
-  ordersCache = orders;
+  try {
+    // Check if KV is available
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+      console.warn('⚠️ Vercel KV not configured, cannot save orders');
+      throw new Error('Vercel KV not configured. Please set KV_REST_API_URL and KV_REST_API_TOKEN environment variables.');
+    }
+
+    await kv.set(ORDERS_KEY, orders);
+    console.log('✅ Orders saved to Vercel KV:', orders.length, 'orders');
+  } catch (error) {
+    console.error('Error saving orders to KV:', error);
+    throw error;
+  }
 }
 
 module.exports = async (req, res) => {

@@ -126,32 +126,37 @@ export async function updateOrderStatus(
   // Find the order first to get orderNumber
   const orders = await getAllOrders();
   const order = orders.find((o) => o.id === orderId);
-  
+
   if (!order) {
-    console.error('Order not found:', orderId);
+    console.error("Order not found:", orderId);
     return;
   }
 
   // In production (Vercel), update via API
   if (!import.meta.env.DEV) {
     try {
-      const response = await fetch(`${API_URL}/api/orders?orderNumber=${encodeURIComponent(order.orderNumber)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, adminNotes }),
-      });
-      
+      const response = await fetch(
+        `${API_URL}/api/orders?orderNumber=${encodeURIComponent(
+          order.orderNumber
+        )}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status, adminNotes }),
+        }
+      );
+
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to update order status');
+        throw new Error(error.error || "Failed to update order status");
       }
-      
+
       // Also update localStorage as backup
       const updatedOrders = await getAllOrders();
       localStorage.setItem(ORDERS_KEY, JSON.stringify(updatedOrders));
       return;
     } catch (error) {
-      console.error('Error updating order status via API:', error);
+      console.error("Error updating order status via API:", error);
       // Fallback to localStorage
     }
   }
