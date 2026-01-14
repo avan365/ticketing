@@ -365,6 +365,31 @@ export async function getOrderStats() {
   };
 }
 
+/**
+ * Reset all orders (clear all order data)
+ * WARNING: This will delete all orders permanently
+ */
+export async function resetAllOrders(): Promise<void> {
+  // In production, call API
+  if (!import.meta.env.DEV) {
+    try {
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        console.log("✅ All orders reset via API");
+        return;
+      }
+    } catch (error) {
+      console.error("Error resetting orders via API:", error);
+    }
+  }
+
+  // In development, clear localStorage
+  localStorage.removeItem(ORDERS_KEY);
+  console.log("🔄 All orders reset");
+}
+
 export async function exportOrdersToCSV(): Promise<string> {
   const orders = await getAllOrders();
 

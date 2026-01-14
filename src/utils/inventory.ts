@@ -1,6 +1,8 @@
 // Ticket Inventory Management
 // Persists available ticket counts in localStorage
 
+import { EventConfig } from '../config/eventConfig';
+
 export interface TicketInventory {
   [ticketId: string]: {
     name: string;
@@ -14,28 +16,38 @@ export interface TicketInventory {
 const INVENTORY_KEY = 'adheeraa_inventory';
 // const RESERVATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes - for future use
 
-// Default inventory (initial stock)
-// NOTE: Prices should match BASE_TICKETS in App.tsx
-const DEFAULT_INVENTORY: TicketInventory = {
-  'early-bird': { name: 'Early Bird', price: 25, available: 150, sold: 0, reserved: 0 },
-  'regular': { name: 'Regular Admission', price: 35, available: 300, sold: 0, reserved: 0 },
-  'table': { name: 'Table for 4', price: 200, available: 20, sold: 0, reserved: 0 },
+// Default inventory (initial stock) - Uses config for ticket types
+// Default quantities can be customized here
+const DEFAULT_QUANTITIES: { [key: string]: number } = {
+  'early-bird': 150,
+  'regular': 300,
+  'table': 20,
 };
 
-// Sync inventory prices and names with BASE_TICKETS (from App.tsx)
+// Generate default inventory from config
+function getDefaultInventory(): TicketInventory {
+  const inventory: TicketInventory = {};
+  EventConfig.tickets.forEach(ticket => {
+    inventory[ticket.id] = {
+      name: ticket.name,
+      price: ticket.price,
+      available: DEFAULT_QUANTITIES[ticket.id] || 0,
+      sold: 0,
+      reserved: 0,
+    };
+  });
+  return inventory;
+}
+
+const DEFAULT_INVENTORY = getDefaultInventory();
+
+// Sync inventory prices and names with EventConfig tickets
 // This ensures inventory always matches the actual ticket prices
 function syncInventoryWithBaseTickets(inventory: TicketInventory): TicketInventory {
-  // BASE_TICKETS from App.tsx - keep in sync!
-  const BASE_TICKETS = [
-    { id: 'early-bird', name: 'Early Bird', price: 25 },
-    { id: 'regular', name: 'Regular Admission', price: 35 },
-    { id: 'table', name: 'Table for 4', price: 200 },
-  ];
-
   const synced: TicketInventory = {};
   
-  // Update existing tickets with correct prices/names, preserve counts
-  for (const ticket of BASE_TICKETS) {
+  // Update existing tickets with correct prices/names from config, preserve counts
+  for (const ticket of EventConfig.tickets) {
     if (inventory[ticket.id]) {
       synced[ticket.id] = {
         ...inventory[ticket.id],
@@ -47,7 +59,7 @@ function syncInventoryWithBaseTickets(inventory: TicketInventory): TicketInvento
       synced[ticket.id] = DEFAULT_INVENTORY[ticket.id] || {
         name: ticket.name,
         price: ticket.price,
-        available: 0,
+        available: DEFAULT_QUANTITIES[ticket.id] || 0,
         sold: 0,
         reserved: 0,
       };

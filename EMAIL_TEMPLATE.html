@@ -6,9 +6,9 @@
 ║  1. Go to https://www.emailjs.com/templates                               ║
 ║  2. Click "Create New Template"                                           ║
 ║  3. In the template editor:                                               ║
-║     - Subject: Your ADHEERAA Ticket Confirmation - Order #{{order_number}}║
+║     - Subject: Your {{event_name}} Ticket Confirmation - Order #{{order_number}}║
 ║     - To Email: {{to_email}}                                              ║
-║     - From Name: ADHEERAA Events                                          ║
+║     - From Name: Use company name from config                             ║
 ║     - Reply To: your-email@example.com                                    ║
 ║                                                                           ║
 ║  4. Copy the HTML below into the "Content" section (click "Code" tab)     ║
@@ -80,7 +80,7 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                       Roboto, 'Helvetica Neue', Arial, sans-serif;
                   "
                 >
-                  ✨ ADHEERAA ✨
+                  ✨ {{event_name}} ✨
                 </h1>
                 <p
                   style="
@@ -93,7 +93,7 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                       Roboto, 'Helvetica Neue', Arial, sans-serif;
                   "
                 >
-                  MASQUERADE NIGHT 2026
+                  {{event_subtitle}} {{event_year}}
                 </p>
               </td>
             </tr>
@@ -527,7 +527,7 @@ COPY EVERYTHING BELOW THIS LINE INTO EMAILJS:
                       Roboto, 'Helvetica Neue', Arial, sans-serif;
                   "
                 >
-                  © 2026 ADHEERAA Events. All rights reserved.
+                  {{copyright_text}}
                 </p>
               </td>
             </tr>

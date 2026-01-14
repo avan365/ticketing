@@ -169,11 +169,14 @@ export const sendCustomerConfirmation = async (
     payment_status: paymentStatus,
     qr_codes: qrCodesHtml, // HTML with QR code images
 
-    // Event info
-    event_name: EventConfig.event.fullTitle,
-    event_date: "February 14, 2026",
-    event_time: "7:00 PM",
-    event_venue: "Grand Ballroom, Marina Bay Sands",
+    // Event info (from config)
+    event_name: EventConfig.event.name,
+    event_subtitle: EventConfig.event.subtitle,
+    event_year: EventConfig.event.year,
+    event_date: EventConfig.dateTime.date,
+    event_time: EventConfig.dateTime.time,
+    event_venue: EventConfig.venue.fullAddress,
+    copyright_text: EventConfig.branding.copyright,
   };
 
   try {

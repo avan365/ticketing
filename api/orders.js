@@ -222,6 +222,13 @@ module.exports = async (req, res) => {
       return res.status(200).json(orders[orderIndex]);
     }
 
+    // DELETE /api/orders - Reset all orders
+    if (method === 'DELETE') {
+      await saveOrders([]);
+      console.log('✅ All orders reset');
+      return res.status(200).json({ success: true, message: 'All orders deleted' });
+    }
+
     // PATCH /api/orders/ticket - Update ticket status
     if (method === 'PATCH' && ticketId && status) {
       const orders = await getOrders();
