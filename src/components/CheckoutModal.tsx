@@ -631,7 +631,7 @@ export function CheckoutModal({
                           PayNow
                         </span>
                         <span className="px-1.5 md:px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] md:text-xs font-semibold rounded-full font-sans">
-                          NO FEES
+                          NO PROCESSING FEES
                         </span>
                         <span className="hidden md:inline px-2 py-0.5 bg-yellow-500/20 text-amber-500/90 text-xs font-semibold rounded-full font-sans">
                           RECOMMENDED
