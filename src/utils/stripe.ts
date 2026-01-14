@@ -30,7 +30,7 @@ export const STRIPE_FEES = {
   card: { percentage: 3.4, fixed: 0.5, label: "3.4% + $0.50" },
   apple_pay: { percentage: 3.4, fixed: 0.5, label: "3.4% + $0.50" }, // Same as card
   google_pay: { percentage: 3.4, fixed: 0.5, label: "3.4% + $0.50" }, // Same as card
-  grabpay: { percentage: 3.3, fixed: 0, label: "3.3%" }, // No fixed fee!
+  grabpay: { percentage: 3.4, fixed: 0.5, label: "3.4% + $0.50" }, // Same as card and Apple Pay
   paynow_stripe: { percentage: 1.3, fixed: 0, label: "1.3%" }, // PayNow via Stripe
 };
 
