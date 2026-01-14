@@ -1,20 +1,48 @@
 // Vercel Serverless Function for Order Management
 // Uses Vercel KV (Redis) for persistent storage
 
-const { kv } = require('@vercel/kv');
+const { createClient } = require('@vercel/kv');
 
 const ORDERS_KEY = 'adheeraa_orders';
+
+// Initialize KV client (supports multiple env var formats)
+let kv = null;
+
+function initKV() {
+  if (kv) return kv; // Already initialized
+  
+  // Try different environment variable formats
+  const url = process.env.KV_REST_API_URL || process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.REDIS_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  
+  if (!url || !token) {
+    console.warn('⚠️ Vercel KV not configured. Available env vars:', Object.keys(process.env).filter(k => k.includes('REDIS') || k.includes('KV')));
+    return null;
+  }
+  
+  try {
+    kv = createClient({
+      url: url,
+      token: token,
+    });
+    console.log('✅ KV client initialized');
+    return kv;
+  } catch (error) {
+    console.error('❌ Error initializing KV client:', error);
+    return null;
+  }
+}
 
 // Helper to read orders from Vercel KV
 async function getOrders() {
   try {
-    // Check if KV is available (environment variables set)
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+    const client = initKV();
+    if (!client) {
       console.warn('⚠️ Vercel KV not configured, falling back to empty array');
       return [];
     }
 
-    const orders = await kv.get(ORDERS_KEY);
+    const orders = await client.get(ORDERS_KEY);
     return orders || [];
   } catch (error) {
     console.error('Error reading orders from KV:', error);
@@ -26,13 +54,13 @@ async function getOrders() {
 // Helper to save orders to Vercel KV
 async function saveOrders(orders) {
   try {
-    // Check if KV is available
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+    const client = initKV();
+    if (!client) {
       console.warn('⚠️ Vercel KV not configured, cannot save orders');
-      throw new Error('Vercel KV not configured. Please set KV_REST_API_URL and KV_REST_API_TOKEN environment variables.');
+      throw new Error('Vercel KV not configured. Please set KV_REST_API_URL and KV_REST_API_TOKEN (or REDIS_URL and REDIS_TOKEN) environment variables.');
     }
 
-    await kv.set(ORDERS_KEY, orders);
+    await client.set(ORDERS_KEY, orders);
     console.log('✅ Orders saved to Vercel KV:', orders.length, 'orders');
   } catch (error) {
     console.error('Error saving orders to KV:', error);
