@@ -1,32 +1,16 @@
 // Vercel Serverless Function for Order Management
-// Uses Vercel KV (Redis) for persistent storage
+// Uses Redis for persistent storage (supports both REST API and native Redis)
 
-const { createClient } = require('@vercel/kv');
+const { createClient: createKVClient } = require('@vercel/kv');
+const { createClient: createRedisClient } = require('redis');
 
 const ORDERS_KEY = 'adheeraa_orders';
 
-// Initialize KV client (supports multiple env var formats)
+// Initialize Redis client (supports multiple formats)
 let kv = null;
 
 function initKV() {
   if (kv) return kv; // Already initialized
-  
-  // Try different environment variable formats
-  // Format 1: Separate URL and TOKEN
-  let url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  let token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  
-  // Format 2: Single REDIS_URL (connection string)
-  // If REDIS_URL exists, it might be a connection string or just the URL
-  if (process.env.REDIS_URL && !url) {
-    const redisUrl = process.env.REDIS_URL;
-    // Check if it's a full connection string (redis:// or https://)
-    if (redisUrl.startsWith('https://') || redisUrl.startsWith('http://')) {
-      url = redisUrl;
-      // Token might be in a separate variable or in the URL
-      token = process.env.REDIS_TOKEN || process.env.REDIS_PASSWORD;
-    }
-  }
   
   // Log available env vars for debugging
   const availableVars = Object.keys(process.env).filter(k => 
@@ -34,58 +18,105 @@ function initKV() {
   );
   console.log('🔍 Available Redis/KV env vars:', availableVars);
   
-  if (!url || !token) {
-    console.warn('⚠️ Vercel KV not configured. Need URL and TOKEN.');
-    console.warn('   Looking for: KV_REST_API_URL + KV_REST_API_TOKEN');
-    console.warn('   Or: REDIS_URL + REDIS_TOKEN');
-    console.warn('   Or: UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN');
-    return null;
+  // Format 1: REST API (Vercel KV / Upstash)
+  let url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  let token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  
+  // Format 2: Native Redis connection string (redis://)
+  const redisUrl = process.env.REDIS_URL;
+  
+  if (redisUrl && redisUrl.startsWith('redis://')) {
+    // Native Redis connection string (Redis Labs, etc.)
+    try {
+      console.log('🔌 Using native Redis connection (redis://)');
+      kv = createRedisClient({
+        url: redisUrl,
+      });
+      // Note: We'll need to connect async, but for now return the client
+      console.log('✅ Redis client created (native protocol)');
+      return kv;
+    } catch (error) {
+      console.error('❌ Error creating Redis client:', error);
+      return null;
+    }
   }
   
-  try {
-    kv = createClient({
-      url: url,
-      token: token,
-    });
-    console.log('✅ KV client initialized with URL:', url.substring(0, 30) + '...');
-    return kv;
-  } catch (error) {
-    console.error('❌ Error initializing KV client:', error);
-    return null;
+  // Format 3: REST API with separate URL and token
+  if (url && token) {
+    try {
+      console.log('🌐 Using REST API connection');
+      kv = createKVClient({
+        url: url,
+        token: token,
+      });
+      console.log('✅ KV client initialized (REST API)');
+      return kv;
+    } catch (error) {
+      console.error('❌ Error initializing KV client:', error);
+      return null;
+    }
   }
+  
+  console.warn('⚠️ Redis/KV not configured. Need one of:');
+  console.warn('   - REDIS_URL (redis:// connection string)');
+  console.warn('   - KV_REST_API_URL + KV_REST_API_TOKEN');
+  console.warn('   - UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN');
+  return null;
 }
 
-// Helper to read orders from Vercel KV
+// Helper to read orders from Redis
 async function getOrders() {
   try {
     const client = initKV();
     if (!client) {
-      console.warn('⚠️ Vercel KV not configured, falling back to empty array');
+      console.warn('⚠️ Redis not configured, falling back to empty array');
       return [];
     }
 
-    const orders = await client.get(ORDERS_KEY);
-    return orders || [];
+    // Check if it's a native Redis client (needs connection)
+    if (typeof client.connect === 'function') {
+      // Native Redis client
+      if (!client.isReady && !client.isOpen) {
+        await client.connect();
+      }
+      const orders = await client.get(ORDERS_KEY);
+      return orders ? JSON.parse(orders) : [];
+    } else {
+      // REST API client (Vercel KV)
+      const orders = await client.get(ORDERS_KEY);
+      return orders || [];
+    }
   } catch (error) {
-    console.error('Error reading orders from KV:', error);
+    console.error('Error reading orders from Redis:', error);
     // Return empty array on error
     return [];
   }
 }
 
-// Helper to save orders to Vercel KV
+// Helper to save orders to Redis
 async function saveOrders(orders) {
   try {
     const client = initKV();
     if (!client) {
-      console.warn('⚠️ Vercel KV not configured, cannot save orders');
-      throw new Error('Vercel KV not configured. Please set KV_REST_API_URL and KV_REST_API_TOKEN (or REDIS_URL and REDIS_TOKEN) environment variables.');
+      console.warn('⚠️ Redis not configured, cannot save orders');
+      throw new Error('Redis not configured. Please set REDIS_URL (or KV_REST_API_URL + KV_REST_API_TOKEN) environment variables.');
     }
 
-    await client.set(ORDERS_KEY, orders);
-    console.log('✅ Orders saved to Vercel KV:', orders.length, 'orders');
+    // Check if it's a native Redis client (needs connection)
+    if (typeof client.connect === 'function') {
+      // Native Redis client - needs JSON string
+      if (!client.isReady && !client.isOpen) {
+        await client.connect();
+      }
+      await client.set(ORDERS_KEY, JSON.stringify(orders));
+    } else {
+      // REST API client (Vercel KV) - handles JSON automatically
+      await client.set(ORDERS_KEY, orders);
+    }
+    
+    console.log('✅ Orders saved to Redis:', orders.length, 'orders');
   } catch (error) {
-    console.error('Error saving orders to KV:', error);
+    console.error('Error saving orders to Redis:', error);
     throw error;
   }
 }

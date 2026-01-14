@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "commonjs",
   "dependencies": {
-    "@vercel/kv": "^0.2.1"
+    "@vercel/kv": "^0.2.1",
+    "redis": "^4.7.0"
   }
 }
