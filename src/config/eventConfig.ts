@@ -187,8 +187,8 @@ export const EventConfig = {
   ],
 
   lineup: [
-    { name: "DJ Anirudh", role: "Headliner" },
-    { name: "DJ Yuvan", role: "Special Guest" },
+    { name: "DJ Kanesh", role: "@" },
+    { name: "DJ Suben", role: "@" },
   ],
 
   // ═══════════════════════════════════════════════════════════════

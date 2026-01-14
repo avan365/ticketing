@@ -1,14 +1,37 @@
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { X, ShoppingBag, CreditCard, User, Mail, Phone, Plus, Minus, Check, Sparkles, AlertCircle, Upload, QrCode, Smartphone, Clock, Copy, CheckCircle } from 'lucide-react';
-import type { CartItem } from '../App';
-import { sendCustomerConfirmation, PAYNOW_UEN } from '../utils/email';
-import { saveOrder, type Order } from '../utils/orders';
-import { generateOrderQRCodes } from '../utils/qrcode';
-import { StripePayment } from './StripePayment';
-import { STRIPE_FEES, PLATFORM_FEE_PERCENTAGE, getFeeBreakdown, calculatePlatformFee } from '../utils/stripe';
-import { confirmPurchase, directPurchase } from '../utils/inventory';
-import { EventConfig } from '../config/eventConfig';
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  X,
+  ShoppingBag,
+  CreditCard,
+  User,
+  Mail,
+  Phone,
+  Plus,
+  Minus,
+  Check,
+  Sparkles,
+  AlertCircle,
+  Upload,
+  QrCode,
+  Smartphone,
+  Clock,
+  Copy,
+  CheckCircle,
+} from "lucide-react";
+import type { CartItem } from "../App";
+import { sendCustomerConfirmation } from "../utils/email";
+import { saveOrder, type Order } from "../utils/orders";
+import { generateOrderQRCodes } from "../utils/qrcode";
+import { StripePayment } from "./StripePayment";
+import {
+  STRIPE_FEES,
+  PLATFORM_FEE_PERCENTAGE,
+  getFeeBreakdown,
+  calculatePlatformFee,
+} from "../utils/stripe";
+import { confirmPurchase, directPurchase } from "../utils/inventory";
+import { EventConfig } from "../config/eventConfig";
 
 interface CheckoutModalProps {
   cart: CartItem[];
@@ -19,66 +42,73 @@ interface CheckoutModalProps {
   onPurchaseComplete?: () => void; // Called after successful purchase to refresh inventory
 }
 
-type CheckoutStep = 'cart' | 'details' | 'payment-select' | 'paynow' | 'stripe-payment' | 'pending' | 'success';
-type PaymentMethod = 'paynow' | 'card' | 'apple_pay' | 'grabpay' | null;
+type CheckoutStep =
+  | "cart"
+  | "details"
+  | "payment-select"
+  | "paynow"
+  | "stripe-payment"
+  | "pending"
+  | "success";
+type PaymentMethod = "paynow" | "card" | "apple_pay" | "grabpay" | null;
 
 // Apple Pay icon component
 const ApplePayIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-    <path d="M17.72 8.2c-.1.08-1.86 1.07-1.86 3.28 0 2.55 2.24 3.46 2.3 3.48-.01.06-.36 1.24-1.18 2.45-.73 1.06-1.5 2.13-2.7 2.13s-1.57-.7-3.01-.7c-1.41 0-1.91.72-3.01.72s-1.84-1-2.69-2.21C4.5 15.9 3.65 13.46 3.65 11.14c0-3.72 2.42-5.69 4.8-5.69 1.26 0 2.32.83 3.11.83.76 0 1.94-.88 3.39-.88.55 0 2.52.05 3.77 1.9zM14.13 3.45c.54-.64.92-1.53.92-2.42 0-.12-.01-.25-.03-.35-.88.03-1.93.58-2.56 1.31-.5.57-.96 1.46-.96 2.36 0 .14.02.27.04.32.06.01.16.02.26.02.79 0 1.78-.53 2.33-1.24z"/>
+    <path d="M17.72 8.2c-.1.08-1.86 1.07-1.86 3.28 0 2.55 2.24 3.46 2.3 3.48-.01.06-.36 1.24-1.18 2.45-.73 1.06-1.5 2.13-2.7 2.13s-1.57-.7-3.01-.7c-1.41 0-1.91.72-3.01.72s-1.84-1-2.69-2.21C4.5 15.9 3.65 13.46 3.65 11.14c0-3.72 2.42-5.69 4.8-5.69 1.26 0 2.32.83 3.11.83.76 0 1.94-.88 3.39-.88.55 0 2.52.05 3.77 1.9zM14.13 3.45c.54-.64.92-1.53.92-2.42 0-.12-.01-.25-.03-.35-.88.03-1.93.58-2.56 1.31-.5.57-.96 1.46-.96 2.36 0 .14.02.27.04.32.06.01.16.02.26.02.79 0 1.78-.53 2.33-1.24z" />
   </svg>
 );
 
-export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, totalPrice, onPurchaseComplete }: CheckoutModalProps) {
-  const [step, setStep] = useState<CheckoutStep>('cart');
+export function CheckoutModal({
+  cart,
+  onClose,
+  onUpdateQuantity,
+  onClearCart,
+  totalPrice,
+  onPurchaseComplete,
+}: CheckoutModalProps) {
+  const [step, setStep] = useState<CheckoutStep>("cart");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    cardNumber: '',
-    expiry: '',
-    cvv: '',
+    name: "",
+    email: "",
+    phone: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderNumber, setOrderNumber] = useState('');
+  const [orderNumber, setOrderNumber] = useState("");
   const [paidAmount, setPaidAmount] = useState(0); // Store final amount before cart clear
   const [ticketCount, setTicketCount] = useState(0); // Store ticket count before cart clear
   const [proofOfPayment, setProofOfPayment] = useState<string | null>(null);
-  const [proofFileName, setProofFileName] = useState<string>('');
-  const [copiedUEN, setCopiedUEN] = useState(false);
+  const [proofFileName, setProofFileName] = useState<string>("");
   const [copiedAmount, setCopiedAmount] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const copyToClipboard = async (text: string, type: 'uen' | 'amount') => {
+  const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      if (type === 'uen') {
-        setCopiedUEN(true);
-        setTimeout(() => setCopiedUEN(false), 2000);
-      } else {
-        setCopiedAmount(true);
-        setTimeout(() => setCopiedAmount(false), 2000);
-      }
+      setCopiedAmount(true);
+      setTimeout(() => setCopiedAmount(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error("Failed to copy:", err);
     }
   };
-
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setErrors({ proof: 'File size must be less than 5MB' });
+        setErrors({ proof: "File size must be less than 5MB" });
         return;
       }
-      
+
       // Check file type
-      if (!file.type.startsWith('image/')) {
-        setErrors({ proof: 'Please upload an image file' });
+      if (!file.type.startsWith("image/")) {
+        setErrors({ proof: "Please upload an image file" });
         return;
       }
 
@@ -97,30 +127,37 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
     let formattedValue = value;
 
     // Format card number with spaces
-    if (name === 'cardNumber') {
-      formattedValue = value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim().slice(0, 19);
+    if (name === "cardNumber") {
+      formattedValue = value
+        .replace(/\s/g, "")
+        .replace(/(.{4})/g, "$1 ")
+        .trim()
+        .slice(0, 19);
     }
 
     // Format expiry date
-    if (name === 'expiry') {
-      formattedValue = value.replace(/\D/g, '').replace(/^(\d{2})/, '$1/').slice(0, 5);
+    if (name === "expiry") {
+      formattedValue = value
+        .replace(/\D/g, "")
+        .replace(/^(\d{2})/, "$1/")
+        .slice(0, 5);
     }
 
     // Format CVV
-    if (name === 'cvv') {
-      formattedValue = value.replace(/\D/g, '').slice(0, 4);
+    if (name === "cvv") {
+      formattedValue = value.replace(/\D/g, "").slice(0, 4);
     }
 
     // Format phone
-    if (name === 'phone') {
-      formattedValue = value.replace(/[^\d+\-() ]/g, '');
+    if (name === "phone") {
+      formattedValue = value.replace(/[^\d+\-() ]/g, "");
     }
 
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -128,17 +165,17 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = "Phone number is required";
     }
 
     setErrors(newErrors);
@@ -147,35 +184,42 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (step === 'cart') {
-      setStep('details');
-    } else if (step === 'details') {
+
+    if (step === "cart") {
+      setStep("details");
+    } else if (step === "details") {
       if (validateDetails()) {
-        setStep('payment-select');
+        setStep("payment-select");
       }
-    } else if (step === 'payment-select') {
-      if (paymentMethod === 'paynow') {
-        setStep('paynow');
-      } else if (paymentMethod === 'card' || paymentMethod === 'apple_pay' || paymentMethod === 'grabpay') {
-        setStep('stripe-payment');
+    } else if (step === "payment-select") {
+      if (paymentMethod === "paynow") {
+        setStep("paynow");
+      } else if (
+        paymentMethod === "card" ||
+        paymentMethod === "apple_pay" ||
+        paymentMethod === "grabpay"
+      ) {
+        setStep("stripe-payment");
       }
-    } else if (step === 'paynow') {
+    } else if (step === "paynow") {
       if (!proofOfPayment) {
-        setErrors({ proof: 'Please upload proof of payment' });
+        setErrors({ proof: "Please upload proof of payment" });
         return;
       }
       setIsProcessing(true);
-      
-      const newOrderNumber = `MASK-${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
+
+      const newOrderNumber = `MASK-${Math.random()
+        .toString(36)
+        .substring(2, 11)
+        .toUpperCase()}`;
       setOrderNumber(newOrderNumber);
-      
+
       // Calculate total with platform fee (no Stripe fee for manual PayNow)
       const platformFee = calculatePlatformFee(totalPrice);
       const paynowTotal = totalPrice + platformFee;
-      
+
       // Generate QR codes for all tickets
-      const ticketList = cart.map(item => ({
+      const ticketList = cart.map((item) => ({
         name: item.ticket.name,
         quantity: item.quantity,
       }));
@@ -184,18 +228,18 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
         ticketList,
         formData.name
       );
-      
+
       // Save order to local storage (Admin Dashboard)
       const order: Order = {
         id: crypto.randomUUID(),
         orderNumber: newOrderNumber,
         createdAt: new Date().toISOString(),
-        status: 'pending',
-        paymentMethod: 'paynow',
+        status: "pending",
+        paymentMethod: "paynow",
         customerName: formData.name,
         customerEmail: formData.email,
         customerPhone: formData.phone,
-        tickets: cart.map(item => ({
+        tickets: cart.map((item) => ({
           name: item.ticket.name,
           quantity: item.quantity,
           price: item.ticket.price,
@@ -205,27 +249,32 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
         platformFee: platformFee,
         stripeFee: 0, // No Stripe fee for PayNow
         customerPays: paynowTotal, // For PayNow, customer pays ticket + platform fee
-        individualTickets: qrCodes.map(qr => ({
+        individualTickets: qrCodes.map((qr) => ({
           ticketId: qr.ticketId,
           ticketType: qr.ticketType,
           qrCodeDataUrl: qr.qrCodeDataUrl,
-          status: 'valid' as const,
+          status: "valid" as const,
         })),
         proofOfPayment: proofOfPayment,
       };
       await saveOrder(order);
-      
+
       // NOTE: Email will be sent AFTER admin verifies the payment
       // (Not sent immediately for PayNow - see AdminDashboard.tsx)
-      
+
       // Update inventory - mark tickets as sold
-      directPurchase(cart.map(item => ({ ticketId: item.ticket.id, quantity: item.quantity })));
+      directPurchase(
+        cart.map((item) => ({
+          ticketId: item.ticket.id,
+          quantity: item.quantity,
+        }))
+      );
       onPurchaseComplete?.(); // Refresh inventory in parent
-      
+
       setPaidAmount(paynowTotal); // Store before clearing cart
       setTicketCount(cart.reduce((total, item) => total + item.quantity, 0));
       setIsProcessing(false);
-      setStep('pending');
+      setStep("pending");
     }
   };
 
@@ -235,8 +284,8 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
 
   // Map steps to progress bar index
   const getProgressIndex = () => {
-    if (step === 'cart') return 0;
-    if (step === 'details') return 1;
+    if (step === "cart") return 0;
+    if (step === "details") return 1;
     return 2; // payment-select, paynow, payment, pending, success
   };
   const progressIndex = getProgressIndex();
@@ -261,11 +310,11 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
           <div className="sticky top-0 bg-[#0a0a12] p-4 md:p-6 flex items-center justify-between border-b border-white/10 rounded-t-xl z-10 shrink-0">
             <div className="flex items-center gap-2 md:gap-3">
               <ShoppingBag className="w-6 h-6 md:w-8 md:h-8 text-amber-500/90" />
-              <h2 
+              <h2
                 className="text-xl md:text-3xl font-bold text-white"
-                style={{ fontFamily: 'Cinzel, serif' }}
+                style={{ fontFamily: "Cinzel, serif" }}
               >
-                {step === 'success' ? 'Order Confirmed!' : 'Checkout'}
+                {step === "success" ? "Order Confirmed!" : "Checkout"}
               </h2>
             </div>
             <motion.button
@@ -279,29 +328,36 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
           </div>
 
           {/* Progress Steps */}
-          {step !== 'success' && step !== 'pending' && (
+          {step !== "success" && step !== "pending" && (
             <div className="p-3 md:p-6 border-b border-purple-500/10 shrink-0">
               <div className="flex items-center justify-center max-w-xs md:max-w-md mx-auto">
-                {['Cart', 'Details', 'Payment'].map((s, index) => (
+                {["Cart", "Details", "Payment"].map((s, index) => (
                   <div key={s} className="flex items-center flex-1">
                     <div className="flex flex-col items-center flex-1">
                       <motion.div
                         animate={{
                           scale: progressIndex === index ? 1.1 : 1,
-                          backgroundColor: progressIndex >= index ? '#facc15' : '#581c87',
+                          backgroundColor:
+                            progressIndex >= index ? "#facc15" : "#581c87",
                         }}
                         className="w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-black mb-1 md:mb-2 text-sm md:text-lg"
                       >
-                        {progressIndex > index ? <Check className="w-4 h-4 md:w-5 md:h-5" /> : index + 1}
+                        {progressIndex > index ? (
+                          <Check className="w-4 h-4 md:w-5 md:h-5" />
+                        ) : (
+                          index + 1
+                        )}
                       </motion.div>
-                      <span className="text-[10px] md:text-sm text-purple-300 capitalize font-sans">{s}</span>
+                      <span className="text-[10px] md:text-sm text-purple-300 capitalize font-sans">
+                        {s}
+                      </span>
                     </div>
                     {index < 2 && (
                       <div className="flex-1 h-0.5 md:h-1 bg-purple-800 mx-1 md:mx-2 mb-6 md:mb-8 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{
-                            width: progressIndex > index ? '100%' : '0%',
+                            width: progressIndex > index ? "100%" : "0%",
                           }}
                           transition={{ duration: 0.3 }}
                           className="h-full bg-yellow-400"
@@ -317,7 +373,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
           {/* Content */}
           <div className="p-4 lg:p-8 overflow-y-auto flex-1">
             <AnimatePresence mode="wait">
-              {step === 'cart' && (
+              {step === "cart" && (
                 <motion.div
                   key="cart"
                   initial={{ opacity: 0, x: -50 }}
@@ -325,8 +381,10 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   exit={{ opacity: 0, x: 50 }}
                   className="space-y-4 lg:space-y-6"
                 >
-                  <h3 className="text-xl lg:text-2xl font-bold text-amber-500/90 mb-4 lg:mb-6 font-bebas tracking-wide">Your Tickets</h3>
-                  
+                  <h3 className="text-xl lg:text-2xl font-bold text-amber-500/90 mb-4 lg:mb-6 font-bebas tracking-wide">
+                    Your Tickets
+                  </h3>
+
                   {cart.length === 0 ? (
                     <div className="text-center py-12">
                       <motion.div
@@ -336,8 +394,12 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       >
                         🎭
                       </motion.div>
-                      <p className="text-purple-300 text-lg font-montserrat">Your cart is empty</p>
-                      <p className="text-purple-400 text-sm mt-2 font-montserrat">Add some tickets to get started!</p>
+                      <p className="text-purple-300 text-lg font-montserrat">
+                        Your cart is empty
+                      </p>
+                      <p className="text-purple-400 text-sm mt-2 font-montserrat">
+                        Add some tickets to get started!
+                      </p>
                     </div>
                   ) : (
                     <>
@@ -352,8 +414,12 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                         >
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                             <div>
-                              <h4 className="text-lg lg:text-xl font-bold text-white font-bebas tracking-wide">{item.ticket.name}</h4>
-                              <p className="text-purple-300 text-sm lg:text-base font-montserrat">${item.ticket.price} each</p>
+                              <h4 className="text-lg lg:text-xl font-bold text-white font-bebas tracking-wide">
+                                {item.ticket.name}
+                              </h4>
+                              <p className="text-purple-300 text-sm lg:text-base font-montserrat">
+                                ${item.ticket.price} each
+                              </p>
                             </div>
                             <div className="text-left sm:text-right">
                               <p className="text-xl lg:text-2xl font-bold text-amber-500/90 font-montserrat">
@@ -361,20 +427,32 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                               </p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 lg:gap-3">
                               <motion.button
                                 whileTap={{ scale: 0.9 }}
-                                onClick={() => onUpdateQuantity(item.ticket.id, item.quantity - 1)}
+                                onClick={() =>
+                                  onUpdateQuantity(
+                                    item.ticket.id,
+                                    item.quantity - 1
+                                  )
+                                }
                                 className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-purple-700 hover:bg-purple-600 flex items-center justify-center transition-colors"
                               >
                                 <Minus className="w-4 h-4 lg:w-5 lg:h-5" />
                               </motion.button>
-                              <span className="w-10 lg:w-12 text-center text-lg lg:text-xl font-bold font-montserrat">{item.quantity}</span>
+                              <span className="w-10 lg:w-12 text-center text-lg lg:text-xl font-bold font-montserrat">
+                                {item.quantity}
+                              </span>
                               <motion.button
                                 whileTap={{ scale: 0.9 }}
-                                onClick={() => onUpdateQuantity(item.ticket.id, item.quantity + 1)}
+                                onClick={() =>
+                                  onUpdateQuantity(
+                                    item.ticket.id,
+                                    item.quantity + 1
+                                  )
+                                }
                                 className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-purple-700 hover:bg-purple-600 flex items-center justify-center transition-colors"
                               >
                                 <Plus className="w-4 h-4 lg:w-5 lg:h-5" />
@@ -382,7 +460,9 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                             </div>
                             <motion.button
                               whileTap={{ scale: 0.9 }}
-                              onClick={() => onUpdateQuantity(item.ticket.id, 0)}
+                              onClick={() =>
+                                onUpdateQuantity(item.ticket.id, 0)
+                              }
                               className="text-red-400 hover:text-red-300 font-bold text-sm lg:text-base font-montserrat"
                             >
                               Remove
@@ -393,15 +473,19 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
 
                       <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/10 rounded-2xl p-4 lg:p-6 border border-amber-500/20">
                         <div className="flex items-center justify-between text-xl lg:text-2xl font-bold">
-                          <span className="text-white font-montserrat">Total ({getTotalItems()} tickets)</span>
-                          <span className="text-amber-500/90 font-montserrat">${totalPrice}</span>
+                          <span className="text-white font-montserrat">
+                            Total ({getTotalItems()} tickets)
+                          </span>
+                          <span className="text-amber-500/90 font-montserrat">
+                            ${totalPrice}
+                          </span>
                         </div>
                       </div>
 
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => setStep('details')}
+                        onClick={() => setStep("details")}
                         className="w-full py-4 lg:py-5 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white rounded-2xl font-bold text-lg lg:text-xl hover:shadow-2xl hover:shadow-amber-500/20/50 transition-all font-bebas tracking-wide"
                       >
                         Continue to Details
@@ -411,7 +495,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                 </motion.div>
               )}
 
-              {step === 'details' && (
+              {step === "details" && (
                 <motion.form
                   key="details"
                   initial={{ opacity: 0, x: -50 }}
@@ -420,8 +504,10 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   onSubmit={handleSubmit}
                   className="space-y-4 lg:space-y-6"
                 >
-                  <h3 className="text-xl lg:text-2xl font-bold text-amber-500/90 mb-4 lg:mb-6 font-bebas tracking-wide">Your Information</h3>
-                  
+                  <h3 className="text-xl lg:text-2xl font-bold text-amber-500/90 mb-4 lg:mb-6 font-bebas tracking-wide">
+                    Your Information
+                  </h3>
+
                   <div>
                     <label className="flex items-center gap-2 text-purple-300 mb-2 font-montserrat text-sm lg:text-base">
                       <User className="w-4 h-4 lg:w-5 lg:h-5" />
@@ -432,7 +518,9 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.name ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none transition-colors font-montserrat text-base`}
+                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${
+                        errors.name ? "border-red-500" : "border-purple-500/30"
+                      } rounded-xl text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none transition-colors font-montserrat text-base`}
                       placeholder="Enter your full name"
                     />
                     {errors.name && (
@@ -453,7 +541,9 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.email ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none transition-colors font-montserrat text-base`}
+                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${
+                        errors.email ? "border-red-500" : "border-purple-500/30"
+                      } rounded-xl text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none transition-colors font-montserrat text-base`}
                       placeholder="your@email.com"
                     />
                     {errors.email && (
@@ -474,7 +564,9 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${errors.phone ? 'border-red-500' : 'border-purple-500/30'} rounded-xl text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none transition-colors font-montserrat text-base`}
+                      className={`w-full px-4 lg:px-6 py-3 lg:py-4 bg-purple-900/50 border ${
+                        errors.phone ? "border-red-500" : "border-purple-500/30"
+                      } rounded-xl text-white placeholder-purple-400 focus:border-amber-500/40 focus:outline-none transition-colors font-montserrat text-base`}
                       placeholder="+65 9123 4567"
                     />
                     {errors.phone && (
@@ -490,7 +582,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       type="button"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => setStep('cart')}
+                      onClick={() => setStep("cart")}
                       className="flex-1 py-3 lg:py-4 bg-purple-800/50 text-white rounded-xl font-bold hover:bg-purple-700/50 transition-colors font-bebas tracking-wide text-base lg:text-lg"
                     >
                       Back
@@ -507,7 +599,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                 </motion.form>
               )}
 
-              {step === 'payment-select' && (
+              {step === "payment-select" && (
                 <motion.div
                   key="payment-select"
                   initial={{ opacity: 0, x: -50 }}
@@ -515,9 +607,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   exit={{ opacity: 0, x: 50 }}
                   className="space-y-2 md:space-y-4"
                 >
-                  <h3 
-                    className="text-lg md:text-2xl font-semibold text-amber-500/90 mb-2 md:mb-4 font-sans"
-                  >
+                  <h3 className="text-lg md:text-2xl font-semibold text-amber-500/90 mb-2 md:mb-4 font-sans">
                     Select Payment Method
                   </h3>
 
@@ -525,11 +615,11 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={() => setPaymentMethod('paynow')}
+                    onClick={() => setPaymentMethod("paynow")}
                     className={`w-full p-3 md:p-4 rounded-xl border transition-all text-left flex items-center gap-2 md:gap-3 ${
-                      paymentMethod === 'paynow'
-                        ? 'border-amber-500/40 bg-amber-500/10'
-                        : 'border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30'
+                      paymentMethod === "paynow"
+                        ? "border-amber-500/40 bg-amber-500/10"
+                        : "border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30"
                     }`}
                   >
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shrink-0">
@@ -537,18 +627,30 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1 md:gap-2 flex-wrap">
-                        <span className="text-sm md:text-lg font-semibold text-white font-sans">PayNow</span>
-                        <span className="px-1.5 md:px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] md:text-xs font-semibold rounded-full font-sans">NO FEES</span>
-                        <span className="hidden md:inline px-2 py-0.5 bg-yellow-500/20 text-amber-500/90 text-xs font-semibold rounded-full font-sans">RECOMMENDED</span>
+                        <span className="text-sm md:text-lg font-semibold text-white font-sans">
+                          PayNow
+                        </span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] md:text-xs font-semibold rounded-full font-sans">
+                          NO FEES
+                        </span>
+                        <span className="hidden md:inline px-2 py-0.5 bg-yellow-500/20 text-amber-500/90 text-xs font-semibold rounded-full font-sans">
+                          RECOMMENDED
+                        </span>
                       </div>
                       <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block font-sans">
                         Scan QR & upload proof • Instant Singapore bank transfer
                       </p>
                     </div>
-                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      paymentMethod === 'paynow' ? 'border-amber-500/40 bg-yellow-400' : 'border-purple-500'
-                    }`}>
-                      {paymentMethod === 'paynow' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
+                    <div
+                      className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        paymentMethod === "paynow"
+                          ? "border-amber-500/40 bg-yellow-400"
+                          : "border-purple-500"
+                      }`}
+                    >
+                      {paymentMethod === "paynow" && (
+                        <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />
+                      )}
                     </div>
                   </motion.button>
 
@@ -556,11 +658,11 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={() => setPaymentMethod('card')}
+                    onClick={() => setPaymentMethod("card")}
                     className={`w-full p-3 md:p-4 rounded-xl border transition-all text-left flex items-center gap-2 md:gap-3 ${
-                      paymentMethod === 'card'
-                        ? 'border-amber-500/40 bg-amber-500/10'
-                        : 'border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30'
+                      paymentMethod === "card"
+                        ? "border-amber-500/40 bg-amber-500/10"
+                        : "border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30"
                     }`}
                   >
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shrink-0">
@@ -568,17 +670,27 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1 md:gap-2">
-                        <span className="text-sm md:text-lg font-semibold text-white font-sans">Credit/Debit Card</span>
-                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-semibold rounded-full font-sans">{STRIPE_FEES.card.label}</span>
+                        <span className="text-sm md:text-lg font-semibold text-white font-sans">
+                          Credit/Debit Card
+                        </span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-semibold rounded-full font-sans">
+                          {STRIPE_FEES.card.label}
+                        </span>
                       </div>
                       <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block font-sans">
                         Visa, Mastercard, AMEX • Powered by Stripe
                       </p>
                     </div>
-                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      paymentMethod === 'card' ? 'border-amber-500/40 bg-yellow-400' : 'border-purple-500'
-                    }`}>
-                      {paymentMethod === 'card' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
+                    <div
+                      className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        paymentMethod === "card"
+                          ? "border-amber-500/40 bg-yellow-400"
+                          : "border-purple-500"
+                      }`}
+                    >
+                      {paymentMethod === "card" && (
+                        <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />
+                      )}
                     </div>
                   </motion.button>
 
@@ -586,11 +698,11 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={() => setPaymentMethod('apple_pay')}
+                    onClick={() => setPaymentMethod("apple_pay")}
                     className={`w-full p-3 md:p-4 rounded-xl border transition-all text-left flex items-center gap-2 md:gap-3 ${
-                      paymentMethod === 'apple_pay'
-                        ? 'border-amber-500/40 bg-amber-500/10'
-                        : 'border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30'
+                      paymentMethod === "apple_pay"
+                        ? "border-amber-500/40 bg-amber-500/10"
+                        : "border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30"
                     }`}
                   >
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-black flex items-center justify-center shrink-0">
@@ -598,17 +710,27 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1 md:gap-2">
-                        <span className="text-sm md:text-lg font-semibold text-white font-sans">Apple Pay</span>
-                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-semibold rounded-full font-sans">{STRIPE_FEES.apple_pay.label}</span>
+                        <span className="text-sm md:text-lg font-semibold text-white font-sans">
+                          Apple Pay
+                        </span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-semibold rounded-full font-sans">
+                          {STRIPE_FEES.apple_pay.label}
+                        </span>
                       </div>
                       <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block font-sans">
                         Pay with Face ID or Touch ID • Safari/iOS only
                       </p>
                     </div>
-                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      paymentMethod === 'apple_pay' ? 'border-amber-500/40 bg-yellow-400' : 'border-purple-500'
-                    }`}>
-                      {paymentMethod === 'apple_pay' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
+                    <div
+                      className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        paymentMethod === "apple_pay"
+                          ? "border-amber-500/40 bg-yellow-400"
+                          : "border-purple-500"
+                      }`}
+                    >
+                      {paymentMethod === "apple_pay" && (
+                        <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />
+                      )}
                     </div>
                   </motion.button>
 
@@ -616,11 +738,11 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={() => setPaymentMethod('grabpay')}
+                    onClick={() => setPaymentMethod("grabpay")}
                     className={`w-full p-3 md:p-4 rounded-xl border transition-all text-left flex items-center gap-2 md:gap-3 ${
-                      paymentMethod === 'grabpay'
-                        ? 'border-amber-500/40 bg-amber-500/10'
-                        : 'border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30'
+                      paymentMethod === "grabpay"
+                        ? "border-amber-500/40 bg-amber-500/10"
+                        : "border-purple-500/10 bg-purple-900/30 hover:border-purple-500/30"
                     }`}
                   >
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-[#00B14F] flex items-center justify-center shrink-0">
@@ -628,17 +750,27 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1 md:gap-2">
-                        <span className="text-sm md:text-lg font-semibold text-white font-sans">GrabPay</span>
-                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-semibold rounded-full font-sans">{STRIPE_FEES.grabpay.label}</span>
+                        <span className="text-sm md:text-lg font-semibold text-white font-sans">
+                          GrabPay
+                        </span>
+                        <span className="px-1.5 md:px-2 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] md:text-xs font-semibold rounded-full font-sans">
+                          {STRIPE_FEES.grabpay.label}
+                        </span>
                       </div>
                       <p className="text-purple-300 text-[10px] md:text-xs mt-0.5 hidden md:block font-sans">
                         Pay with Grab wallet • Opens Grab app
                       </p>
                     </div>
-                    <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      paymentMethod === 'grabpay' ? 'border-amber-500/40 bg-yellow-400' : 'border-purple-500'
-                    }`}>
-                      {paymentMethod === 'grabpay' && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />}
+                    <div
+                      className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        paymentMethod === "grabpay"
+                          ? "border-amber-500/40 bg-yellow-400"
+                          : "border-purple-500"
+                      }`}
+                    >
+                      {paymentMethod === "grabpay" && (
+                        <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-black" />
+                      )}
                     </div>
                   </motion.button>
 
@@ -646,48 +778,64 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/10 rounded-xl p-4 border border-amber-500/20 mt-4 shadow-sm">
                     {(() => {
                       // Calculate fees based on selected payment method
-                      const stripeMethod = paymentMethod === 'apple_pay' ? 'apple_pay' : 
-                                          paymentMethod === 'grabpay' ? 'grabpay' : 
-                                          paymentMethod === 'card' ? 'card' : null;
-                      
-                      const platformFee = totalPrice * (PLATFORM_FEE_PERCENTAGE / 100);
+                      const stripeMethod =
+                        paymentMethod === "apple_pay"
+                          ? "apple_pay"
+                          : paymentMethod === "grabpay"
+                          ? "grabpay"
+                          : paymentMethod === "card"
+                          ? "card"
+                          : null;
+
+                      const platformFee =
+                        totalPrice * (PLATFORM_FEE_PERCENTAGE / 100);
                       const showPlatformFee = paymentMethod !== null; // Show for all methods
                       const showStripeFee = stripeMethod !== null;
-                      
-                      const fees = stripeMethod ? getFeeBreakdown(totalPrice, stripeMethod) : null;
+
+                      const fees = stripeMethod
+                        ? getFeeBreakdown(totalPrice, stripeMethod)
+                        : null;
                       const totalWithPlatformOnly = totalPrice + platformFee;
-                      const finalTotal = fees ? fees.total : (paymentMethod === 'paynow' ? totalWithPlatformOnly : totalPrice);
-                      
+                      const finalTotal = fees
+                        ? fees.total
+                        : paymentMethod === "paynow"
+                        ? totalWithPlatformOnly
+                        : totalPrice;
+
                       return (
                         <>
                           <div className="flex items-center justify-between text-sm text-purple-300 mb-1 font-sans">
                             <span>Tickets</span>
                             <span>${totalPrice.toFixed(2)}</span>
                           </div>
-                          
+
                           {showPlatformFee && (
                             <div className="flex items-center justify-between text-sm text-purple-300 mb-1 font-sans">
-                              <span>Service Fee ({PLATFORM_FEE_PERCENTAGE}%)</span>
+                              <span>
+                                Service Fee ({PLATFORM_FEE_PERCENTAGE}%)
+                              </span>
                               <span>+${platformFee.toFixed(2)}</span>
                             </div>
                           )}
-                          
+
                           {showStripeFee && fees && (
                             <div className="flex items-center justify-between text-sm text-purple-300 mb-1 font-sans">
                               <span>Processing ({fees.stripeFeeLabel})</span>
                               <span>+${fees.stripeFee.toFixed(2)}</span>
                             </div>
                           )}
-                          
+
                           <div className="flex items-center justify-between text-xl font-semibold pt-2 border-t border-purple-500/20 mt-2 font-sans">
                             <span className="text-amber-500/90">Total</span>
                             <span className="text-amber-500/90">
                               ${finalTotal.toFixed(2)}
                             </span>
                           </div>
-                          
+
                           <p className="text-xs text-purple-400 mt-2 font-sans">
-                            {getTotalItems()} ticket{getTotalItems() > 1 ? 's' : ''} for {EventConfig.event.fullTitle}
+                            {getTotalItems()} ticket
+                            {getTotalItems() > 1 ? "s" : ""} for{" "}
+                            {EventConfig.event.fullTitle}
                           </p>
                         </>
                       );
@@ -699,7 +847,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       type="button"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => setStep('details')}
+                      onClick={() => setStep("details")}
                       className="flex-1 py-4 bg-purple-800/50 text-white rounded-xl font-semibold hover:bg-purple-700/50 transition-colors font-sans"
                     >
                       Back
@@ -717,7 +865,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                 </motion.div>
               )}
 
-              {step === 'paynow' && (
+              {step === "paynow" && (
                 <motion.div
                   key="paynow"
                   initial={{ opacity: 0, x: -50 }}
@@ -725,9 +873,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   exit={{ opacity: 0, x: 50 }}
                   className="space-y-6"
                 >
-                  <h3 
-                    className="text-2xl font-semibold text-amber-500/90 mb-2 font-sans"
-                  >
+                  <h3 className="text-2xl font-semibold text-amber-500/90 mb-2 font-sans">
                     Pay with PayNow
                   </h3>
                   <p className="text-purple-300 text-sm font-sans">
@@ -736,69 +882,50 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
 
                   {/* PayNow QR Code */}
                   <div className="bg-white rounded-2xl p-6 mx-auto max-w-sm">
-                    <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden max-w-[200px] mx-auto">
-                      {/* Placeholder QR Code Pattern */}
-                      <div className="absolute inset-4 grid grid-cols-8 gap-1">
-                        {Array.from({ length: 64 }).map((_, i) => (
-                          <div
-                            key={i}
-                            className={`rounded-sm ${Math.random() > 0.5 ? 'bg-black' : 'bg-white'}`}
-                          />
-                        ))}
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-white px-3 py-1 rounded text-xs font-bold text-purple-600">
-                          PAYNOW
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 text-center">
-                      <p className="text-gray-600 text-sm font-medium">{EventConfig.branding.companyName}</p>
+                    <div className="aspect-square rounded-xl flex items-center justify-center relative overflow-hidden max-w-[300px] mx-auto">
+                      <img
+                        src="/paynow-qr.jpeg"
+                        alt="PayNow QR Code"
+                        className="w-full h-full object-contain rounded-xl"
+                      />
                     </div>
 
-                    {/* UEN Copy Section */}
+                    <div className="mt-4 text-center">
+                      <p className="text-gray-600 text-sm font-medium">
+                        {EventConfig.branding.companyName}
+                      </p>
+                    </div>
+
+                    {/* Amount Copy Section */}
                     <div className="mt-4 space-y-3">
                       <div className="flex items-center justify-between bg-gray-100 rounded-lg p-3">
                         <div>
-                          <p className="text-gray-500 text-xs font-medium">UEN</p>
-                          <p className="text-black font-bold font-mono">{PAYNOW_UEN}</p>
+                          <p className="text-gray-500 text-xs font-medium">
+                            Amount (incl. {PLATFORM_FEE_PERCENTAGE}% service
+                            fee)
+                          </p>
+                          <p className="text-black font-bold text-xl">
+                            $
+                            {(
+                              totalPrice *
+                              (1 + PLATFORM_FEE_PERCENTAGE / 100)
+                            ).toFixed(2)}
+                          </p>
                         </div>
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => copyToClipboard(PAYNOW_UEN, 'uen')}
+                          onClick={() =>
+                            copyToClipboard(
+                              (
+                                totalPrice *
+                                (1 + PLATFORM_FEE_PERCENTAGE / 100)
+                              ).toFixed(2)
+                            )
+                          }
                           className={`px-3 py-2 rounded-lg flex items-center gap-1.5 text-sm font-medium transition-all ${
-                            copiedUEN 
-                              ? 'bg-green-500 text-white' 
-                              : 'bg-purple-600 text-white hover:bg-purple-700'
-                          }`}
-                        >
-                          {copiedUEN ? (
-                            <>
-                              <CheckCircle className="w-4 h-4" />
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-4 h-4" />
-                              Copy
-                            </>
-                          )}
-                        </motion.button>
-                      </div>
-
-                      <div className="flex items-center justify-between bg-gray-100 rounded-lg p-3">
-                        <div>
-                          <p className="text-gray-500 text-xs font-medium">Amount (incl. {PLATFORM_FEE_PERCENTAGE}% service fee)</p>
-                          <p className="text-black font-bold text-xl">${(totalPrice * (1 + PLATFORM_FEE_PERCENTAGE / 100)).toFixed(2)}</p>
-                        </div>
-                        <motion.button
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => copyToClipboard((totalPrice * (1 + PLATFORM_FEE_PERCENTAGE / 100)).toFixed(2), 'amount')}
-                          className={`px-3 py-2 rounded-lg flex items-center gap-1.5 text-sm font-medium transition-all ${
-                            copiedAmount 
-                              ? 'bg-green-500 text-white' 
-                              : 'bg-purple-600 text-white hover:bg-purple-700'
+                            copiedAmount
+                              ? "bg-green-500 text-white"
+                              : "bg-purple-600 text-white hover:bg-purple-700"
                           }`}
                         >
                           {copiedAmount ? (
@@ -822,11 +949,22 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     <div className="flex items-start gap-3">
                       <Smartphone className="w-5 h-5 text-amber-500/90 mt-0.5" />
                       <div className="text-sm text-purple-200 font-sans">
-                        <p className="font-semibold text-white mb-1">How to pay:</p>
+                        <p className="font-semibold text-white mb-1">
+                          How to pay:
+                        </p>
                         <ol className="list-decimal list-inside space-y-1">
                           <li>Open your banking app (DBS, OCBC, UOB, etc.)</li>
                           <li>Scan the QR code above</li>
-                          <li>Enter amount: <span className="text-amber-500/90 font-bold">${(totalPrice * (1 + PLATFORM_FEE_PERCENTAGE / 100)).toFixed(2)}</span></li>
+                          <li>
+                            Enter amount:{" "}
+                            <span className="text-amber-500/90 font-bold">
+                              $
+                              {(
+                                totalPrice *
+                                (1 + PLATFORM_FEE_PERCENTAGE / 100)
+                              ).toFixed(2)}
+                            </span>
+                          </li>
                           <li>Complete the payment</li>
                           <li>Screenshot the confirmation</li>
                         </ol>
@@ -836,9 +974,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
 
                   {/* Upload Proof */}
                   <div>
-                    <label 
-                      className="block text-purple-300 mb-2 font-medium font-sans"
-                    >
+                    <label className="block text-purple-300 mb-2 font-medium font-sans">
                       Upload Proof of Payment *
                     </label>
                     <input
@@ -854,31 +990,43 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       onClick={() => fileInputRef.current?.click()}
                       className={`w-full p-6 rounded-xl border-2 border-dashed transition-all ${
                         proofOfPayment
-                          ? 'border-green-500 bg-green-500/10'
+                          ? "border-green-500 bg-green-500/10"
                           : errors.proof
-                          ? 'border-red-500 bg-red-500/10'
-                          : 'border-purple-500/50 bg-purple-900/30 hover:border-purple-400'
+                          ? "border-red-500 bg-red-500/10"
+                          : "border-purple-500/50 bg-purple-900/30 hover:border-purple-400"
                       }`}
                     >
                       {proofOfPayment ? (
                         <div className="flex items-center justify-center gap-3">
                           <div className="w-16 h-16 rounded-lg overflow-hidden">
-                            <img src={proofOfPayment} alt="Proof" className="w-full h-full object-cover" />
+                            <img
+                              src={proofOfPayment}
+                              alt="Proof"
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                           <div className="text-left">
                             <p className="text-green-400 font-semibold flex items-center gap-2">
                               <Check className="w-4 h-4" />
                               Image uploaded
                             </p>
-                            <p className="text-purple-300 text-sm">{proofFileName}</p>
-                            <p className="text-purple-400 text-xs mt-1">Click to change</p>
+                            <p className="text-purple-300 text-sm">
+                              {proofFileName}
+                            </p>
+                            <p className="text-purple-400 text-xs mt-1">
+                              Click to change
+                            </p>
                           </div>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-2">
                           <Upload className="w-8 h-8 text-purple-400" />
-                          <p className="text-purple-300 font-medium">Click to upload screenshot</p>
-                          <p className="text-purple-400 text-xs">PNG, JPG up to 5MB</p>
+                          <p className="text-purple-300 font-medium">
+                            Click to upload screenshot
+                          </p>
+                          <p className="text-purple-400 text-xs">
+                            PNG, JPG up to 5MB
+                          </p>
                         </div>
                       )}
                     </motion.button>
@@ -896,9 +1044,9 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
-                        setStep('payment-select');
+                        setStep("payment-select");
                         setProofOfPayment(null);
-                        setProofFileName('');
+                        setProofFileName("");
                       }}
                       disabled={isProcessing}
                       className="flex-1 py-4 bg-purple-800/50 text-white rounded-xl font-semibold hover:bg-purple-700/50 transition-colors disabled:opacity-50 font-sans"
@@ -906,8 +1054,12 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                       Back
                     </motion.button>
                     <motion.button
-                      whileHover={{ scale: proofOfPayment && !isProcessing ? 1.01 : 1 }}
-                      whileTap={{ scale: proofOfPayment && !isProcessing ? 0.99 : 1 }}
+                      whileHover={{
+                        scale: proofOfPayment && !isProcessing ? 1.01 : 1,
+                      }}
+                      whileTap={{
+                        scale: proofOfPayment && !isProcessing ? 0.99 : 1,
+                      }}
                       onClick={handleSubmit}
                       disabled={!proofOfPayment || isProcessing}
                       className="flex-1 py-4 bg-gradient-to-r from-amber-600/90 to-amber-700/90 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/20/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-sans"
@@ -916,107 +1068,129 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                         <>
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
                             className="w-5 h-5 border-2 border-black border-t-transparent rounded-full"
                           />
                           Submitting...
                         </>
                       ) : (
-                        'Submit Payment'
+                        "Submit Payment"
                       )}
                     </motion.button>
                   </div>
                 </motion.div>
               )}
 
-              {step === 'stripe-payment' && paymentMethod && paymentMethod !== 'paynow' && (
-                <StripePayment
-                  amount={totalPrice}
-                  customerEmail={formData.email}
-                  customerName={formData.name}
-                  selectedMethod={paymentMethod as 'card' | 'apple_pay' | 'grabpay'}
-                  onBack={() => {
-                    setStep('payment-select');
-                    setPaymentMethod(null);
-                  }}
-                  onSuccess={async (paymentId) => {
-                    const newOrderNumber = `MASK-${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
-                    setOrderNumber(newOrderNumber);
-                    
-                    // Calculate total with all fees
-                    const stripeMethod = paymentMethod === 'apple_pay' ? 'apple_pay' : 
-                                        paymentMethod === 'grabpay' ? 'grabpay' : 'card';
-                    const fees = getFeeBreakdown(totalPrice, stripeMethod);
-                    
-                    // Generate QR codes for all tickets
-                    const ticketList = cart.map(item => ({
-                      name: item.ticket.name,
-                      quantity: item.quantity,
-                    }));
-                    const qrCodes = await generateOrderQRCodes(
-                      newOrderNumber,
-                      ticketList,
-                      formData.name
-                    );
-                    
-                    // Save order to local storage (Admin Dashboard)
-                    const order: Order = {
-                      id: crypto.randomUUID(),
-                      orderNumber: newOrderNumber,
-                      createdAt: new Date().toISOString(),
-                      status: 'verified', // Stripe payments are auto-verified
-                      paymentMethod: 'card',
-                      customerName: formData.name,
-                      customerEmail: formData.email,
-                      customerPhone: formData.phone,
-                      tickets: cart.map(item => ({
+              {step === "stripe-payment" &&
+                paymentMethod &&
+                paymentMethod !== "paynow" && (
+                  <StripePayment
+                    amount={totalPrice}
+                    customerEmail={formData.email}
+                    customerName={formData.name}
+                    selectedMethod={
+                      paymentMethod as "card" | "apple_pay" | "grabpay"
+                    }
+                    onBack={() => {
+                      setStep("payment-select");
+                      setPaymentMethod(null);
+                    }}
+                    onSuccess={async (paymentId) => {
+                      const newOrderNumber = `MASK-${Math.random()
+                        .toString(36)
+                        .substring(2, 11)
+                        .toUpperCase()}`;
+                      setOrderNumber(newOrderNumber);
+
+                      // Calculate total with all fees
+                      const stripeMethod =
+                        paymentMethod === "apple_pay"
+                          ? "apple_pay"
+                          : paymentMethod === "grabpay"
+                          ? "grabpay"
+                          : "card";
+                      const fees = getFeeBreakdown(totalPrice, stripeMethod);
+
+                      // Generate QR codes for all tickets
+                      const ticketList = cart.map((item) => ({
                         name: item.ticket.name,
                         quantity: item.quantity,
-                        price: item.ticket.price,
-                      })),
-                      totalAmount: fees.total,
-                      ticketSubtotal: fees.ticketPrice,
-                      platformFee: fees.platformFee,
-                      stripeFee: fees.stripeFee,
-                      customerPays: fees.subtotal, // Customer pays: ticket + platform fee (excludes Stripe fee)
-                      individualTickets: qrCodes.map(qr => ({
-                        ticketId: qr.ticketId,
-                        ticketType: qr.ticketType,
-                        qrCodeDataUrl: qr.qrCodeDataUrl,
-                        status: 'valid' as const,
-                      })),
-                      adminNotes: `Payment ID: ${paymentId}, Method: ${paymentMethod}, Platform Fee: $${fees.platformFee}, Stripe Fee: $${fees.stripeFee}`,
-                    };
-                    await saveOrder(order);
-                    
-                    // Send confirmation email to CUSTOMER (with QR codes)
-                    await sendCustomerConfirmation(
-                      newOrderNumber,
-                      formData.name,
-                      formData.email,
-                      cart,
-                      fees.total,
-                      'card',
-                      true, // isVerified
-                      qrCodes // Pass QR codes to email
-                    );
-                    
-                    // Update inventory - mark tickets as sold
-                    confirmPurchase(cart.map(item => ({ ticketId: item.ticket.id, quantity: item.quantity })));
-                    onPurchaseComplete?.(); // Refresh inventory in parent
-                    
-                    setPaidAmount(fees.total); // Store before clearing cart
-                    setTicketCount(cart.reduce((total, item) => total + item.quantity, 0));
-                    setStep('success');
-                    onClearCart();
-                  }}
-                  onError={(error) => {
-                    setErrors({ payment: error });
-                  }}
-                />
-              )}
+                      }));
+                      const qrCodes = await generateOrderQRCodes(
+                        newOrderNumber,
+                        ticketList,
+                        formData.name
+                      );
 
-              {step === 'pending' && (
+                      // Save order to local storage (Admin Dashboard)
+                      const order: Order = {
+                        id: crypto.randomUUID(),
+                        orderNumber: newOrderNumber,
+                        createdAt: new Date().toISOString(),
+                        status: "verified", // Stripe payments are auto-verified
+                        paymentMethod: "card",
+                        customerName: formData.name,
+                        customerEmail: formData.email,
+                        customerPhone: formData.phone,
+                        tickets: cart.map((item) => ({
+                          name: item.ticket.name,
+                          quantity: item.quantity,
+                          price: item.ticket.price,
+                        })),
+                        totalAmount: fees.total,
+                        ticketSubtotal: fees.ticketPrice,
+                        platformFee: fees.platformFee,
+                        stripeFee: fees.stripeFee,
+                        customerPays: fees.subtotal, // Customer pays: ticket + platform fee (excludes Stripe fee)
+                        individualTickets: qrCodes.map((qr) => ({
+                          ticketId: qr.ticketId,
+                          ticketType: qr.ticketType,
+                          qrCodeDataUrl: qr.qrCodeDataUrl,
+                          status: "valid" as const,
+                        })),
+                        adminNotes: `Payment ID: ${paymentId}, Method: ${paymentMethod}, Platform Fee: $${fees.platformFee}, Stripe Fee: $${fees.stripeFee}`,
+                      };
+                      await saveOrder(order);
+
+                      // Send confirmation email to CUSTOMER (with QR codes)
+                      await sendCustomerConfirmation(
+                        newOrderNumber,
+                        formData.name,
+                        formData.email,
+                        cart,
+                        fees.total,
+                        "card",
+                        true, // isVerified
+                        qrCodes // Pass QR codes to email
+                      );
+
+                      // Update inventory - mark tickets as sold
+                      confirmPurchase(
+                        cart.map((item) => ({
+                          ticketId: item.ticket.id,
+                          quantity: item.quantity,
+                        }))
+                      );
+                      onPurchaseComplete?.(); // Refresh inventory in parent
+
+                      setPaidAmount(fees.total); // Store before clearing cart
+                      setTicketCount(
+                        cart.reduce((total, item) => total + item.quantity, 0)
+                      );
+                      setStep("success");
+                      onClearCart();
+                    }}
+                    onError={(error) => {
+                      setErrors({ payment: error });
+                    }}
+                  />
+                )}
+
+              {step === "pending" && (
                 <motion.div
                   key="pending"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -1025,28 +1199,30 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                 >
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                     className="w-32 h-32 mx-auto bg-gradient-to-br from-amber-500/10 to-amber-600/10 rounded-full flex items-center justify-center border-4 border-amber-500/40/50"
                   >
                     <Clock className="w-16 h-16 text-amber-500/90" />
                   </motion.div>
 
                   <div>
-                    <h3 
+                    <h3
                       className="text-3xl lg:text-4xl font-bold text-amber-500/90 mb-3"
-                      style={{ fontFamily: 'Cinzel, serif' }}
+                      style={{ fontFamily: "Cinzel, serif" }}
                     >
                       Payment Pending
                     </h3>
-                    <p 
-                      className="text-xl text-purple-300 mb-2 font-sans"
-                    >
+                    <p className="text-xl text-purple-300 mb-2 font-sans">
                       Your payment is being verified
                     </p>
-                    <p 
-                      className="text-purple-400 font-sans"
-                    >
-                      We'll email you at <span className="text-white">{formData.email}</span> once confirmed
+                    <p className="text-purple-400 font-sans">
+                      We'll email you at{" "}
+                      <span className="text-white">{formData.email}</span> once
+                      confirmed
                     </p>
                   </div>
 
@@ -1054,35 +1230,53 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     <div className="space-y-3 text-left font-sans">
                       <div className="flex justify-between">
                         <span className="text-purple-300">Reference:</span>
-                        <span className="font-bold text-white">{orderNumber}</span>
+                        <span className="font-bold text-white">
+                          {orderNumber}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Name:</span>
-                        <span className="font-bold text-white">{formData.name}</span>
+                        <span className="font-bold text-white">
+                          {formData.name}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Event:</span>
-                        <span className="font-bold text-white">{EventConfig.event.name} {EventConfig.event.subtitle}</span>
+                        <span className="font-bold text-white">
+                          {EventConfig.event.name} {EventConfig.event.subtitle}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Date:</span>
-                        <span className="font-bold text-white">Feb 21, 2026</span>
+                        <span className="font-bold text-white">
+                          Feb 21, 2026
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Tickets:</span>
-                        <span className="font-bold text-white">{ticketCount}</span>
+                        <span className="font-bold text-white">
+                          {ticketCount}
+                        </span>
                       </div>
                       <div className="flex justify-between text-xl pt-3 border-t border-purple-500/30">
-                        <span className="text-amber-500/90 font-bold">Amount:</span>
-                        <span className="text-amber-500/90 font-bold">${paidAmount.toFixed(2)}</span>
+                        <span className="text-amber-500/90 font-bold">
+                          Amount:
+                        </span>
+                        <span className="text-amber-500/90 font-bold">
+                          ${paidAmount.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-cyan-500/10 border border-amber-500/20 rounded-xl p-4 max-w-md mx-auto shadow-sm">
                     <p className="text-amber-500/80 text-sm font-sans">
-                      <span className="font-semibold">⏰ Verification typically takes 5-15 minutes.</span><br />
-                      You'll receive your e-tickets via email once payment is confirmed.
+                      <span className="font-semibold">
+                        ⏰ Verification typically takes 5-15 minutes.
+                      </span>
+                      <br />
+                      You'll receive your e-tickets via email once payment is
+                      confirmed.
                     </p>
                   </div>
 
@@ -1100,7 +1294,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                 </motion.div>
               )}
 
-              {step === 'success' && (
+              {step === "success" && (
                 <motion.div
                   key="success"
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -1110,7 +1304,7 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1, rotate: 360 }}
-                    transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
                     className="w-16 h-16 md:w-32 md:h-32 mx-auto bg-gradient-to-br from-amber-500/80 to-amber-600/80 rounded-full flex items-center justify-center shadow-2xl glow-amber"
                   >
                     <Check className="w-8 h-8 md:w-16 md:h-16 text-black" />
@@ -1152,23 +1346,35 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
                     <div className="space-y-2 md:space-y-3 text-left font-montserrat text-xs md:text-base">
                       <div className="flex justify-between">
                         <span className="text-purple-300">Order Number:</span>
-                        <span className="font-bold text-white">{orderNumber}</span>
+                        <span className="font-bold text-white">
+                          {orderNumber}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Event:</span>
-                        <span className="font-bold text-white">{EventConfig.event.name} {EventConfig.event.subtitle}</span>
+                        <span className="font-bold text-white">
+                          {EventConfig.event.name} {EventConfig.event.subtitle}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Date:</span>
-                        <span className="font-bold text-white">Feb 21, 2026</span>
+                        <span className="font-bold text-white">
+                          Feb 21, 2026
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-purple-300">Venue:</span>
-                        <span className="font-bold text-white">Skyfall Rooftop Bar</span>
+                        <span className="font-bold text-white">
+                          Skyfall Rooftop Bar
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm md:text-xl pt-2 md:pt-3 border-t border-purple-500/30">
-                        <span className="text-amber-500/90 font-bold">Total Paid:</span>
-                        <span className="text-amber-500/90 font-bold">${paidAmount.toFixed(2)}</span>
+                        <span className="text-amber-500/90 font-bold">
+                          Total Paid:
+                        </span>
+                        <span className="text-amber-500/90 font-bold">
+                          ${paidAmount.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   </motion.div>
@@ -1203,4 +1409,3 @@ export function CheckoutModal({ cart, onClose, onUpdateQuantity, onClearCart, to
     </AnimatePresence>
   );
 }
-
