@@ -672,7 +672,7 @@ export function KlyckAdminPage() {
                 className="text-xs mt-1"
                 style={{ color: EventConfig.colors.text.muted }}
               >
-                Event Revenue - PayNow
+                = Event Revenue
               </p>
             </div>
           </div>
