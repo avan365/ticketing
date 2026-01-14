@@ -77,12 +77,19 @@ export function AdminDashboard({ onClose, skipAuth = false }: AdminDashboardProp
   }, [isAuthenticated]);
 
   const refreshData = async () => {
-    const orders = await getAllOrders();
-    setOrders(orders);
-    const statsData = await getOrderStats();
-    setStats(statsData);
-    setInventory(getInventory());
-    setInventoryStats(getInventoryStats());
+    console.log('🔄 Refreshing admin data...');
+    try {
+      const orders = await getAllOrders();
+      console.log('📋 Orders loaded:', orders.length);
+      setOrders(orders);
+      
+      const statsData = await getOrderStats();
+      setStats(statsData);
+      setInventory(getInventory());
+      setInventoryStats(getInventoryStats());
+    } catch (error) {
+      console.error('❌ Error refreshing data:', error);
+    }
   };
 
   // Calculate ticket scanning stats for an order

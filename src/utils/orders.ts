@@ -62,18 +62,37 @@ export async function getAllOrders(): Promise<Order[]> {
   // In production (Vercel), fetch from API
   if (!import.meta.env.DEV) {
     try {
-      const response = await fetch(`${API_URL}/api/orders`);
+      const apiUrl = `${API_URL}/api/orders`;
+      console.log('🔍 Fetching orders from API:', apiUrl);
+      const response = await fetch(apiUrl);
+      
+      console.log('📡 API Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        console.error("Failed to fetch orders from API");
-        return [];
+        const errorText = await response.text();
+        console.error("❌ Failed to fetch orders from API:", response.status, errorText);
+        // Fallback to localStorage if API fails
+        try {
+          const stored = localStorage.getItem(ORDERS_KEY);
+          const localOrders = stored ? JSON.parse(stored) : [];
+          console.log('📦 Fallback: Using localStorage orders:', localOrders.length);
+          return localOrders;
+        } catch {
+          return [];
+        }
       }
-      return await response.json();
+      
+      const orders = await response.json();
+      console.log('✅ Orders fetched from API:', orders.length, 'orders');
+      return orders;
     } catch (error) {
-      console.error("Error fetching orders from API:", error);
+      console.error("❌ Error fetching orders from API:", error);
       // Fallback to localStorage if API fails
       try {
         const stored = localStorage.getItem(ORDERS_KEY);
-        return stored ? JSON.parse(stored) : [];
+        const localOrders = stored ? JSON.parse(stored) : [];
+        console.log('📦 Fallback: Using localStorage orders:', localOrders.length);
+        return localOrders;
       } catch {
         return [];
       }
