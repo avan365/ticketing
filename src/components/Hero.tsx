@@ -11,7 +11,10 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
   return (
     <div className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background - matching poster's dark aesthetic */}
-      <div className="absolute inset-0" style={{ backgroundColor: EventConfig.colors.background }} />
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: EventConfig.colors.background }}
+      />
 
       {/* Subtle background gradient - minimalistic */}
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/20 via-transparent to-transparent pointer-events-none" />
@@ -25,11 +28,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
           whileTap={{ scale: 0.95 }}
           onClick={onCheckout}
           className="fixed top-4 right-4 md:top-8 md:right-8 z-50 text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 transition-transform backdrop-blur-sm"
-          style={{ 
+          style={{
             background: `linear-gradient(to right, ${EventConfig.colors.primary.base}E6, ${EventConfig.colors.primary.dark}E6)`,
             borderColor: EventConfig.colors.border.secondary,
-            borderWidth: '1px',
-            borderStyle: 'solid',
+            borderWidth: "1px",
+            borderStyle: "solid",
           }}
         >
           <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
@@ -99,7 +102,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
                   className="block text-xl sm:text-2xl md:text-3xl lg:text-6xl mt-1 md:mt-2"
-                  style={{ 
+                  style={{
                     fontFamily: EventConfig.fonts.accent,
                     color: EventConfig.colors.text.secondary,
                   }}
@@ -118,10 +121,16 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
                 <span className="text-2xl md:text-5xl">📅</span>
                 <div className="text-left">
-                  <p className="text-lg md:text-xl" style={{ color: EventConfig.colors.text.secondary }}>
+                  <p
+                    className="text-lg md:text-xl"
+                    style={{ color: EventConfig.colors.text.secondary }}
+                  >
                     {EventConfig.dateTime.date}
                   </p>
-                  <p className="text-base md:text-lg" style={{ color: EventConfig.colors.text.muted }}>
+                  <p
+                    className="text-base md:text-lg"
+                    style={{ color: EventConfig.colors.text.muted }}
+                  >
                     {EventConfig.dateTime.time}
                   </p>
                 </div>
@@ -130,10 +139,16 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
                 <span className="text-2xl md:text-5xl">📍</span>
                 <div className="text-left">
-                  <p className="text-lg md:text-xl" style={{ color: EventConfig.colors.text.secondary }}>
+                  <p
+                    className="text-lg md:text-xl"
+                    style={{ color: EventConfig.colors.text.secondary }}
+                  >
                     {EventConfig.venue.name}
                   </p>
-                  <p className="text-base md:text-lg" style={{ color: EventConfig.colors.text.muted }}>
+                  <p
+                    className="text-base md:text-lg"
+                    style={{ color: EventConfig.colors.text.muted }}
+                  >
                     {EventConfig.venue.location}
                   </p>
                 </div>
@@ -149,8 +164,14 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               whileTap={{ scale: 0.95 }}
               className="inline-block text-white px-8 py-3 md:px-12 md:py-4 rounded-lg text-lg md:text-xl font-medium transition-colors duration-200 font-sans"
               style={{ backgroundColor: EventConfig.colors.primary.base }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  EventConfig.colors.primary.dark)
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  EventConfig.colors.primary.base)
+              }
             >
               {EventConfig.branding.ctaButton}
             </motion.a>
