@@ -187,10 +187,8 @@ export const EventConfig = {
   ],
 
   lineup: [
-    { name: "DJ Anirudh", role: "Headliner", time: "10:30 PM" },
-    { name: "The Thala Band", role: "Live Performance", time: "9:00 PM" },
-    { name: "DJ Yuvan", role: "Special Guest", time: "10:00 PM" },
-    { name: "DJ Karthik", role: "Opening Act", time: "8:00 PM" },
+    { name: "DJ Anirudh", role: "Headliner" },
+    { name: "DJ Yuvan", role: "Special Guest" },
   ],
 
   // ═══════════════════════════════════════════════════════════════

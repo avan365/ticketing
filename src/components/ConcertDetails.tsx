@@ -177,11 +177,6 @@ export function ConcertDetails() {
                             </p>
                           </div>
                         </div>
-                        <p 
-                          className="text-sm font-semibold text-amber-500/90 font-sans"
-                        >
-                          {artist.time}
-                        </p>
                       </div>
                     ))}
                   </div>
@@ -228,13 +223,6 @@ export function ConcertDetails() {
                           {artist.role}
                         </p>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <p 
-                        className="text-xl font-semibold text-amber-500/90 font-sans"
-                      >
-                        {artist.time}
-                      </p>
                     </div>
                   </div>
                 </motion.div>
