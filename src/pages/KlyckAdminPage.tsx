@@ -194,7 +194,7 @@ export function KlyckAdminPage() {
       totalPlatformFees += platformFee;
     });
 
-    const amountOwed = totalEventRevenue - totalPayNow;
+    const amountOwed = totalEventRevenue;
 
     return {
       totalPayNow,
