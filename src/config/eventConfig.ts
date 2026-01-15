@@ -180,6 +180,11 @@ export const EventConfig = {
       description:
         "Rooftop views, immersive visuals, elevated sound, and a venue designed for unforgettable moments.",
     },
+    {
+      icon: "Camera",
+      title: "Photobooth",
+      description: "Pose like nobody's watching. We'll handle the rest.",
+    },
   ],
 
   // Lineup removed - no longer displayed
@@ -194,7 +199,7 @@ export const EventConfig = {
     mainTitle: "Elegant Cocktail Attire",
     tags: ["✨ Classy", "🎩 Polished", "🖤 Intentional"],
     description:
-      "Think dresses, blazers, clean shirts, statement fits — elevated but comfortable.",
+      "Think dresses, clean shirts, statement fits — elevated but comfortable.",
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -243,6 +248,7 @@ export const EventConfig = {
       "Venue reserves the right to refuse entry or remove guests for inappropriate behaviour",
       "Be respectful to staff, DJs, and fellow guests",
       "Photos and videos will be taken during the event",
+      "Vomitting would incur a fine and guest may be asked to leave",
     ],
     closing:
       "Behave. Look good. Stay mysterious. The rest is between you and the dance floor.",

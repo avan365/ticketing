@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Music, Clock, Star, ChevronDown } from "lucide-react";
+import { Music, Clock, Star, ChevronDown, Camera } from "lucide-react";
 import { EventConfig } from "../config/eventConfig";
 
 // Map icon names to components
@@ -8,6 +8,7 @@ const iconMap: { [key: string]: typeof Music } = {
   Music,
   Clock,
   Star,
+  Camera,
 };
 
 export function ConcertDetails() {
@@ -49,7 +50,7 @@ export function ConcertDetails() {
         </motion.div>
 
         {/* Features Grid - Collapsible on mobile, full cards on desktop */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8 mb-8 md:mb-24 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 mb-8 md:mb-24 max-w-7xl mx-auto">
           {features.map((feature, index) => (
             <motion.div
               key={index}

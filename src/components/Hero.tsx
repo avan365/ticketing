@@ -44,6 +44,24 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
 
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 pt-16 pb-8 md:pt-0 md:pb-0">
+        {/* TwinMonkeyss Brand */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center md:text-left mb-6 md:mb-8"
+        >
+          <p
+            className="text-sm md:text-base font-medium"
+            style={{
+              color: EventConfig.colors.text.muted,
+              fontFamily: EventConfig.fonts.body,
+            }}
+          >
+            twinmonkeyss
+          </p>
+        </motion.div>
+
         {/* Mobile: Centered single column | Desktop: Side-by-side grid */}
         <div className="flex flex-col items-center text-center md:grid md:grid-cols-2 md:gap-12 md:items-start md:text-left">
           {/* Image - Mobile: much smaller centered below text | Desktop: left side */}
@@ -118,7 +136,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               transition={{ delay: 0.6 }}
               className="space-y-3 md:space-y-4 font-sans"
             >
-              <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
+              <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-start">
                 <span className="text-2xl md:text-5xl">🗓️</span>
                 <div className="text-left">
                   <p
@@ -136,7 +154,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
+              <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-start">
                 <span className="text-2xl md:text-5xl">📍</span>
                 <div className="text-left">
                   <p

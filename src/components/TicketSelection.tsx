@@ -373,7 +373,7 @@ export function TicketSelection({
         >
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 md:p-8">
             <h4 className="text-base md:text-2xl font-semibold text-amber-500/90 mb-4 md:mb-6 font-sans">
-              ❓ FAQs
+              FAQs
             </h4>
             <div className="space-y-3 md:space-y-4 text-purple-200 text-xs md:text-base font-sans">
               <div>
