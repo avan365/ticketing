@@ -51,15 +51,11 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
           transition={{ duration: 0.6 }}
           className="text-center md:text-left mb-6 md:mb-8"
         >
-          <p
-            className="text-sm md:text-base font-medium"
-            style={{
-              color: EventConfig.colors.text.muted,
-              fontFamily: EventConfig.fonts.body,
-            }}
-          >
-            twinmonkeyss
-          </p>
+          <img
+            src="/twinmonkeyss-logo.png"
+            alt="TwinMonkeyss Logo"
+            className="h-12 md:h-16 mx-auto md:mx-0"
+          />
         </motion.div>
 
         {/* Mobile: Centered single column | Desktop: Side-by-side grid */}
