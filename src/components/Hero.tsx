@@ -119,7 +119,7 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
               className="space-y-3 md:space-y-4 font-sans"
             >
               <div className="flex items-center gap-3 md:gap-4 text-base md:text-xl justify-center md:justify-start">
-                <span className="text-2xl md:text-5xl">📅</span>
+                <span className="text-2xl md:text-5xl">🗓️</span>
                 <div className="text-left">
                   <p
                     className="text-lg md:text-xl"

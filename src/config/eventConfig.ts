@@ -34,7 +34,7 @@ export const EventConfig = {
 
   dateTime: {
     // Event date (display format)
-    date: "Friday, February 21, 2026",
+    date: "Saturday, February 21, 2026",
 
     // Event time range
     time: "8:00 PM - 12:00 AM",
@@ -186,6 +186,69 @@ export const EventConfig = {
   lineup: [],
 
   // ═══════════════════════════════════════════════════════════════
+  // DRESS CODE
+  // ═══════════════════════════════════════════════════════════════
+
+  dressCode: {
+    title: "🎭 Dress Code",
+    mainTitle: "Elegant Cocktail Attire",
+    tags: ["✨ Classy", "🎩 Elegant", "🖤 Elevated"],
+    description:
+      "Think dresses, blazers, clean shirts, statement fits — elevated but comfortable.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // MASK INFORMATION
+  // ═══════════════════════════════════════════════════════════════
+
+  maskInfo: {
+    title: "🎭 Your Mask Is Included",
+    description:
+      "Every ticket includes a complimentary masquerade mask. Masquerade masks provided at entry and can be personalized inside.",
+    disclaimer:
+      "Masks and customization materials are available while stocks last.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // FAQ
+  // ═══════════════════════════════════════════════════════════════
+
+  faq: [
+    {
+      question: "Do I need to bring my own mask?",
+      answer: "No. Every ticket includes a complimentary masquerade mask.",
+    },
+    {
+      question: "Can I customize my mask anytime?",
+      answer:
+        "Yes, the Mask Atelier is open early in the night while supplies last.",
+    },
+    {
+      question: "Can I bring my own mask?",
+      answer: "Yes, as long as it aligns with formal masquerade attire.",
+    },
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // IMPORTANT INFORMATION
+  // ═══════════════════════════════════════════════════════════════
+
+  importantInfo: {
+    title: "📋 Important Information",
+    items: [
+      "18+ event — valid physical ID required for entry",
+      "Masks are mandatory on entry (complimentary mask included with every ticket)",
+      "Personal masks are allowed, subject to entry approval",
+      "Tickets are non-refundable but transferable",
+      "Venue reserves the right to refuse entry or remove guests for inappropriate behaviour",
+      "Be respectful to staff, DJs, and fellow guests",
+      "Photos and videos will be taken during the event",
+    ],
+    closing:
+      "Behave. Look good. Stay mysterious. The rest is between you and the dance floor.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════
   // FOOTER & BRANDING
   // ═══════════════════════════════════════════════════════════════
 
@@ -231,6 +294,10 @@ export const {
   tickets,
   features,
   lineup,
+  dressCode,
+  maskInfo,
+  faq,
+  importantInfo,
   branding,
   meta,
 } = EventConfig;

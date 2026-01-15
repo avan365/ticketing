@@ -49,7 +49,7 @@ export function ConcertDetails() {
         </motion.div>
 
         {/* Features Grid - Collapsible on mobile, full cards on desktop */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 mb-8 md:mb-24">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8 mb-8 md:mb-24">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -145,42 +145,35 @@ export function ConcertDetails() {
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="mt-6 md:mt-24 max-w-3xl mx-auto text-center"
+          className="mt-6 md:mt-24 max-w-3xl mx-auto"
         >
           <div className="relative">
             <div className="relative bg-white/5 backdrop-blur-sm p-4 md:p-12 rounded-xl border border-white/10">
-              {/* Mobile: Two lines */}
-              <div className="md:hidden">
+              <div className="text-center mb-4 md:mb-6">
                 <p
-                  className="text-lg text-amber-500/90 font-bold"
-                  style={{ fontFamily: "Cinzel, serif" }}
+                  className="text-lg md:text-3xl text-amber-500/90 font-bold mb-3 md:mb-4"
+                  style={{ fontFamily: EventConfig.fonts.display }}
                 >
-                  🎭 Dress Code
+                  {EventConfig.dressCode.title}
                 </p>
                 <p
-                  className="text-sm text-purple-200 mt-1"
-                  style={{ fontFamily: "Playfair Display, serif" }}
+                  className="text-base md:text-2xl text-purple-200 mb-3 md:mb-4"
+                  style={{ fontFamily: EventConfig.fonts.accent }}
                 >
-                  Formal Masquerade Attire
+                  {EventConfig.dressCode.mainTitle}
                 </p>
-              </div>
-              {/* Desktop: Full display */}
-              <div className="hidden md:block">
-                <h3
-                  className="text-4xl font-bold text-amber-500/90 mb-6"
-                  style={{ fontFamily: "Cinzel, serif" }}
-                >
-                  🎭 Dress Code 🎭
-                </h3>
-                <p
-                  className="text-2xl text-purple-200 mb-4"
-                  style={{ fontFamily: "Playfair Display, serif" }}
-                >
-                  Formal Masquerade Attire Required
-                </p>
-                <p className="text-lg text-purple-300 font-sans">
-                  Don your finest evening wear and an elegant mask. Let your
-                  mystique shine through!
+                <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-3 md:mb-4">
+                  {EventConfig.dressCode.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="text-sm md:text-lg text-purple-300"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs md:text-base text-purple-200/80 max-w-2xl mx-auto font-sans">
+                  {EventConfig.dressCode.description}
                 </p>
               </div>
             </div>

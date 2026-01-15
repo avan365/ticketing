@@ -122,18 +122,17 @@ export function TicketSelection({
             <h3
               className="text-xl md:text-3xl font-bold mb-3 md:mb-4"
               style={{
-                fontFamily: "Cinzel, serif",
+                fontFamily: EventConfig.fonts.display,
                 color: EventConfig.colors.text.primary,
               }}
             >
-              🎭 Your Mask Is Included
+              {EventConfig.maskInfo.title}
             </h3>
             <p className="text-sm md:text-lg text-purple-200 max-w-2xl mx-auto font-sans">
-              Every ticket includes a complimentary masquerade mask. Masquerade
-              masks provided at entry and can be personalized inside.
+              {EventConfig.maskInfo.description}
             </p>
             <p className="text-xs md:text-sm text-purple-300/80 mt-3 md:mt-4 font-sans italic">
-              Masks and customization materials are available while stocks last.
+              {EventConfig.maskInfo.disclaimer}
             </p>
           </div>
         </motion.div>
@@ -374,7 +373,7 @@ export function TicketSelection({
         >
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 md:p-8">
             <h4 className="text-base md:text-2xl font-semibold text-amber-500/90 mb-4 md:mb-6 font-sans">
-              ❓ Frequently Asked Questions
+              ❓ FAQs
             </h4>
             <div className="space-y-3 md:space-y-4 text-purple-200 text-xs md:text-base font-sans">
               <div>
@@ -415,26 +414,15 @@ export function TicketSelection({
         >
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 md:p-8">
             <h4 className="text-base md:text-2xl font-semibold text-amber-500/90 mb-4 md:mb-6 font-sans">
-              📋 Important Information
+              {EventConfig.importantInfo.title}
             </h4>
             <ul className="space-y-2 md:space-y-3 text-purple-200 text-xs md:text-base font-sans">
-              <li>• 18+ event — valid physical ID required for entry</li>
-              <li>
-                • Masks are mandatory on entry (complimentary mask included with
-                every ticket)
-              </li>
-              <li>• Personal masks are allowed, subject to entry approval</li>
-              <li>• Tickets are non-refundable but transferable</li>
-              <li>
-                • Venue reserves the right to refuse entry or remove guests for
-                inappropriate behaviour
-              </li>
-              <li>• Be respectful to staff, DJs, and fellow guests</li>
-              <li>• Photos and videos will be taken during the event</li>
+              {EventConfig.importantInfo.items.map((item, index) => (
+                <li key={index}>• {item}</li>
+              ))}
             </ul>
             <p className="text-center text-sm md:text-base font-semibold text-amber-400/90 mt-4 md:mt-6 font-sans italic">
-              Behave. Look good. Stay mysterious. The rest is between you and
-              the dancefloor.
+              {EventConfig.importantInfo.closing}
             </p>
           </div>
         </motion.div>
