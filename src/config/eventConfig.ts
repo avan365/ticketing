@@ -24,7 +24,8 @@ export const EventConfig = {
     year: "2026",
 
     // Event description (for meta tags, emails)
-    description: "An exclusive evening of mystery, music, and elegance.",
+    description:
+      "Step into an evening where mystery reigns, masks conceal stories, and music commands the night.",
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -50,9 +51,9 @@ export const EventConfig = {
   // ═══════════════════════════════════════════════════════════════
 
   venue: {
-    name: "Skyfall Rooftop Bar",
+    name: "Skyfall Rooftop Restrobar",
     location: "HarbourFront, Singapore",
-    fullAddress: "Skyfall Rooftop Bar, HarbourFront, Singapore",
+    fullAddress: "Skyfall Rooftop Restrobar, HarbourFront, Singapore",
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -134,25 +135,25 @@ export const EventConfig = {
 
   tickets: [
     {
-      id: "early-bird",
-      name: "Early Bird",
+      id: "phase-i",
+      name: "Phase I",
+      price: 17,
+      description:
+        "Be among the first to enter ADHEERAA. Mask included. Customization access.",
+    },
+    {
+      id: "phase-ii",
+      name: "Phase II",
+      price: 22,
+      description:
+        "The heart of the masquerade experience. Mask included. Customization access.",
+    },
+    {
+      id: "phase-iii",
+      name: "Phase III",
       price: 25,
       description:
-        "Limited time offer, full venue access. Get in before the crowd!",
-    },
-    {
-      id: "regular",
-      name: "Regular Admission",
-      price: 35,
-      description:
-        "General admission with full venue access and all performances.",
-    },
-    {
-      id: "table",
-      name: "Table for 4",
-      price: 200,
-      description:
-        "Reserved table seating, includes 1 premium bottle & priority service.",
+        "Last chance to join the night of mystery. Mask included. Customization access.",
     },
   ],
 
@@ -163,33 +164,26 @@ export const EventConfig = {
   features: [
     {
       icon: "Music",
-      title: "Live Performance",
+      title: "DJ Performances",
       description:
-        "4 hours of non-stop entertainment with top Tamil DJs and live musicians",
-    },
-    {
-      icon: "Users",
-      title: "Exclusive Guest List",
-      description:
-        "Celebrate with Singapore's Tamil community and special guests",
+        "Two curated DJs delivering high-energy Tamil, fusion, and party anthems — seamless sets from start to midnight.",
     },
     {
       icon: "Clock",
-      title: "All Night Long",
-      description: "Party from 8 PM to midnight with multiple stages",
+      title: "Non-Stop Nightlife",
+      description:
+        "From 8PM till midnight — seamless transitions, no dull moments, only rising energy.",
     },
     {
       icon: "Star",
       title: "Premium Experience",
       description:
-        "Luxurious venue, gourmet catering, and surprise performances",
+        "Rooftop views, immersive visuals, elevated sound, and a venue designed for unforgettable moments.",
     },
   ],
 
-  lineup: [
-    { name: "DJ Kanesh", role: "@" },
-    { name: "DJ Suben", role: "@" },
-  ],
+  // Lineup removed - no longer displayed
+  lineup: [],
 
   // ═══════════════════════════════════════════════════════════════
   // FOOTER & BRANDING
@@ -206,7 +200,7 @@ export const EventConfig = {
     footerEmojis: ["🎭", "✨", "🎶"],
 
     // CTA button text
-    ctaButton: "Get Your Tickets 🎭",
+    ctaButton: "Reserve your night 🎭",
   },
 
   // ═══════════════════════════════════════════════════════════════

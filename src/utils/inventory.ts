@@ -19,9 +19,9 @@ const INVENTORY_KEY = 'adheeraa_inventory';
 // Default inventory (initial stock) - Uses config for ticket types
 // Default quantities can be customized here
 const DEFAULT_QUANTITIES: { [key: string]: number } = {
-  'early-bird': 150,
-  'regular': 300,
-  'table': 20,
+  'phase-i': 150,
+  'phase-ii': 300,
+  'phase-iii': 20,
 };
 
 // Generate default inventory from config
