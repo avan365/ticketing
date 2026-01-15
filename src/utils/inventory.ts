@@ -1,7 +1,7 @@
 // Ticket Inventory Management
 // Persists available ticket counts in localStorage
 
-import { EventConfig } from '../config/eventConfig';
+import { EventConfig } from "../config/eventConfig";
 
 export interface TicketInventory {
   [ticketId: string]: {
@@ -13,21 +13,21 @@ export interface TicketInventory {
   };
 }
 
-const INVENTORY_KEY = 'adheeraa_inventory';
+const INVENTORY_KEY = "adheeraa_inventory";
 // const RESERVATION_TIMEOUT = 10 * 60 * 1000; // 10 minutes - for future use
 
 // Default inventory (initial stock) - Uses config for ticket types
 // Default quantities can be customized here
 const DEFAULT_QUANTITIES: { [key: string]: number } = {
-  'phase-i': 150,
-  'phase-ii': 300,
-  'phase-iii': 20,
+  "phase-i": 100,
+  "phase-ii": 200,
+  "phase-iii": 200,
 };
 
 // Generate default inventory from config
 function getDefaultInventory(): TicketInventory {
   const inventory: TicketInventory = {};
-  EventConfig.tickets.forEach(ticket => {
+  EventConfig.tickets.forEach((ticket) => {
     inventory[ticket.id] = {
       name: ticket.name,
       price: ticket.price,
@@ -43,9 +43,11 @@ const DEFAULT_INVENTORY = getDefaultInventory();
 
 // Sync inventory prices and names with EventConfig tickets
 // This ensures inventory always matches the actual ticket prices
-function syncInventoryWithBaseTickets(inventory: TicketInventory): TicketInventory {
+function syncInventoryWithBaseTickets(
+  inventory: TicketInventory
+): TicketInventory {
   const synced: TicketInventory = {};
-  
+
   // Update existing tickets with correct prices/names from config, preserve counts
   for (const ticket of EventConfig.tickets) {
     if (inventory[ticket.id]) {
@@ -65,7 +67,7 @@ function syncInventoryWithBaseTickets(inventory: TicketInventory): TicketInvento
       };
     }
   }
-  
+
   return synced;
 }
 
@@ -84,7 +86,7 @@ export function getInventory(): TicketInventory {
       return synced;
     }
   } catch (error) {
-    console.error('Error reading inventory:', error);
+    console.error("Error reading inventory:", error);
   }
   // Initialize with defaults if not found
   saveInventory(DEFAULT_INVENTORY);
@@ -96,7 +98,7 @@ export function saveInventory(inventory: TicketInventory): void {
   try {
     localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
   } catch (error) {
-    console.error('Error saving inventory:', error);
+    console.error("Error saving inventory:", error);
   }
 }
 
@@ -124,7 +126,7 @@ export function checkCartAvailability(
   cart: { ticketId: string; quantity: number }[]
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   for (const item of cart) {
     const available = getAvailableCount(item.ticketId);
     if (item.quantity > available) {
@@ -135,7 +137,7 @@ export function checkCartAvailability(
       }
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -147,7 +149,7 @@ export function reserveTickets(
   cart: { ticketId: string; quantity: number }[]
 ): boolean {
   const inventory = getInventory();
-  
+
   // First check if all tickets are available
   for (const item of cart) {
     const ticket = inventory[item.ticketId];
@@ -155,12 +157,12 @@ export function reserveTickets(
     const available = ticket.available - ticket.sold - ticket.reserved;
     if (available < item.quantity) return false;
   }
-  
+
   // Reserve the tickets
   for (const item of cart) {
     inventory[item.ticketId].reserved += item.quantity;
   }
-  
+
   saveInventory(inventory);
   return true;
 }
@@ -170,7 +172,7 @@ export function releaseReservation(
   cart: { ticketId: string; quantity: number }[]
 ): void {
   const inventory = getInventory();
-  
+
   for (const item of cart) {
     if (inventory[item.ticketId]) {
       inventory[item.ticketId].reserved = Math.max(
@@ -179,7 +181,7 @@ export function releaseReservation(
       );
     }
   }
-  
+
   saveInventory(inventory);
 }
 
@@ -188,7 +190,7 @@ export function confirmPurchase(
   cart: { ticketId: string; quantity: number }[]
 ): boolean {
   const inventory = getInventory();
-  
+
   for (const item of cart) {
     if (inventory[item.ticketId]) {
       // Move from reserved to sold
@@ -199,9 +201,9 @@ export function confirmPurchase(
       inventory[item.ticketId].sold += item.quantity;
     }
   }
-  
+
   saveInventory(inventory);
-  console.log('✅ Purchase confirmed, inventory updated:', inventory);
+  console.log("✅ Purchase confirmed, inventory updated:", inventory);
   return true;
 }
 
@@ -210,7 +212,7 @@ export function directPurchase(
   cart: { ticketId: string; quantity: number }[]
 ): boolean {
   const inventory = getInventory();
-  
+
   // Check availability
   for (const item of cart) {
     const ticket = inventory[item.ticketId];
@@ -218,21 +220,21 @@ export function directPurchase(
     const available = ticket.available - ticket.sold;
     if (available < item.quantity) return false;
   }
-  
+
   // Deduct from available
   for (const item of cart) {
     inventory[item.ticketId].sold += item.quantity;
   }
-  
+
   saveInventory(inventory);
-  console.log('✅ Direct purchase confirmed, inventory updated:', inventory);
+  console.log("✅ Direct purchase confirmed, inventory updated:", inventory);
   return true;
 }
 
 // Get inventory stats for each ticket type
 export function getInventoryByTicket() {
   const inventory = getInventory();
-  
+
   return Object.entries(inventory).map(([id, data]) => ({
     id,
     name: data.name,
@@ -247,17 +249,17 @@ export function getInventoryByTicket() {
 // Get aggregate inventory stats for dashboard
 export function getInventoryStats() {
   const inventory = getInventory();
-  
+
   let totalTickets = 0;
   let totalSold = 0;
   let totalReserved = 0;
-  
+
   for (const data of Object.values(inventory)) {
     totalTickets += data.available;
     totalSold += data.sold;
     totalReserved += data.reserved;
   }
-  
+
   return {
     totalTickets,
     totalSold,
@@ -269,7 +271,7 @@ export function getInventoryStats() {
 // Reset inventory to defaults (for testing)
 export function resetInventory(): void {
   saveInventory(DEFAULT_INVENTORY);
-  console.log('🔄 Inventory reset to defaults');
+  console.log("🔄 Inventory reset to defaults");
 }
 
 // Update initial inventory (admin function)
@@ -280,4 +282,3 @@ export function setInitialInventory(ticketId: string, quantity: number): void {
     saveInventory(inventory);
   }
 }
-

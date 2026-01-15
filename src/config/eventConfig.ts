@@ -192,7 +192,7 @@ export const EventConfig = {
   dressCode: {
     title: "🎭 Dress Code",
     mainTitle: "Elegant Cocktail Attire",
-    tags: ["✨ Classy", "🎩 Elegant", "🖤 Elevated"],
+    tags: ["✨ Classy", "🎩 Polished", "🖤 Intentional"],
     description:
       "Think dresses, blazers, clean shirts, statement fits — elevated but comfortable.",
   },
