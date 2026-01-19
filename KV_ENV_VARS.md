@@ -76,3 +76,4 @@ After setup, the code will log available env vars. Check Vercel function logs:
 
 If you see warnings, the variables aren't set correctly.
 
+

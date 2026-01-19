@@ -44,3 +44,4 @@ After making this change:
 2. Check the email - QR codes should now display as images
 3. The QR code images should be visible and scannable
 
+

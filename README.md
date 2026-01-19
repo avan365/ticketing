@@ -125,3 +125,4 @@ The project is configured for Vercel deployment:
 - Backend API: The `api/` directory contains serverless functions
 - Server: The `server/` directory can be deployed separately or converted to serverless functions
 
+

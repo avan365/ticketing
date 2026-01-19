@@ -145,6 +145,7 @@ export function TicketSelection({
             const quantity = quantities[ticket.id] || 0;
             const isAdded = addedToCart[ticket.id];
             const isSoldOut = ticket.available === 0;
+            const isLocked = ticket.id === "phase-ii" || ticket.id === "phase-iii";
             // Availability numbers removed - no longer displayed
 
             return (
@@ -159,12 +160,12 @@ export function TicketSelection({
                   stiffness: 100,
                 }}
                 whileHover={{
-                  scale: isSoldOut ? 1 : 1.05,
-                  y: isSoldOut ? 0 : -20,
+                  scale: isSoldOut || isLocked ? 1 : 1.05,
+                  y: isSoldOut || isLocked ? 0 : -20,
                 }}
                 className={`relative group ${
                   ticket.id === "vip" ? "md:scale-110 z-10" : ""
-                }`}
+                } ${isLocked ? "blur-sm" : ""}`}
               >
                 {/* Glow Effect */}
                 <div
@@ -178,10 +179,12 @@ export function TicketSelection({
                 {/* Card */}
                 <div
                   className={`relative bg-white/5 backdrop-blur-sm rounded-xl border ${
-                    isSoldOut
+                    isSoldOut || isLocked
                       ? "border-gray-600/20 opacity-60"
                       : "border-white/10 group-hover:border-amber-500/30"
-                  } transition-all duration-200 overflow-hidden h-full flex flex-col hover:bg-white/10`}
+                  } transition-all duration-200 overflow-hidden h-full flex flex-col ${
+                    isLocked ? "" : "hover:bg-white/10"
+                  }`}
                 >
                   {/* Sold Out Badge */}
                   {isSoldOut && (
@@ -189,10 +192,16 @@ export function TicketSelection({
                       🎭 SOLD OUT
                     </div>
                   )}
+                  {/* Locked Badge */}
+                  {isLocked && (
+                    <div className="absolute top-0 left-0 right-0 bg-gray-700/90 text-white px-6 py-3 font-bold text-center z-10">
+                      🔒 LOCKED
+                    </div>
+                  )}
 
                   <div
                     className={`p-4 md:p-8 flex flex-col flex-1 ${
-                      isSoldOut ? "pt-14 md:pt-16" : ""
+                      isSoldOut || isLocked ? "pt-14 md:pt-16" : ""
                     }`}
                   >
                     {/* Mobile: Icon in top-right, title+price compact */}
@@ -200,7 +209,7 @@ export function TicketSelection({
                       <div>
                         <h3
                           className={`text-xl font-bold mb-1 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${
-                            isSoldOut ? "grayscale" : ""
+                            isSoldOut || isLocked ? "grayscale" : ""
                           }`}
                         >
                           {ticket.name}
@@ -208,7 +217,7 @@ export function TicketSelection({
                         <div>
                           <span
                             className={`text-2xl font-bold ${
-                              isSoldOut ? "text-gray-500" : "text-white"
+                              isSoldOut || isLocked ? "text-gray-500" : "text-white"
                             }`}
                           >
                             ${ticket.price}
@@ -219,14 +228,14 @@ export function TicketSelection({
                         </div>
                       </div>
                       <motion.div
-                        animate={isSoldOut ? {} : { rotateY: [0, 360] }}
+                        animate={isSoldOut || isLocked ? {} : { rotateY: [0, 360] }}
                         transition={{
                           duration: 3,
                           repeat: Infinity,
                           repeatDelay: 2,
                         }}
                         className={`w-10 h-10 rounded-full bg-gradient-to-br ${gradient} ${
-                          isSoldOut ? "grayscale opacity-50" : ""
+                          isSoldOut || isLocked ? "grayscale opacity-50" : ""
                         } flex items-center justify-center flex-shrink-0`}
                       >
                         <Icon className="w-5 h-5 text-white" />
@@ -237,14 +246,14 @@ export function TicketSelection({
                     <div className="hidden md:block">
                       {/* Icon */}
                       <motion.div
-                        animate={isSoldOut ? {} : { rotateY: [0, 360] }}
+                        animate={isSoldOut || isLocked ? {} : { rotateY: [0, 360] }}
                         transition={{
                           duration: 3,
                           repeat: Infinity,
                           repeatDelay: 2,
                         }}
                         className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradient} ${
-                          isSoldOut ? "grayscale opacity-50" : ""
+                          isSoldOut || isLocked ? "grayscale opacity-50" : ""
                         } flex items-center justify-center mb-6`}
                       >
                         <Icon className="w-10 h-10 text-white" />
@@ -253,7 +262,7 @@ export function TicketSelection({
                       {/* Title */}
                       <h3
                         className={`text-3xl font-bold mb-2 bg-gradient-to-r ${gradient} bg-clip-text text-transparent ${
-                          isSoldOut ? "grayscale" : ""
+                          isSoldOut || isLocked ? "grayscale" : ""
                         }`}
                       >
                         {ticket.name}
@@ -263,7 +272,7 @@ export function TicketSelection({
                       <div className="mb-6">
                         <span
                           className={`text-5xl font-bold ${
-                            isSoldOut ? "text-gray-500" : "text-white"
+                            isSoldOut || isLocked ? "text-gray-500" : "text-white"
                           }`}
                         >
                           ${ticket.price}
@@ -277,14 +286,14 @@ export function TicketSelection({
                     {/* Description */}
                     <p
                       className={`${
-                        isSoldOut ? "text-gray-400" : "text-purple-200"
+                        isSoldOut || isLocked ? "text-gray-400" : "text-purple-200"
                       } mb-4 md:mb-6 flex-1 text-sm md:text-base`}
                     >
                       {ticket.description}
                     </p>
 
-                    {/* Quantity Selector - Hidden when sold out */}
-                    {!isSoldOut && (
+                    {/* Quantity Selector - Hidden when sold out or locked */}
+                    {!isSoldOut && !isLocked && (
                       <div className="flex items-center justify-between md:justify-start gap-2 md:gap-4 mb-4 md:mb-6">
                         <span className="text-purple-300 text-sm md:text-base">
                           Quantity:
@@ -329,12 +338,12 @@ export function TicketSelection({
 
                     {/* Add to Cart Button */}
                     <motion.button
-                      whileHover={{ scale: isSoldOut ? 1 : 1.01 }}
-                      whileTap={{ scale: isSoldOut ? 1 : 0.99 }}
+                      whileHover={{ scale: isSoldOut || isLocked ? 1 : 1.01 }}
+                      whileTap={{ scale: isSoldOut || isLocked ? 1 : 0.99 }}
                       onClick={() => handleAddToCart(ticket)}
-                      disabled={isSoldOut || quantity === 0}
+                      disabled={isSoldOut || isLocked || quantity === 0}
                       className={`w-full py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg transition-all duration-200 flex items-center justify-center gap-2 font-sans ${
-                        isSoldOut
+                        isSoldOut || isLocked
                           ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                           : isAdded
                           ? "bg-green-500 text-white"
@@ -343,6 +352,8 @@ export function TicketSelection({
                     >
                       {isSoldOut ? (
                         <>🎭 Sold Out</>
+                      ) : isLocked ? (
+                        <>🔒 Locked</>
                       ) : isAdded ? (
                         <>
                           <Check className="w-4 h-4 md:w-5 md:h-5" />

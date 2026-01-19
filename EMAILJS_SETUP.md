@@ -58,3 +58,4 @@ After setting up:
 - QR codes are embedded as base64 data URLs, so they should work in most email clients
 - Some email clients may block images - customers can still use manual entry in bouncer portal
 
+
