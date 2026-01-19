@@ -194,90 +194,92 @@ export default function App() {
   };
 
   return (
-    <div
-      className="min-h-screen text-white overflow-x-hidden"
-      style={{
-        backgroundColor: EventConfig.colors.background,
-        WebkitOverflowScrolling: "touch",
-      }}
-    >
-      <Hero totalItems={getTotalItems()} onCheckout={handleViewCart} />
-      <ConcertDetails />
-      <TicketSelection tickets={tickets} onAddToCart={addToCart} />
-
-      {/* Footer */}
-      <footer
-        className="py-4 md:py-12 border-t"
+    <>
+      <div
+        className="min-h-screen text-white overflow-x-hidden"
         style={{
           backgroundColor: EventConfig.colors.background,
-          borderColor: EventConfig.colors.border.primary,
+          WebkitOverflowScrolling: "touch",
         }}
       >
-        <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="space-y-1 md:space-y-4"
-          >
-            <h3
-              className={`text-lg md:text-3xl lg:text-4xl font-bold bg-gradient-to-r ${EventConfig.colors.primary.gradient} bg-clip-text text-transparent`}
-              style={{ fontFamily: EventConfig.fonts.display }}
-            >
-              {EventConfig.event.name}
-            </h3>
-            <p
-              className="text-[10px] md:text-base font-sans"
-              style={{ color: EventConfig.colors.text.secondary }}
-            >
-              {EventConfig.event.subtitle} {EventConfig.event.year} •{" "}
-              {EventConfig.venue.name},{" "}
-              {EventConfig.venue.location.split(", ")[1]}
-            </p>
-            {/* Emojis - hidden on mobile */}
-            <div className="hidden md:flex justify-center gap-6 text-3xl">
-              {EventConfig.branding.footerEmojis.map((emoji, index) => (
-                <motion.span
-                  key={index}
-                  whileHover={{
-                    scale: 1.2,
-                    rotate: index % 2 === 0 ? 10 : -10,
-                  }}
-                  className="cursor-pointer"
-                >
-                  {emoji}
-                </motion.span>
-              ))}
-            </div>
-            <p
-              className="text-[9px] md:text-sm pt-1 md:pt-4 font-sans"
-              style={{ color: EventConfig.colors.text.muted }}
-            >
-              {EventConfig.branding.copyright}
-            </p>
-          </motion.div>
-        </div>
-      </footer>
+        <Hero totalItems={getTotalItems()} onCheckout={handleViewCart} />
+        <ConcertDetails />
+        <TicketSelection tickets={tickets} onAddToCart={addToCart} />
 
-      {/* Checkout Modal */}
-      <AnimatePresence>
-        {showCheckout && (
-          <div id="checkout-modal">
-            <CheckoutModal
-              cart={cart}
-              onClose={() => {
-                setShowCheckout(false);
-                setRedirectOrderData(null); // Clear redirect data when closing
-              }}
-              onUpdateQuantity={updateQuantity}
-              onClearCart={clearCart}
-              totalPrice={getTotalPrice()}
-              onPurchaseComplete={refreshInventory}
-              redirectOrderData={redirectOrderData}
-            />
+        {/* Footer */}
+        <footer
+          className="py-4 md:py-12 border-t"
+          style={{
+            backgroundColor: EventConfig.colors.background,
+            borderColor: EventConfig.colors.border.primary,
+          }}
+        >
+          <div className="container mx-auto px-4 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-1 md:space-y-4"
+            >
+              <h3
+                className={`text-lg md:text-3xl lg:text-4xl font-bold bg-gradient-to-r ${EventConfig.colors.primary.gradient} bg-clip-text text-transparent`}
+                style={{ fontFamily: EventConfig.fonts.display }}
+              >
+                {EventConfig.event.name}
+              </h3>
+              <p
+                className="text-[10px] md:text-base font-sans"
+                style={{ color: EventConfig.colors.text.secondary }}
+              >
+                {EventConfig.event.subtitle} {EventConfig.event.year} •{" "}
+                {EventConfig.venue.name},{" "}
+                {EventConfig.venue.location.split(", ")[1]}
+              </p>
+              {/* Emojis - hidden on mobile */}
+              <div className="hidden md:flex justify-center gap-6 text-3xl">
+                {EventConfig.branding.footerEmojis.map((emoji, index) => (
+                  <motion.span
+                    key={index}
+                    whileHover={{
+                      scale: 1.2,
+                      rotate: index % 2 === 0 ? 10 : -10,
+                    }}
+                    className="cursor-pointer"
+                  >
+                    {emoji}
+                  </motion.span>
+                ))}
+              </div>
+              <p
+                className="text-[9px] md:text-sm pt-1 md:pt-4 font-sans"
+                style={{ color: EventConfig.colors.text.muted }}
+              >
+                {EventConfig.branding.copyright}
+              </p>
+            </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </footer>
+
+        {/* Checkout Modal */}
+        <AnimatePresence>
+          {showCheckout && (
+            <div id="checkout-modal">
+              <CheckoutModal
+                cart={cart}
+                onClose={() => {
+                  setShowCheckout(false);
+                  setRedirectOrderData(null); // Clear redirect data when closing
+                }}
+                onUpdateQuantity={updateQuantity}
+                onClearCart={clearCart}
+                totalPrice={getTotalPrice()}
+                onPurchaseComplete={refreshInventory}
+                redirectOrderData={redirectOrderData}
+              />
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Floating Cart Button - Fixed to bottom-right of viewport */}
       {!showCheckout && (
@@ -292,7 +294,11 @@ export default function App() {
           className="fixed bottom-4 right-4 md:bottom-6 md:right-6 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-xl transition-colors duration-200 z-[100] font-medium flex items-center gap-2 md:gap-3 font-sans"
           style={{
             backgroundColor: EventConfig.colors.primary.base,
-            position: "fixed", // Ensure it's fixed to viewport
+            position: "fixed",
+            bottom: "1rem",
+            right: "1rem",
+            top: "auto",
+            left: "auto",
           }}
           onMouseEnter={(e) =>
             (e.currentTarget.style.backgroundColor =
@@ -314,6 +320,6 @@ export default function App() {
           )}
         </motion.button>
       )}
-    </div>
+    </>
   );
 }
