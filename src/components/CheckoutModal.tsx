@@ -76,7 +76,7 @@ export function CheckoutModal({
   const [step, setStep] = useState<CheckoutStep>(
     redirectOrderData ? "success" : "cart"
   );
-  
+
   // Set order number and paid amount if from redirect
   useEffect(() => {
     if (redirectOrderData) {
@@ -84,7 +84,10 @@ export function CheckoutModal({
       setPaidAmount(redirectOrderData.totalAmount);
       // Set form data email if available
       if (redirectOrderData.customerEmail) {
-        setFormData(prev => ({ ...prev, email: redirectOrderData.customerEmail }));
+        setFormData((prev) => ({
+          ...prev,
+          email: redirectOrderData.customerEmail,
+        }));
       }
     }
   }, [redirectOrderData]);
@@ -222,11 +225,14 @@ export function CheckoutModal({
         // Store cart in sessionStorage for redirect-based payments (Apple Pay, GrabPay)
         if (paymentMethod === "apple_pay" || paymentMethod === "grabpay") {
           sessionStorage.setItem("checkout_cart", JSON.stringify(cart));
-          sessionStorage.setItem("checkout_customer", JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-          }));
+          sessionStorage.setItem(
+            "checkout_customer",
+            JSON.stringify({
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+            })
+          );
         }
         setStep("stripe-payment");
       }
@@ -328,6 +334,19 @@ export function CheckoutModal({
         className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
         onClick={onClose}
       >
+        {/* Global Close Button (top-right of screen) */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="absolute top-3 right-3 md:top-4 md:right-4 z-50 bg-purple-700 hover:bg-purple-600 text-white rounded-full w-9 h-9 flex items-center justify-center shadow-lg md:hidden"
+          aria-label="Close checkout and return to main page"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         <motion.div
           initial={{ scale: 0.9, y: 50 }}
           animate={{ scale: 1, y: 0 }}
@@ -929,17 +948,23 @@ export function CheckoutModal({
                       <div className="flex items-center justify-between bg-gray-100 rounded-lg p-3">
                         <div>
                           <p className="text-gray-500 text-xs font-medium">
-                            Amount (incl. {PLATFORM_FEE_PERCENTAGE}% + $0.30 service fee)
+                            Amount (incl. {PLATFORM_FEE_PERCENTAGE}% + $0.30
+                            service fee)
                           </p>
                           <p className="text-black font-bold text-xl">
-                            ${(totalPrice + calculatePlatformFee(totalPrice)).toFixed(2)}
+                            $
+                            {(
+                              totalPrice + calculatePlatformFee(totalPrice)
+                            ).toFixed(2)}
                           </p>
                         </div>
                         <motion.button
                           whileTap={{ scale: 0.95 }}
                           onClick={() =>
                             copyToClipboard(
-                              (totalPrice + calculatePlatformFee(totalPrice)).toFixed(2)
+                              (
+                                totalPrice + calculatePlatformFee(totalPrice)
+                              ).toFixed(2)
                             )
                           }
                           className={`px-3 py-2 rounded-lg flex items-center gap-1.5 text-sm font-medium transition-all ${
@@ -978,7 +1003,10 @@ export function CheckoutModal({
                           <li>
                             Enter amount:{" "}
                             <span className="text-amber-500/90 font-bold">
-                              ${(totalPrice + calculatePlatformFee(totalPrice)).toFixed(2)}
+                              $
+                              {(
+                                totalPrice + calculatePlatformFee(totalPrice)
+                              ).toFixed(2)}
                             </span>
                           </li>
                           <li>Complete the payment</li>

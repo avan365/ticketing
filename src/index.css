@@ -38,6 +38,14 @@ body {
   -webkit-transform: translateZ(0);
 }
 
+/* Floating root for viewport-pinned UI (e.g., cart button) */
+#floating-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
