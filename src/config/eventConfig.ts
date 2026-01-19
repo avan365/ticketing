@@ -137,7 +137,7 @@ export const EventConfig = {
     {
       id: "phase-i",
       name: "Phase I",
-      price: 17,
+      price: 1,
       description:
         "Be among the first to enter ADHEERAA. Mask included. Customization access.",
     },
