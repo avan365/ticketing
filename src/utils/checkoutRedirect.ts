@@ -75,7 +75,7 @@ export async function processCheckoutSession(
     }
     
     // Fallback to sessionStorage if metadata doesn't have cart
-    if (cartItems.length === 0) {
+    if (cartItems.length === 0 && typeof window !== 'undefined') {
       const storedCart = sessionStorage.getItem("checkout_cart");
       if (storedCart) {
         try {
@@ -169,13 +169,17 @@ export async function processCheckoutSession(
     await saveOrder(order);
 
     // Send confirmation email
+    // Map payment method to expected type ("paynow" | "card")
+    const emailPaymentMethod: "paynow" | "card" = 
+      paymentMethod === "paynow" ? "paynow" : "card";
+    
     await sendCustomerConfirmation(
       orderNumber,
       customerName,
       customerEmail,
       cartItems,
       fees.total,
-      paymentMethod,
+      emailPaymentMethod,
       true, // isVerified
       qrCodes
     );
