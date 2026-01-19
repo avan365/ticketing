@@ -9,7 +9,14 @@
 }
 
 html {
+  /* Remove smooth scroll on mobile for better performance */
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
@@ -21,6 +28,14 @@ body {
   overflow-x: hidden;
   letter-spacing: -0.01em;
   line-height: 1.5;
+  /* Improve mobile scrolling performance */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  /* Prevent text size adjustment on iOS */
+  -webkit-text-size-adjust: 100%;
+  /* Optimize rendering */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Custom scrollbar */
@@ -118,6 +133,49 @@ button {
   .backdrop-blur-xl {
     background-color: rgba(0, 0, 0, 0.9);
   }
+}
+
+/* Optimize mobile scrolling performance */
+@media (max-width: 768px) {
+  /* Disable smooth scroll on mobile for better performance */
+  html {
+    scroll-behavior: auto;
+  }
+  
+  /* Optimize animations on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Reduce backdrop blur on mobile for better performance */
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl {
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+  }
+  
+  /* Optimize transform animations */
+  [class*="motion-"],
+  [class*="animate-"] {
+    will-change: transform;
+  }
+  
+  /* Prevent scroll chaining on modals */
+  body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* Optimize scroll containers */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Hide scrollbar for horizontal carousels */

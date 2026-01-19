@@ -46,10 +46,17 @@ export default function App() {
 
   // Show floating cart button after scrolling past hero
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setShowCartButton(window.scrollY > 500);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowCartButton(window.scrollY > 500);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -91,7 +98,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: EventConfig.colors.background }}>
+    <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: EventConfig.colors.background, WebkitOverflowScrolling: 'touch' }}>
       <Hero totalItems={getTotalItems()} onCheckout={() => setShowCheckout(true)} />
       <ConcertDetails />
       <TicketSelection tickets={tickets} onAddToCart={addToCart} />
