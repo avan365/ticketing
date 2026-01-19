@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   X,
-  ShoppingBag,
   CreditCard,
   User,
   Mail,
@@ -357,7 +356,6 @@ export function CheckoutModal({
           {/* Header */}
           <div className="sticky top-0 bg-[#0a0a12] p-4 md:p-6 flex items-center justify-between border-b border-white/10 rounded-t-xl z-10 shrink-0">
             <div className="flex items-center gap-2 md:gap-3">
-              <ShoppingBag className="w-6 h-6 md:w-8 md:h-8 text-amber-500/90" />
               <h2
                 className="text-xl md:text-3xl font-bold text-white"
                 style={{ fontFamily: "Cinzel, serif" }}
