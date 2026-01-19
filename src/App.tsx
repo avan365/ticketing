@@ -281,17 +281,9 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      {/* Floating Cart Button - Fixed to bottom-right of viewport */}
+      {/* Floating Cart Button - pinned to viewport */}
       {!showCheckout && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "1rem",
-            right: "1rem",
-            zIndex: 100,
-            pointerEvents: "none",
-          }}
-        >
+        <div className="fixed bottom-4 right-4 z-[9999] pointer-events-none">
           <motion.button
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -300,20 +292,8 @@ export default function App() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleViewCart}
-            className="text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-xl transition-colors duration-200 font-medium flex items-center gap-2 md:gap-3 font-sans"
-            style={{
-              backgroundColor: EventConfig.colors.primary.base,
-              position: "relative",
-              pointerEvents: "auto",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                EventConfig.colors.primary.dark)
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                EventConfig.colors.primary.base)
-            }
+            className="pointer-events-auto text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-xl transition-colors duration-200 font-medium flex items-center gap-2 md:gap-3 font-sans"
+            style={{ backgroundColor: EventConfig.colors.primary.base }}
           >
             <span className="text-lg">🎭</span>
             <span className="text-sm md:text-base">
