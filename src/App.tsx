@@ -33,6 +33,7 @@ export default function App() {
     customerEmail: string;
     totalAmount: number;
   } | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Get tickets with live availability from inventory
   const getTicketsWithAvailability = useCallback((): TicketType[] => {
@@ -47,6 +48,22 @@ export default function App() {
   // Refresh inventory (called after purchase)
   const refreshInventory = useCallback(() => {
     setInventoryVersion(v => v + 1);
+  }, []);
+
+  // Track scroll position for cart button positioning
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 100);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Handle Stripe Checkout redirect (Apple Pay, GrabPay)
@@ -259,16 +276,22 @@ export default function App() {
       </AnimatePresence>
 
 
-      {/* Floating Cart Button - Fixed at bottom of screen */}
+      {/* Floating Cart Button - Top left initially, bottom right when scrolled */}
       {!showCheckout && (
         <motion.button
-          initial={{ scale: 0, y: 100 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0, y: 100 }}
+          initial={{ scale: 0 }}
+          animate={{ 
+            scale: 1,
+            top: isScrolled ? 'auto' : '1rem',
+            bottom: isScrolled ? '1rem' : 'auto',
+            left: isScrolled ? 'auto' : '1rem',
+            right: isScrolled ? '1rem' : 'auto',
+          }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleViewCart}
-          className="fixed bottom-4 right-4 md:bottom-8 md:right-8 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-lg transition-colors duration-200 z-[100] font-medium flex items-center gap-2 md:gap-3 font-sans"
+          className="fixed text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-lg transition-colors duration-200 z-[100] font-medium flex items-center gap-2 md:gap-3 font-sans"
           style={{ backgroundColor: EventConfig.colors.primary.base }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
