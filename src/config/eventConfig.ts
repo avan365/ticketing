@@ -138,22 +138,19 @@ export const EventConfig = {
       id: "phase-i",
       name: "Phase I",
       price: 17,
-      description:
-        "Be among the first to enter ADHEERAA. Mask included. Customization access.",
+      description: "Be among the first to enter ADHEERAA. Mask included.",
     },
     {
       id: "phase-ii",
       name: "Phase II",
       price: 22,
-      description:
-        "The heart of the masquerade experience. Mask included. Customization access.",
+      description: "The heart of the masquerade experience. Mask included.",
     },
     {
       id: "phase-iii",
-      name: "Phase III",
+      name: "Final Release",
       price: 25,
-      description:
-        "Last chance to join the night of mystery. Mask included. Customization access.",
+      description: "Last chance to join the night of mystery. Mask included.",
     },
   ],
 
@@ -209,9 +206,8 @@ export const EventConfig = {
   maskInfo: {
     title: "🎭 Your Mask Is Included",
     description:
-      "Every ticket includes a complimentary masquerade mask. Masquerade masks provided at entry and can be personalized inside.",
-    disclaimer:
-      "Masks and customization materials are available while stocks last.",
+      "Every ticket includes a complimentary masquerade mask. Masquerade masks are provided at entry.",
+    disclaimer: "Masks are available while stocks last.",
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -224,9 +220,9 @@ export const EventConfig = {
       answer: "No. Every ticket includes a complimentary masquerade mask.",
     },
     {
-      question: "Can I customize my mask anytime?",
+      question: "Can I customize my mask at the event?",
       answer:
-        "Yes, the Mask Atelier is open early in the night while supplies last.",
+        "For this event, masks are provided as-is and cannot be customized on-site.",
     },
     {
       question: "Can I bring my own mask?",

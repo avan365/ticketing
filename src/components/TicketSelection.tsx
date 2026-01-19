@@ -412,11 +412,11 @@ export function TicketSelection({
               </div>
               <div>
                 <p className="font-semibold text-white mb-1">
-                  Can I customize my mask anytime?
+                  Can I customize my mask at the event?
                 </p>
                 <p className="text-purple-300/80">
-                  Yes, the Mask Atelier is open early in the night while
-                  supplies last.
+                  For this event, masks are provided as-is and cannot be
+                  customized on-site.
                 </p>
               </div>
               <div>
