@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Hero } from "./components/Hero";
 import { ConcertDetails } from "./components/ConcertDetails";
@@ -281,32 +282,35 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      {/* Floating Cart Button - pinned to viewport */}
-      {!showCheckout && (
-        <div className="fixed bottom-4 right-4 z-[9999] pointer-events-none">
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleViewCart}
-            className="pointer-events-auto text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-xl transition-colors duration-200 font-medium flex items-center gap-2 md:gap-3 font-sans"
-            style={{ backgroundColor: EventConfig.colors.primary.base }}
-          >
-            <span className="text-lg">🎭</span>
-            <span className="text-sm md:text-base">
-              View Cart {cart.length > 0 && `(${getTotalItems()})`}
-            </span>
-            {cart.length > 0 && (
-              <span className="text-base md:text-lg font-bold">
-                ${getTotalPrice()}
+      {/* Floating Cart Button - pinned to viewport via portal */}
+      {!showCheckout &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed bottom-4 right-4 z-[9999] pointer-events-none">
+            <motion.button
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleViewCart}
+              className="pointer-events-auto text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-xl transition-colors duration-200 font-medium flex items-center gap-2 md:gap-3 font-sans"
+              style={{ backgroundColor: EventConfig.colors.primary.base }}
+            >
+              <span className="text-lg">🎭</span>
+              <span className="text-sm md:text-base">
+                View Cart {cart.length > 0 && `(${getTotalItems()})`}
               </span>
-            )}
-          </motion.button>
-        </div>
-      )}
+              {cart.length > 0 && (
+                <span className="text-base md:text-lg font-bold">
+                  ${getTotalPrice()}
+                </span>
+              )}
+            </motion.button>
+          </div>,
+          document.body
+        )}
     </>
   );
 }
