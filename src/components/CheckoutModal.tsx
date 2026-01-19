@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   X,
@@ -40,6 +40,11 @@ interface CheckoutModalProps {
   onClearCart: () => void;
   totalPrice: number;
   onPurchaseComplete?: () => void; // Called after successful purchase to refresh inventory
+  redirectOrderData?: {
+    orderNumber: string;
+    customerEmail: string;
+    totalAmount: number;
+  } | null; // Order data from redirect (Apple Pay/GrabPay)
 }
 
 type CheckoutStep =
@@ -66,8 +71,23 @@ export function CheckoutModal({
   onClearCart,
   totalPrice,
   onPurchaseComplete,
+  redirectOrderData,
 }: CheckoutModalProps) {
-  const [step, setStep] = useState<CheckoutStep>("cart");
+  const [step, setStep] = useState<CheckoutStep>(
+    redirectOrderData ? "success" : "cart"
+  );
+  
+  // Set order number and paid amount if from redirect
+  useEffect(() => {
+    if (redirectOrderData) {
+      setOrderNumber(redirectOrderData.orderNumber);
+      setPaidAmount(redirectOrderData.totalAmount);
+      // Set form data email if available
+      if (redirectOrderData.customerEmail) {
+        setFormData(prev => ({ ...prev, email: redirectOrderData.customerEmail }));
+      }
+    }
+  }, [redirectOrderData]);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
   const [formData, setFormData] = useState({
     name: "",

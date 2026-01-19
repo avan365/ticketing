@@ -113,7 +113,7 @@ export default function App() {
 
           // Process the order
           const result = await processCheckoutSession(sessionData);
-          if (result.success) {
+          if (result.success && result.orderNumber) {
             // Mark as processed immediately to prevent duplicates
             processedSessions.push(sessionId);
             sessionStorage.setItem(
@@ -127,8 +127,15 @@ export default function App() {
             // Clear cart
             setCart([]);
 
-            // Show success message (you could show a toast/notification here)
-            console.log('✅ Order created successfully:', result.orderNumber);
+            // Store order data to show success screen
+            setRedirectOrderData({
+              orderNumber: result.orderNumber,
+              customerEmail: sessionData.customerEmail,
+              totalAmount: sessionData.amountTotal,
+            });
+
+            // Open checkout modal to show success screen
+            setShowCheckout(true);
 
             // Remove query params from URL
             window.history.replaceState({}, '', window.location.pathname);
@@ -249,20 +256,24 @@ export default function App() {
           <div id="checkout-modal">
             <CheckoutModal
               cart={cart}
-              onClose={() => setShowCheckout(false)}
+              onClose={() => {
+                setShowCheckout(false);
+                setRedirectOrderData(null); // Clear redirect data when closing
+              }}
               onUpdateQuantity={updateQuantity}
               onClearCart={clearCart}
               totalPrice={getTotalPrice()}
               onPurchaseComplete={refreshInventory}
+              redirectOrderData={redirectOrderData}
             />
           </div>
         )}
       </AnimatePresence>
 
 
-      {/* Floating Cart Button */}
+      {/* Floating Cart Button - Fixed at bottom of screen */}
       <AnimatePresence>
-        {cart.length > 0 && !showCheckout && showCartButton && (
+        {cart.length > 0 && !showCheckout && (
           <motion.button
             initial={{ scale: 0, y: 100 }}
             animate={{ scale: 1, y: 0 }}
@@ -270,14 +281,14 @@ export default function App() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleViewCart}
-            className="fixed bottom-8 right-8 text-white px-8 py-4 rounded-lg shadow-md transition-colors duration-200 z-50 font-medium flex items-center gap-3 font-sans"
+            className="fixed bottom-4 right-4 md:bottom-8 md:right-8 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-lg transition-colors duration-200 z-50 font-medium flex items-center gap-2 md:gap-3 font-sans"
             style={{ backgroundColor: EventConfig.colors.primary.base }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
           >
             <span className="text-lg">🎭</span>
-            <span>View Cart ({getTotalItems()})</span>
-            <span className="text-lg">${getTotalPrice()}</span>
+            <span className="text-sm md:text-base">View Cart ({getTotalItems()})</span>
+            <span className="text-base md:text-lg font-bold">${getTotalPrice()}</span>
           </motion.button>
         )}
       </AnimatePresence>
