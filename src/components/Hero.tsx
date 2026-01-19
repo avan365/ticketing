@@ -20,27 +20,30 @@ export function Hero({ totalItems, onCheckout }: HeroProps) {
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/20 via-transparent to-transparent pointer-events-none" />
 
       {/* Cart Icon */}
-      {totalItems > 0 && (
-        <motion.button
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onCheckout}
-          className="fixed top-4 right-4 md:top-8 md:right-8 z-50 text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 transition-transform backdrop-blur-sm"
-          style={{
-            background: `linear-gradient(to right, ${EventConfig.colors.primary.base}E6, ${EventConfig.colors.primary.dark}E6)`,
-            borderColor: EventConfig.colors.border.secondary,
-            borderWidth: "1px",
-            borderStyle: "solid",
-          }}
-        >
-          <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+      <motion.button
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onCheckout}
+        className="fixed top-4 right-4 md:top-8 md:right-8 z-[100] text-white p-3 md:p-4 rounded-full shadow-lg hover:scale-110 transition-transform backdrop-blur-sm"
+        style={{
+          background: `linear-gradient(to right, ${EventConfig.colors.primary.base}E6, ${EventConfig.colors.primary.dark}E6)`,
+          borderColor: EventConfig.colors.border.secondary,
+          borderWidth: "1px",
+          borderStyle: "solid",
+          position: "fixed",
+          top: "1rem",
+          right: "1rem",
+        }}
+      >
+        <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+        {totalItems > 0 && (
           <span className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-purple-600 text-white text-xs font-bold rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
             {totalItems}
           </span>
-        </motion.button>
-      )}
+        )}
+      </motion.button>
 
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 pt-16 pb-8 md:pt-0 md:pb-0">

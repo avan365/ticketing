@@ -453,7 +453,7 @@ function StripePaymentForm({
             <span>${fees.ticketPrice.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-purple-300">
-            <span>Platform({PLATFORM_FEE_PERCENTAGE}%)</span>
+            <span>Platform({PLATFORM_FEE_PERCENTAGE}% + $0.30)</span>
             <span>+${fees.platformFee.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-purple-300">

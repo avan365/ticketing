@@ -840,7 +840,7 @@ export function CheckoutModal({
                           {showPlatformFee && (
                             <div className="flex items-center justify-between text-sm text-purple-300 mb-1 font-sans">
                               <span>
-                                Service Fee ({PLATFORM_FEE_PERCENTAGE}%)
+                                Service Fee ({PLATFORM_FEE_PERCENTAGE}% + $0.30)
                               </span>
                               <span>+${platformFee.toFixed(2)}</span>
                             </div>
@@ -929,8 +929,7 @@ export function CheckoutModal({
                       <div className="flex items-center justify-between bg-gray-100 rounded-lg p-3">
                         <div>
                           <p className="text-gray-500 text-xs font-medium">
-                            Amount (incl. {PLATFORM_FEE_PERCENTAGE}% service
-                            fee)
+                            Amount (incl. {PLATFORM_FEE_PERCENTAGE}% + $0.30 service fee)
                           </p>
                           <p className="text-black font-bold text-xl">
                             ${(totalPrice + calculatePlatformFee(totalPrice)).toFixed(2)}
