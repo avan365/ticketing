@@ -72,11 +72,9 @@ export function CheckoutModal({
   onPurchaseComplete,
   redirectOrderData,
 }: CheckoutModalProps) {
-  const [step, setStep] = useState<CheckoutStep>(
-    redirectOrderData ? "success" : "cart"
-  );
+  const [step, setStep] = useState<CheckoutStep>("cart");
 
-  // Set order number and paid amount if from redirect
+  // Set order number and paid amount if from redirect (after payment is confirmed)
   useEffect(() => {
     if (redirectOrderData) {
       setOrderNumber(redirectOrderData.orderNumber);
@@ -88,6 +86,8 @@ export function CheckoutModal({
           email: redirectOrderData.customerEmail,
         }));
       }
+      // Only show success AFTER payment is confirmed (redirectOrderData means payment completed)
+      setStep("success");
     }
   }, [redirectOrderData]);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
