@@ -260,26 +260,24 @@ export default function App() {
 
 
       {/* Floating Cart Button - Fixed at bottom of screen */}
-      <AnimatePresence>
-        {cart.length > 0 && !showCheckout && (
-          <motion.button
-            initial={{ scale: 0, y: 100 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0, y: 100 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleViewCart}
-            className="fixed bottom-4 right-4 md:bottom-8 md:right-8 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-lg transition-colors duration-200 z-50 font-medium flex items-center gap-2 md:gap-3 font-sans"
-            style={{ backgroundColor: EventConfig.colors.primary.base }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
-          >
-            <span className="text-lg">🎭</span>
-            <span className="text-sm md:text-base">View Cart ({getTotalItems()})</span>
-            <span className="text-base md:text-lg font-bold">${getTotalPrice()}</span>
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {cart.length > 0 && !showCheckout && (
+        <motion.button
+          initial={{ scale: 0, y: 100 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0, y: 100 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleViewCart}
+          className="fixed bottom-4 right-4 md:bottom-8 md:right-8 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg shadow-lg transition-colors duration-200 z-[100] font-medium flex items-center gap-2 md:gap-3 font-sans"
+          style={{ backgroundColor: EventConfig.colors.primary.base }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
+        >
+          <span className="text-lg">🎭</span>
+          <span className="text-sm md:text-base">View Cart ({getTotalItems()})</span>
+          <span className="text-base md:text-lg font-bold">${getTotalPrice()}</span>
+        </motion.button>
+      )}
     </div>
   );
 }

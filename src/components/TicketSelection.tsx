@@ -223,11 +223,13 @@ export function TicketSelection({
                                 : "text-white"
                             }`}
                           >
-                            ${ticket.price}
+                            {isLocked ? "---" : `$${ticket.price}`}
                           </span>
-                          <span className="text-purple-300 ml-1 text-xs">
-                            per ticket
-                          </span>
+                          {!isLocked && (
+                            <span className="text-purple-300 ml-1 text-xs">
+                              per ticket
+                            </span>
+                          )}
                         </div>
                       </div>
                       <motion.div
@@ -284,11 +286,13 @@ export function TicketSelection({
                               : "text-white"
                           }`}
                         >
-                          ${ticket.price}
+                          {isLocked ? "---" : `$${ticket.price}`}
                         </span>
-                        <span className="text-purple-300 ml-2 text-base">
-                          per ticket
-                        </span>
+                        {!isLocked && (
+                          <span className="text-purple-300 ml-2 text-base">
+                            per ticket
+                          </span>
+                        )}
                       </div>
                     </div>
 
