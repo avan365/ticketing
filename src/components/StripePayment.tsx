@@ -62,6 +62,7 @@ interface StripePaymentProps {
   onError: (error: string) => void;
   onBack: () => void;
   selectedMethod: "card" | "apple_pay" | "grabpay";
+  cartItems?: Array<{ ticket: { id: string; name: string; price: number }; quantity: number }>;
 }
 
 // Inner component that uses Stripe hooks
@@ -73,6 +74,7 @@ function StripePaymentForm({
   onError,
   onBack,
   selectedMethod,
+  cartItems = [],
 }: StripePaymentProps) {
   const stripe = useStripe();
   const elements = useElements();
@@ -190,7 +192,10 @@ function StripePaymentForm({
           customerEmail,
           customerName,
           paymentMethod: "grabpay",
-          orderDetails: { tickets: "ADHEERAA Masquerade Tickets" },
+          orderDetails: { 
+            tickets: "ADHEERAA Masquerade Tickets",
+            cartItems: cartItems, // Include cart items in metadata
+          },
           successUrl: `${window.location.origin}?success=true&session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}?canceled=true`,
         }),
@@ -233,7 +238,10 @@ function StripePaymentForm({
           customerEmail,
           customerName,
           paymentMethod: "apple_pay",
-          orderDetails: { tickets: "ADHEERAA Masquerade Tickets" },
+          orderDetails: { 
+            tickets: "ADHEERAA Masquerade Tickets",
+            cartItems: cartItems, // Include cart items in metadata
+          },
           successUrl: `${window.location.origin}?success=true&session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}?canceled=true`,
         }),

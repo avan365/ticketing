@@ -145,7 +145,8 @@ export function TicketSelection({
             const quantity = quantities[ticket.id] || 0;
             const isAdded = addedToCart[ticket.id];
             const isSoldOut = ticket.available === 0;
-            const isLocked = ticket.id === "phase-ii" || ticket.id === "phase-iii";
+            const isLocked =
+              ticket.id === "phase-ii" || ticket.id === "phase-iii";
             // Availability numbers removed - no longer displayed
 
             return (
@@ -165,7 +166,7 @@ export function TicketSelection({
                 }}
                 className={`relative group ${
                   ticket.id === "vip" ? "md:scale-110 z-10" : ""
-                } ${isLocked ? "blur-[2px]" : ""}`}
+                } ${isLocked ? "blur-[1px]" : ""}`}
               >
                 {/* Glow Effect */}
                 <div
@@ -217,7 +218,9 @@ export function TicketSelection({
                         <div>
                           <span
                             className={`text-2xl font-bold ${
-                              isSoldOut || isLocked ? "text-gray-500" : "text-white"
+                              isSoldOut || isLocked
+                                ? "text-gray-500"
+                                : "text-white"
                             }`}
                           >
                             ${ticket.price}
@@ -228,7 +231,9 @@ export function TicketSelection({
                         </div>
                       </div>
                       <motion.div
-                        animate={isSoldOut || isLocked ? {} : { rotateY: [0, 360] }}
+                        animate={
+                          isSoldOut || isLocked ? {} : { rotateY: [0, 360] }
+                        }
                         transition={{
                           duration: 3,
                           repeat: Infinity,
@@ -246,7 +251,9 @@ export function TicketSelection({
                     <div className="hidden md:block">
                       {/* Icon */}
                       <motion.div
-                        animate={isSoldOut || isLocked ? {} : { rotateY: [0, 360] }}
+                        animate={
+                          isSoldOut || isLocked ? {} : { rotateY: [0, 360] }
+                        }
                         transition={{
                           duration: 3,
                           repeat: Infinity,
@@ -272,7 +279,9 @@ export function TicketSelection({
                       <div className="mb-6">
                         <span
                           className={`text-5xl font-bold ${
-                            isSoldOut || isLocked ? "text-gray-500" : "text-white"
+                            isSoldOut || isLocked
+                              ? "text-gray-500"
+                              : "text-white"
                           }`}
                         >
                           ${ticket.price}
@@ -286,7 +295,9 @@ export function TicketSelection({
                     {/* Description */}
                     <p
                       className={`${
-                        isSoldOut || isLocked ? "text-gray-400" : "text-purple-200"
+                        isSoldOut || isLocked
+                          ? "text-gray-400"
+                          : "text-purple-200"
                       } mb-4 md:mb-6 flex-1 text-sm md:text-base`}
                     >
                       {ticket.description}

@@ -60,6 +60,15 @@ module.exports = async (req, res) => {
       paymentMethodTypes: paymentMethodTypes[paymentMethod] || ['card']
     });
 
+    // Parse orderDetails to get cart data if available
+    let cartData = null;
+    if (orderDetails && typeof orderDetails === 'object') {
+      // If orderDetails contains cart items, include them
+      if (orderDetails.cartItems) {
+        cartData = JSON.stringify(orderDetails.cartItems);
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: paymentMethodTypes[paymentMethod] || ['card'],
       line_items: [{
@@ -80,7 +89,9 @@ module.exports = async (req, res) => {
       metadata: {
         customerName: customerName || '',
         customerEmail: customerEmail || '',
+        paymentMethod: paymentMethod || 'card',
         orderDetails: JSON.stringify(orderDetails || {}),
+        ...(cartData && { cartData: cartData }),
       },
     });
 

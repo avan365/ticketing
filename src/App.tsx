@@ -6,6 +6,7 @@ import { TicketSelection } from './components/TicketSelection';
 import { CheckoutModal } from './components/CheckoutModal';
 import { getAvailableCount } from './utils/inventory';
 import { EventConfig } from './config/eventConfig';
+import { getCheckoutSession, processCheckoutSession } from './utils/checkoutRedirect';
 
 export interface TicketType {
   id: string;
@@ -59,6 +60,76 @@ export default function App() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle Stripe Checkout redirect (Apple Pay, GrabPay)
+  useEffect(() => {
+    const handleCheckoutRedirect = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+      const success = urlParams.get('success');
+      const canceled = urlParams.get('canceled');
+
+      // If canceled, just clean up and return
+      if (canceled === 'true') {
+        sessionStorage.removeItem('checkout_cart');
+        sessionStorage.removeItem('checkout_customer');
+        // Remove query params from URL
+        window.history.replaceState({}, '', window.location.pathname);
+        return;
+      }
+
+      // If success with session_id, process the order
+      if (success === 'true' && sessionId) {
+        try {
+          // Check if we've already processed this session
+          const processedSessions = JSON.parse(
+            sessionStorage.getItem('processed_sessions') || '[]'
+          );
+          if (processedSessions.includes(sessionId)) {
+            // Already processed, just clean up URL
+            window.history.replaceState({}, '', window.location.pathname);
+            return;
+          }
+
+          // Retrieve session details
+          const sessionData = await getCheckoutSession(sessionId);
+          if (!sessionData) {
+            console.error('Failed to retrieve checkout session');
+            return;
+          }
+
+          // Process the order
+          const result = await processCheckoutSession(sessionData);
+          if (result.success) {
+            // Mark as processed
+            processedSessions.push(sessionId);
+            sessionStorage.setItem(
+              'processed_sessions',
+              JSON.stringify(processedSessions.slice(-10)) // Keep last 10
+            );
+
+            // Refresh inventory
+            refreshInventory();
+
+            // Clear cart
+            setCart([]);
+
+            // Show success message (you could show a toast/notification here)
+            console.log('✅ Order created successfully:', result.orderNumber);
+
+            // Remove query params from URL
+            window.history.replaceState({}, '', window.location.pathname);
+          } else {
+            console.error('Failed to process checkout session:', result.error);
+          }
+        } catch (error) {
+          console.error('Error handling checkout redirect:', error);
+        }
+      }
+    };
+
+    handleCheckoutRedirect();
+  }, [refreshInventory]);
 
   const addToCart = (ticket: TicketType, quantity: number) => {
     setCart((prevCart) => {

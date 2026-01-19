@@ -199,6 +199,15 @@ export function CheckoutModal({
         paymentMethod === "apple_pay" ||
         paymentMethod === "grabpay"
       ) {
+        // Store cart in sessionStorage for redirect-based payments (Apple Pay, GrabPay)
+        if (paymentMethod === "apple_pay" || paymentMethod === "grabpay") {
+          sessionStorage.setItem("checkout_cart", JSON.stringify(cart));
+          sessionStorage.setItem("checkout_customer", JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+          }));
+        }
         setStep("stripe-payment");
       }
     } else if (step === "paynow") {
