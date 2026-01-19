@@ -203,7 +203,11 @@ export default function App() {
           WebkitOverflowScrolling: "touch",
         }}
       >
-        <Hero totalItems={getTotalItems()} onCheckout={handleViewCart} />
+        <Hero
+          totalItems={getTotalItems()}
+          onCheckout={handleViewCart}
+          showCartButton={!showCheckout}
+        />
         <ConcertDetails />
         <TicketSelection tickets={tickets} onAddToCart={addToCart} />
 
