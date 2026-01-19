@@ -4,7 +4,6 @@ import { Hero } from "./components/Hero";
 import { ConcertDetails } from "./components/ConcertDetails";
 import { TicketSelection } from "./components/TicketSelection";
 import { CheckoutModal } from "./components/CheckoutModal";
-import { FloatingCartButton } from "./components/FloatingCartButton";
 import { getAvailableCount } from "./utils/inventory";
 import { EventConfig } from "./config/eventConfig";
 import {
@@ -209,7 +208,13 @@ export default function App() {
           showCartButton={!showCheckout}
         />
         <ConcertDetails />
-        <TicketSelection tickets={tickets} onAddToCart={addToCart} />
+        <TicketSelection
+          tickets={tickets}
+          onAddToCart={addToCart}
+          onViewCart={handleViewCart}
+          cartItemCount={getTotalItems()}
+          cartTotal={getTotalPrice()}
+        />
 
         {/* Footer */}
         <footer
@@ -285,15 +290,6 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
-
-      {/* Floating Cart Button - rendered via portal into #floating-root */}
-      <FloatingCartButton
-        showCheckout={showCheckout}
-        cart={cart}
-        getTotalItems={getTotalItems}
-        getTotalPrice={getTotalPrice}
-        onClick={handleViewCart}
-      />
     </>
   );
 }

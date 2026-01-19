@@ -330,7 +330,7 @@ export function CheckoutModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center overflow-y-auto"
         onClick={onClose}
       >
         {/* Global Close Button (top-right of screen) */}
@@ -351,7 +351,7 @@ export function CheckoutModal({
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 50 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-[#0a0a12] border border-white/10 rounded-none md:rounded-xl max-w-4xl w-full h-full md:h-auto md:max-h-[100vh] overflow-hidden shadow-xl flex flex-col"
+          className="bg-[#0a0a12] border border-white/10 rounded-none md:rounded-xl max-w-4xl w-full mt-4 md:mt-8 mb-4 md:mb-8 md:h-auto overflow-hidden shadow-xl flex flex-col"
         >
           {/* Header */}
           <div className="sticky top-0 bg-[#0a0a12] p-4 md:p-6 flex items-center justify-between border-b border-white/10 rounded-t-xl z-10 shrink-0">

@@ -9,11 +9,17 @@ import { EventConfig } from "../config/eventConfig";
 interface TicketSelectionProps {
   tickets: TicketType[];
   onAddToCart: (ticket: TicketType, quantity: number) => void;
+  onViewCart?: () => void;
+  cartItemCount?: number;
+  cartTotal?: number;
 }
 
 export function TicketSelection({
   tickets,
   onAddToCart,
+  onViewCart,
+  cartItemCount = 0,
+  cartTotal = 0,
 }: TicketSelectionProps) {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [addedToCart, setAddedToCart] = useState<{ [key: string]: boolean }>(
@@ -389,6 +395,40 @@ export function TicketSelection({
             );
           })}
         </div>
+
+        {/* View Cart Button */}
+        {onViewCart && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-8 md:mt-12 flex justify-center"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onViewCart}
+              className="text-white px-8 py-4 md:px-12 md:py-5 rounded-lg shadow-xl transition-colors duration-200 font-medium flex items-center gap-3 md:gap-4 font-sans text-base md:text-lg"
+              style={{ backgroundColor: EventConfig.colors.primary.base }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  EventConfig.colors.primary.dark)
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  EventConfig.colors.primary.base)
+              }
+            >
+              <span className="text-xl md:text-2xl">🎭</span>
+              <span>View Cart {cartItemCount > 0 && `(${cartItemCount})`}</span>
+              {cartItemCount > 0 && (
+                <span className="text-lg md:text-xl font-bold">
+                  ${cartTotal.toFixed(2)}
+                </span>
+              )}
+            </motion.button>
+          </motion.div>
+        )}
 
         {/* FAQ Section */}
         <motion.div
