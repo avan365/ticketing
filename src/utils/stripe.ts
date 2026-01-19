@@ -15,10 +15,12 @@ export const API_URL = import.meta.env.DEV ? "http://localhost:3001" : "";
 // PLATFORM FEE (Your profit margin)
 // ============================================
 export const PLATFORM_FEE_PERCENTAGE = 2; // 2% platform fee
+export const PLATFORM_FEE_FIXED = 0.3; // $0.30 fixed fee
 
-// Calculate platform fee
+// Calculate platform fee (2% + $0.30)
 export function calculatePlatformFee(amount: number): number {
-  return Number((amount * (PLATFORM_FEE_PERCENTAGE / 100)).toFixed(2));
+  const percentageFee = amount * (PLATFORM_FEE_PERCENTAGE / 100);
+  return Number((percentageFee + PLATFORM_FEE_FIXED).toFixed(2));
 }
 
 // ============================================
@@ -79,7 +81,9 @@ export function getFeeBreakdown(
   return {
     ticketPrice: amount,
     platformFee,
-    platformFeeLabel: `${PLATFORM_FEE_PERCENTAGE}%`,
+    platformFeeLabel: `${PLATFORM_FEE_PERCENTAGE}% + $${PLATFORM_FEE_FIXED.toFixed(
+      2
+    )}`,
     subtotal: amountYouWant,
     stripeFee,
     stripeFeeLabel: STRIPE_FEES[method].label,

@@ -63,6 +63,8 @@ export default function App() {
 
   // Handle Stripe Checkout redirect (Apple Pay, GrabPay)
   useEffect(() => {
+    let isProcessing = false; // Flag to prevent duplicate processing
+    
     const handleCheckoutRedirect = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const sessionId = urlParams.get('session_id');
@@ -79,29 +81,40 @@ export default function App() {
       }
 
       // If success with session_id, process the order
-      if (success === 'true' && sessionId) {
-        try {
-          // Check if we've already processed this session
-          const processedSessions = JSON.parse(
-            sessionStorage.getItem('processed_sessions') || '[]'
-          );
-          if (processedSessions.includes(sessionId)) {
-            // Already processed, just clean up URL
-            window.history.replaceState({}, '', window.location.pathname);
-            return;
-          }
+      if (success === 'true' && sessionId && !isProcessing) {
+        // Check if we've already processed this session
+        const processedSessions = JSON.parse(
+          sessionStorage.getItem('processed_sessions') || '[]'
+        );
+        if (processedSessions.includes(sessionId)) {
+          // Already processed, just clean up URL
+          window.history.replaceState({}, '', window.location.pathname);
+          return;
+        }
 
+        // Set processing flag
+        isProcessing = true;
+        
+        try {
           // Retrieve session details
           const sessionData = await getCheckoutSession(sessionId);
           if (!sessionData) {
             console.error('Failed to retrieve checkout session');
+            isProcessing = false;
+            return;
+          }
+
+          // Double-check we haven't processed this session (race condition protection)
+          if (processedSessions.includes(sessionId)) {
+            window.history.replaceState({}, '', window.location.pathname);
+            isProcessing = false;
             return;
           }
 
           // Process the order
           const result = await processCheckoutSession(sessionData);
           if (result.success) {
-            // Mark as processed
+            // Mark as processed immediately to prevent duplicates
             processedSessions.push(sessionId);
             sessionStorage.setItem(
               'processed_sessions',
@@ -124,6 +137,8 @@ export default function App() {
           }
         } catch (error) {
           console.error('Error handling checkout redirect:', error);
+        } finally {
+          isProcessing = false;
         }
       }
     };
@@ -168,9 +183,20 @@ export default function App() {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
+  const handleViewCart = () => {
+    setShowCheckout(true);
+    // Scroll to checkout modal after a brief delay to ensure it's rendered
+    setTimeout(() => {
+      const checkoutElement = document.getElementById('checkout-modal');
+      if (checkoutElement) {
+        checkoutElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen text-white overflow-x-hidden" style={{ backgroundColor: EventConfig.colors.background, WebkitOverflowScrolling: 'touch' }}>
-      <Hero totalItems={getTotalItems()} onCheckout={() => setShowCheckout(true)} />
+      <Hero totalItems={getTotalItems()} onCheckout={handleViewCart} />
       <ConcertDetails />
       <TicketSelection tickets={tickets} onAddToCart={addToCart} />
 
@@ -220,14 +246,16 @@ export default function App() {
       {/* Checkout Modal */}
       <AnimatePresence>
         {showCheckout && (
-          <CheckoutModal
-            cart={cart}
-            onClose={() => setShowCheckout(false)}
-            onUpdateQuantity={updateQuantity}
-            onClearCart={clearCart}
-            totalPrice={getTotalPrice()}
-            onPurchaseComplete={refreshInventory}
-          />
+          <div id="checkout-modal">
+            <CheckoutModal
+              cart={cart}
+              onClose={() => setShowCheckout(false)}
+              onUpdateQuantity={updateQuantity}
+              onClearCart={clearCart}
+              totalPrice={getTotalPrice()}
+              onPurchaseComplete={refreshInventory}
+            />
+          </div>
         )}
       </AnimatePresence>
 
@@ -241,7 +269,7 @@ export default function App() {
             exit={{ scale: 0, y: 100 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setShowCheckout(true)}
+            onClick={handleViewCart}
             className="fixed bottom-8 right-8 text-white px-8 py-4 rounded-lg shadow-md transition-colors duration-200 z-50 font-medium flex items-center gap-3 font-sans"
             style={{ backgroundColor: EventConfig.colors.primary.base }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.dark}

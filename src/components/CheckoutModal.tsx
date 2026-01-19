@@ -796,8 +796,7 @@ export function CheckoutModal({
                           ? "card"
                           : null;
 
-                      const platformFee =
-                        totalPrice * (PLATFORM_FEE_PERCENTAGE / 100);
+                      const platformFee = calculatePlatformFee(totalPrice);
                       const showPlatformFee = paymentMethod !== null; // Show for all methods
                       const showStripeFee = stripeMethod !== null;
 
@@ -914,21 +913,14 @@ export function CheckoutModal({
                             fee)
                           </p>
                           <p className="text-black font-bold text-xl">
-                            $
-                            {(
-                              totalPrice *
-                              (1 + PLATFORM_FEE_PERCENTAGE / 100)
-                            ).toFixed(2)}
+                            ${(totalPrice + calculatePlatformFee(totalPrice)).toFixed(2)}
                           </p>
                         </div>
                         <motion.button
                           whileTap={{ scale: 0.95 }}
                           onClick={() =>
                             copyToClipboard(
-                              (
-                                totalPrice *
-                                (1 + PLATFORM_FEE_PERCENTAGE / 100)
-                              ).toFixed(2)
+                              (totalPrice + calculatePlatformFee(totalPrice)).toFixed(2)
                             )
                           }
                           className={`px-3 py-2 rounded-lg flex items-center gap-1.5 text-sm font-medium transition-all ${
@@ -967,11 +959,7 @@ export function CheckoutModal({
                           <li>
                             Enter amount:{" "}
                             <span className="text-amber-500/90 font-bold">
-                              $
-                              {(
-                                totalPrice *
-                                (1 + PLATFORM_FEE_PERCENTAGE / 100)
-                              ).toFixed(2)}
+                              ${(totalPrice + calculatePlatformFee(totalPrice)).toFixed(2)}
                             </span>
                           </li>
                           <li>Complete the payment</li>
