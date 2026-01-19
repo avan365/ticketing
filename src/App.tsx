@@ -260,7 +260,7 @@ export default function App() {
 
 
       {/* Floating Cart Button - Fixed at bottom of screen */}
-      {cart.length > 0 && !showCheckout && (
+      {!showCheckout && (
         <motion.button
           initial={{ scale: 0, y: 100 }}
           animate={{ scale: 1, y: 0 }}
@@ -274,8 +274,12 @@ export default function App() {
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = EventConfig.colors.primary.base}
         >
           <span className="text-lg">🎭</span>
-          <span className="text-sm md:text-base">View Cart ({getTotalItems()})</span>
-          <span className="text-base md:text-lg font-bold">${getTotalPrice()}</span>
+          <span className="text-sm md:text-base">
+            View Cart {cart.length > 0 && `(${getTotalItems()})`}
+          </span>
+          {cart.length > 0 && (
+            <span className="text-base md:text-lg font-bold">${getTotalPrice()}</span>
+          )}
         </motion.button>
       )}
     </div>
