@@ -333,19 +333,6 @@ export function CheckoutModal({
         className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center overflow-y-auto"
         onClick={onClose}
       >
-        {/* Global Close Button (top-right of screen) */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="absolute top-3 right-3 md:top-4 md:right-4 z-50 bg-purple-700 hover:bg-purple-600 text-white rounded-full w-9 h-9 flex items-center justify-center shadow-lg md:hidden"
-          aria-label="Close checkout and return to main page"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
         <motion.div
           initial={{ scale: 0.9, y: 50 }}
           animate={{ scale: 1, y: 0 }}
