@@ -27,8 +27,12 @@ const BASE_TICKETS = EventConfig.tickets;
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
-  const [showCartButton, setShowCartButton] = useState(false);
   const [inventoryVersion, setInventoryVersion] = useState(0); // Trigger re-render when inventory changes
+  const [redirectOrderData, setRedirectOrderData] = useState<{
+    orderNumber: string;
+    customerEmail: string;
+    totalAmount: number;
+  } | null>(null);
 
   // Get tickets with live availability from inventory
   const getTicketsWithAvailability = useCallback((): TicketType[] => {
@@ -43,22 +47,6 @@ export default function App() {
   // Refresh inventory (called after purchase)
   const refreshInventory = useCallback(() => {
     setInventoryVersion(v => v + 1);
-  }, []);
-
-  // Show floating cart button after scrolling past hero
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setShowCartButton(window.scrollY > 500);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Handle Stripe Checkout redirect (Apple Pay, GrabPay)
