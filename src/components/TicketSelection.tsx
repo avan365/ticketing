@@ -165,7 +165,7 @@ export function TicketSelection({
                 }}
                 className={`relative group ${
                   ticket.id === "vip" ? "md:scale-110 z-10" : ""
-                } ${isLocked ? "blur-sm" : ""}`}
+                } ${isLocked ? "blur-[2px]" : ""}`}
               >
                 {/* Glow Effect */}
                 <div

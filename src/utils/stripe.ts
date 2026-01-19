@@ -6,7 +6,7 @@ import { loadStripe, type Stripe } from "@stripe/stripe-js";
 
 // Your Stripe publishable key (starts with pk_)
 export const STRIPE_PUBLISHABLE_KEY =
-  "pk_test_51SnvrcBqx0IdgUymIqgd66nZuJLT1uHXDDGJXeFa2owUq8XwqC0h9nhFPweKsmj9S6tvulazraUn1ISK6Iz6B1zs00MhPWKU6S";
+  "pk_live_51SnvrTAzvkOI7f2J3RIX9WlzO2iw95dc2uuJgBOiCb48wxgEdtpfp1wvBcx5Eilv9Kgdzfjw7wDFvRbFisYLeaGt00dUVLtLd3";
 
 // Backend API URL - Uses relative path for Vercel, localhost for dev
 export const API_URL = import.meta.env.DEV ? "http://localhost:3001" : "";
