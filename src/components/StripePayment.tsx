@@ -191,6 +191,8 @@ function StripePaymentForm({
           customerName,
           paymentMethod: "grabpay",
           orderDetails: { tickets: "ADHEERAA Masquerade Tickets" },
+          successUrl: `${window.location.origin}?success=true&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}?canceled=true`,
         }),
       });
 
@@ -211,46 +213,41 @@ function StripePaymentForm({
   };
 
   const handleApplePay = async () => {
-    // For Apple Pay, we'd use PaymentRequest API
-    // For now, fall back to card payment
     setIsProcessing(true);
 
     try {
       if (!backendAvailable) {
+        // Demo mode
         await new Promise((resolve) => setTimeout(resolve, 1500));
         onSuccess("demo_applepay_" + Date.now());
         return;
       }
 
-      // Check if Apple Pay is available
-      if (!stripe) {
-        throw new Error("Stripe not loaded");
-      }
-
-      const paymentRequest = stripe.paymentRequest({
-        country: "SG",
-        currency: "sgd",
-        total: {
-          label: "ADHEERAA Tickets",
-          amount: Math.round(totalWithFee * 100),
-        },
-        requestPayerName: true,
-        requestPayerEmail: true,
+      // Create Checkout Session for Apple Pay (redirect flow)
+      // Stripe Checkout supports Apple Pay automatically on supported devices
+      const response = await fetch(`${API_URL}/api/create-checkout-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: totalWithFee,
+          customerEmail,
+          customerName,
+          paymentMethod: "apple_pay",
+          orderDetails: { tickets: "ADHEERAA Masquerade Tickets" },
+          successUrl: `${window.location.origin}?success=true&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}?canceled=true`,
+        }),
       });
 
-      const canMakePayment = await paymentRequest.canMakePayment();
-
-      if (!canMakePayment?.applePay) {
-        throw new Error(
-          "Apple Pay is not available on this device. Please use Card payment instead."
-        );
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to create checkout session");
       }
 
-      // For full implementation, you'd show the Apple Pay sheet
-      // For now, show error
-      throw new Error(
-        "Apple Pay requires additional setup. Please use Card payment."
-      );
+      const { url } = await response.json();
+
+      // Redirect to Stripe Checkout (which will show Apple Pay if available)
+      window.location.href = url;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Apple Pay failed";
       onError(message);

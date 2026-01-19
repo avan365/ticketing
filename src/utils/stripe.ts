@@ -208,7 +208,7 @@ export async function createCheckoutSession(
   amount: number,
   customerEmail: string,
   customerName: string,
-  paymentMethod: "grabpay" | "card",
+  paymentMethod: "grabpay" | "card" | "apple_pay",
   orderDetails?: OrderDetails
 ): Promise<CheckoutSessionResult | null> {
   const backendAvailable = await isBackendAvailable();
