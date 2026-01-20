@@ -124,8 +124,8 @@ export function AdminDashboard({
 
       const statsData = await getOrderStats();
       setStats(statsData);
-      setInventory(getInventory());
-      // Derive global inventory stats from orders so counts are consistent across devices
+
+      // Derive global inventory (per ticket) and aggregate stats from orders so counts are consistent across devices
       const soldById: Record<string, number> = {};
 
       const mapTicketToId = (ticketName: string, ticketPrice: number): string | null => {
@@ -155,12 +155,28 @@ export function AdminDashboard({
       let totalTickets = 0;
       let totalSold = 0;
 
+      const inventoryById: TicketInventory = {};
+
       for (const ticket of EventConfig.tickets) {
         const base = getBaseQuantity(ticket.id);
+        const sold = soldById[ticket.id] || 0;
+
         totalTickets += base;
-        totalSold += soldById[ticket.id] || 0;
+        totalSold += sold;
+
+        inventoryById[ticket.id] = {
+          name: ticket.name,
+          price: ticket.price,
+          available: base,
+          sold,
+          reserved: 0,
+        };
       }
 
+      // Update per-ticket inventory view
+      setInventory(inventoryById);
+
+      // Update aggregate stats
       setInventoryStats({
         totalTickets,
         totalSold,
