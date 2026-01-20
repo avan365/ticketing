@@ -63,14 +63,23 @@ export default function App() {
         const orders = await getAllOrders();
         const soldById: Record<string, number> = {};
 
-        // Helper: map historical ticket names to current IDs
-        const mapNameToId = (name: string): string | null => {
-          // First try exact match against current config
-          const match = EventConfig.tickets.find((t) => t.name === name);
-          if (match) return match.id;
+        // Helper: map historical ticket entries to current IDs
+        const mapTicketToId = (
+          ticketName: string,
+          ticketPrice: number
+        ): string | null => {
+          // 1) Try exact name match against current config
+          const byName = EventConfig.tickets.find((t) => t.name === ticketName);
+          if (byName) return byName.id;
 
-          // Handle known legacy names (e.g. before renaming Phase III -> Final Release)
-          if (name === "Phase III") return "phase-iii";
+          // 2) Handle known legacy names (e.g. before renaming Phase III -> Final Release)
+          if (ticketName === "Phase III") return "phase-iii";
+
+          // 3) Fallback: match by unique price
+          const byPrice = EventConfig.tickets.filter(
+            (t) => t.price === ticketPrice
+          );
+          if (byPrice.length === 1) return byPrice[0].id;
 
           return null;
         };
@@ -78,7 +87,7 @@ export default function App() {
         for (const order of orders) {
           if (order.status === "rejected") continue;
           for (const t of order.tickets) {
-            const ticketId = mapNameToId(t.name);
+            const ticketId = mapTicketToId(t.name, t.price);
             if (!ticketId) continue;
             soldById[ticketId] = (soldById[ticketId] || 0) + t.quantity;
           }
