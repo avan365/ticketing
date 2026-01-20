@@ -61,18 +61,32 @@ export default function App() {
     const loadGlobalInventory = async () => {
       try {
         const orders = await getAllOrders();
-        const soldByName: Record<string, number> = {};
+        const soldById: Record<string, number> = {};
+
+        // Helper: map historical ticket names to current IDs
+        const mapNameToId = (name: string): string | null => {
+          // First try exact match against current config
+          const match = EventConfig.tickets.find((t) => t.name === name);
+          if (match) return match.id;
+
+          // Handle known legacy names (e.g. before renaming Phase III -> Final Release)
+          if (name === "Phase III") return "phase-iii";
+
+          return null;
+        };
 
         for (const order of orders) {
           if (order.status === "rejected") continue;
           for (const t of order.tickets) {
-            soldByName[t.name] = (soldByName[t.name] || 0) + t.quantity;
+            const ticketId = mapNameToId(t.name);
+            if (!ticketId) continue;
+            soldById[ticketId] = (soldById[ticketId] || 0) + t.quantity;
           }
         }
 
         const updated = BASE_TICKETS.map((ticket) => {
           const baseQty = getBaseQuantity(ticket.id);
-          const sold = soldByName[ticket.name] || 0;
+          const sold = soldById[ticket.id] || 0;
           const remaining = Math.max(0, baseQty - sold);
           return {
             ...ticket,
