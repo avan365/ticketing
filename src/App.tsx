@@ -4,12 +4,13 @@ import { Hero } from "./components/Hero";
 import { ConcertDetails } from "./components/ConcertDetails";
 import { TicketSelection } from "./components/TicketSelection";
 import { CheckoutModal } from "./components/CheckoutModal";
-import { getAvailableCount } from "./utils/inventory";
+import { getAvailableCount, getBaseQuantity } from "./utils/inventory";
 import { EventConfig } from "./config/eventConfig";
 import {
   getCheckoutSession,
   processCheckoutSession,
 } from "./utils/checkoutRedirect";
+import { getAllOrders } from "./utils/orders";
 
 export interface TicketType {
   id: string;
@@ -31,21 +32,62 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
   const [inventoryVersion, setInventoryVersion] = useState(0); // Trigger re-render when inventory changes
+  const [tickets, setTickets] = useState<TicketType[]>(() =>
+    BASE_TICKETS.map((ticket) => ({
+      ...ticket,
+      available: getAvailableCount(ticket.id),
+    }))
+  );
   const [redirectOrderData, setRedirectOrderData] = useState<{
     orderNumber: string;
     customerEmail: string;
     totalAmount: number;
   } | null>(null);
 
-  // Get tickets with live availability from inventory
-  const getTicketsWithAvailability = useCallback((): TicketType[] => {
-    return BASE_TICKETS.map((ticket) => ({
-      ...ticket,
-      available: getAvailableCount(ticket.id),
-    }));
-  }, [inventoryVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Load tickets with live availability
+  useEffect(() => {
+    // In development, continue to use localStorage-based inventory
+    if (import.meta.env.DEV) {
+      setTickets(
+        BASE_TICKETS.map((ticket) => ({
+          ...ticket,
+          available: getAvailableCount(ticket.id),
+        }))
+      );
+      return;
+    }
 
-  const tickets = getTicketsWithAvailability();
+    // In production, derive availability from global orders (KV) so it's consistent across devices
+    const loadGlobalInventory = async () => {
+      try {
+        const orders = await getAllOrders();
+        const soldByName: Record<string, number> = {};
+
+        for (const order of orders) {
+          if (order.status === "rejected") continue;
+          for (const t of order.tickets) {
+            soldByName[t.name] = (soldByName[t.name] || 0) + t.quantity;
+          }
+        }
+
+        const updated = BASE_TICKETS.map((ticket) => {
+          const baseQty = getBaseQuantity(ticket.id);
+          const sold = soldByName[ticket.name] || 0;
+          const remaining = Math.max(0, baseQty - sold);
+          return {
+            ...ticket,
+            available: remaining,
+          };
+        });
+
+        setTickets(updated);
+      } catch (error) {
+        console.error("Error loading global inventory from orders:", error);
+      }
+    };
+
+    loadGlobalInventory();
+  }, [inventoryVersion]);
 
   // Refresh inventory (called after purchase)
   const refreshInventory = useCallback(() => {

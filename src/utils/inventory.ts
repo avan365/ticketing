@@ -24,6 +24,11 @@ const DEFAULT_QUANTITIES: { [key: string]: number } = {
   "phase-iii": 200,
 };
 
+// Export helper to get base quantity for a ticket type
+export function getBaseQuantity(ticketId: string): number {
+  return DEFAULT_QUANTITIES[ticketId] || 0;
+}
+
 // Generate default inventory from config
 function getDefaultInventory(): TicketInventory {
   const inventory: TicketInventory = {};
