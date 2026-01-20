@@ -39,8 +39,10 @@ import {
   saveInventory,
   resetInventory,
   getInventoryStats,
+  getBaseQuantity,
   type TicketInventory,
 } from "../utils/inventory";
+import { EventConfig } from "../config/eventConfig";
 import { sendCustomerConfirmation } from "../utils/email";
 
 type AdminTab = "orders" | "inventory";
@@ -123,7 +125,48 @@ export function AdminDashboard({
       const statsData = await getOrderStats();
       setStats(statsData);
       setInventory(getInventory());
-      setInventoryStats(getInventoryStats());
+      // Derive global inventory stats from orders so counts are consistent across devices
+      const soldById: Record<string, number> = {};
+
+      const mapTicketToId = (ticketName: string, ticketPrice: number): string | null => {
+        // 1) Try exact name match against current config
+        const byName = EventConfig.tickets.find((t) => t.name === ticketName);
+        if (byName) return byName.id;
+
+        // 2) Legacy names (e.g. before renaming Phase III -> Final Release)
+        if (ticketName === "Phase III") return "phase-iii";
+
+        // 3) Fallback by unique price
+        const byPrice = EventConfig.tickets.filter((t) => t.price === ticketPrice);
+        if (byPrice.length === 1) return byPrice[0].id;
+
+        return null;
+      };
+
+      for (const order of orders) {
+        if (order.status === "rejected") continue;
+        for (const t of order.tickets || []) {
+          const id = mapTicketToId(t.name, t.price);
+          if (!id) continue;
+          soldById[id] = (soldById[id] || 0) + t.quantity;
+        }
+      }
+
+      let totalTickets = 0;
+      let totalSold = 0;
+
+      for (const ticket of EventConfig.tickets) {
+        const base = getBaseQuantity(ticket.id);
+        totalTickets += base;
+        totalSold += soldById[ticket.id] || 0;
+      }
+
+      setInventoryStats({
+        totalTickets,
+        totalSold,
+        totalReserved: 0,
+        totalAvailable: Math.max(0, totalTickets - totalSold),
+      });
     } catch (error) {
       console.error("❌ Error refreshing data:", error);
     }
