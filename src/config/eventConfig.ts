@@ -139,18 +139,22 @@ export const EventConfig = {
       name: "Phase I",
       price: 17,
       description: "Be among the first to enter ADHEERAA. Mask included.",
+      locked: true, // Set to true to lock this phase
     },
     {
       id: "phase-ii",
       name: "Phase II",
       price: 22,
       description: "The heart of the masquerade experience. Mask included.",
+      locked: false, // Set to true to lock this phase
     },
     {
       id: "phase-iii",
-      name: "Final Release",
-      price: 25,
-      description: "Last chance to join the night of mystery. Mask included.",
+      name: "Bundle for 5",
+      price: 100,
+      description: "Bundle for 5 tickets. Mask included.",
+      locked: false, // Set to true to lock this phase
+      //"Last chance to join the night of mystery. Mask included.",
     },
   ],
 
@@ -196,7 +200,7 @@ export const EventConfig = {
     mainTitle: "Elegant Cocktail Attire",
     tags: ["✨ Classy", "🎩 Polished", "🖤 Intentional"],
     description:
-      "Think dresses, clean shirts, statement fits — elevated but comfortable.",
+      "Think dresses, clean shirts, statement fits — elevated but comfortable. No slippers, no shorts, no tshirts, no jeans.",
   },
 
   // ═══════════════════════════════════════════════════════════════

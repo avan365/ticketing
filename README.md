@@ -126,3 +126,4 @@ The project is configured for Vercel deployment:
 - Server: The `server/` directory can be deployed separately or converted to serverless functions
 
 
+

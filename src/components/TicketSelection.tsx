@@ -151,8 +151,7 @@ export function TicketSelection({
             const quantity = quantities[ticket.id] || 0;
             const isAdded = addedToCart[ticket.id];
             const isSoldOut = ticket.available === 0;
-            const isLocked =
-              ticket.id === "phase-ii" || ticket.id === "phase-iii";
+            const isLocked = ticket.locked ?? false;
             // Availability numbers removed - no longer displayed
 
             return (
