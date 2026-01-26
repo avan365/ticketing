@@ -18,6 +18,7 @@ export interface TicketType {
   price: number;
   description: string;
   available: number;
+  locked?: boolean;
 }
 
 export interface CartItem {
