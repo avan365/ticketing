@@ -139,21 +139,21 @@ export const EventConfig = {
       name: "Phase I",
       price: 17,
       description: "Be among the first to enter ADHEERAA. Mask included.",
-      locked: false, // Set to true to lock this phase
+      locked: true, // Set to true to lock this phase
     },
     {
       id: "phase-ii",
       name: "Phase II",
       price: 22,
       description: "The heart of the masquerade experience. Mask included.",
-      locked: true, // Set to true to lock this phase
+      locked: false, // Set to true to lock this phase
     },
     {
       id: "phase-iii",
       name: "Bundle for 5",
       price: 100,
       description: "Bundle for 5 tickets. Mask included.",
-      locked: true, // Set to true to lock this phase
+      locked: false, // Set to true to lock this phase
       //"Last chance to join the night of mystery. Mask included.",
     },
   ],
