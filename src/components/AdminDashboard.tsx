@@ -260,57 +260,68 @@ export function AdminDashboard({
       return;
     }
 
-    // If verifying a PayNow order, send confirmation email to customer
+    // For PayNow verification, show loading state
     if (status === "verified" && order.paymentMethod === "paynow") {
       setSendingEmail(orderId);
-      try {
-        // Convert individualTickets to TicketQR format for email
-        const qrCodes =
-          order.individualTickets?.map((t) => ({
-            ticketId: t.ticketId,
-            qrCodeDataUrl: t.qrCodeDataUrl,
-            orderNumber: order.orderNumber,
-            ticketType: t.ticketType,
-            customerName: order.customerName,
-          })) || [];
-
-        await sendCustomerConfirmation(
-          order.orderNumber,
-          order.customerName,
-          order.customerEmail,
-          order.tickets.map((t) => ({
-            ticket: {
-              id: t.name.toLowerCase().replace(/\s+/g, "-"),
-              name: t.name,
-              price: t.price,
-              description: "",
-              available: 0,
-            },
-            quantity: t.quantity,
-          })),
-          order.totalAmount,
-          "paynow",
-          true, // isVerified = true, so email shows "Confirmed" status
-          qrCodes.length > 0 ? qrCodes : undefined
-        );
-        console.log("✅ Confirmation email sent to:", order.customerEmail);
-      } catch (error) {
-        console.error("Failed to send confirmation email:", error);
-      } finally {
-        setSendingEmail(null);
-      }
     }
 
-    updateOrderStatus(orderId, status)
-      .then(() => {
-        refreshData();
-      })
-      .catch((error) => {
-        console.error("Failed to update order status:", error);
-        alert(
-          `Failed to update order status: ${error.message || "Unknown error"}`
-        );
-      });
+    try {
+      // FIRST: Update the order status in the database
+      await updateOrderStatus(orderId, status);
+      console.log("✅ Order status updated to:", status);
+
+      // THEN: If verifying a PayNow order, send confirmation email
+      if (status === "verified" && order.paymentMethod === "paynow") {
+        try {
+          // Convert individualTickets to TicketQR format for email
+          const qrCodes =
+            order.individualTickets?.map((t) => ({
+              ticketId: t.ticketId,
+              qrCodeDataUrl: t.qrCodeDataUrl,
+              orderNumber: order.orderNumber,
+              ticketType: t.ticketType,
+              customerName: order.customerName,
+            })) || [];
+
+          await sendCustomerConfirmation(
+            order.orderNumber,
+            order.customerName,
+            order.customerEmail,
+            order.tickets.map((t) => ({
+              ticket: {
+                id: t.name.toLowerCase().replace(/\s+/g, "-"),
+                name: t.name,
+                price: t.price,
+                description: "",
+                available: 0,
+              },
+              quantity: t.quantity,
+            })),
+            order.totalAmount,
+            "paynow",
+            true, // isVerified = true, so email shows "Confirmed" status
+            qrCodes.length > 0 ? qrCodes : undefined
+          );
+          console.log("✅ Confirmation email sent to:", order.customerEmail);
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+          // Email failed but status was updated - notify admin
+          alert(
+            `Order verified but email failed to send. Please manually notify the customer at: ${order.customerEmail}`
+          );
+        }
+      }
+
+      // Refresh data to show updated status
+      await refreshData();
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      alert(
+        `Failed to update order status: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    } finally {
+      setSendingEmail(null);
+    }
   };
 
   const handleOverrideConfirm = () => {

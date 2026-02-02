@@ -51,6 +51,35 @@ export interface Order {
 const ORDERS_KEY = "adheeraa_orders";
 const ADMIN_PASSWORD = "adheeraa2026"; // Change this to your preferred password
 
+/**
+ * Safely set localStorage, handling quota exceeded errors
+ * Returns true if successful, false if quota exceeded
+ */
+function safeSetLocalStorage(key: string, value: string): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    if (error instanceof DOMException && 
+        (error.name === 'QuotaExceededError' || error.code === 22)) {
+      console.warn('localStorage quota exceeded, attempting cleanup...');
+      // Try to clear old data and retry
+      try {
+        // Clear the orders from localStorage since API is source of truth in production
+        localStorage.removeItem(key);
+        // Try to set again with fresh data
+        localStorage.setItem(key, value);
+        return true;
+      } catch {
+        console.error('localStorage quota exceeded even after cleanup. Using API only.');
+        return false;
+      }
+    }
+    console.error('Error setting localStorage:', error);
+    return false;
+  }
+}
+
 export function getAdminPassword(): string {
   return ADMIN_PASSWORD;
 }
@@ -135,9 +164,8 @@ export async function saveOrder(order: Order): Promise<void> {
         const error = await response.json();
         throw new Error(error.error || "Failed to save order");
       }
-      // Also save to localStorage as backup
-      const orders = await getAllOrders();
-      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+      // Don't backup to localStorage in production - API is the source of truth
+      // This prevents quota exceeded errors from large QR codes and payment proofs
       return;
     } catch (error) {
       console.error("Error saving order to API:", error);
@@ -148,7 +176,7 @@ export async function saveOrder(order: Order): Promise<void> {
   // In development, use localStorage
   const orders = await getAllOrders();
   orders.unshift(order); // Add to beginning (newest first)
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  safeSetLocalStorage(ORDERS_KEY, JSON.stringify(orders));
 }
 
 export async function updateOrderStatus(
@@ -184,9 +212,8 @@ export async function updateOrderStatus(
         throw new Error(error.error || "Failed to update order status");
       }
 
-      // Also update localStorage as backup
-      const updatedOrders = await getAllOrders();
-      localStorage.setItem(ORDERS_KEY, JSON.stringify(updatedOrders));
+      // Don't backup to localStorage in production - API is the source of truth
+      // This prevents quota exceeded errors from large QR codes and payment proofs
       return;
     } catch (error) {
       console.error("Error updating order status via API:", error);
@@ -202,7 +229,7 @@ export async function updateOrderStatus(
     if (status === "verified") {
       orders[index].verifiedAt = new Date().toISOString();
     }
-    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+    safeSetLocalStorage(ORDERS_KEY, JSON.stringify(orders));
   }
 }
 
@@ -271,7 +298,7 @@ export async function updateTicketStatus(
         ticket.scannedAt = new Date().toISOString();
         ticket.scannedBy = scannedBy || "bouncer";
       }
-      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+      safeSetLocalStorage(ORDERS_KEY, JSON.stringify(orders));
       return {
         success: true,
         orderNumber: order.orderNumber,
@@ -321,7 +348,7 @@ export async function getOrderByNumber(
 
 export async function deleteOrder(orderId: string): Promise<void> {
   const orders = (await getAllOrders()).filter((o) => o.id !== orderId);
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  safeSetLocalStorage(ORDERS_KEY, JSON.stringify(orders));
 }
 
 export async function getOrderStats() {
@@ -378,6 +405,8 @@ export async function resetAllOrders(): Promise<void> {
       });
       if (response.ok) {
         console.log("✅ All orders reset via API");
+        // Also clear localStorage cache
+        localStorage.removeItem(ORDERS_KEY);
         return;
       }
     } catch (error) {
@@ -388,6 +417,15 @@ export async function resetAllOrders(): Promise<void> {
   // In development, clear localStorage
   localStorage.removeItem(ORDERS_KEY);
   console.log("🔄 All orders reset");
+}
+
+/**
+ * Clear localStorage cache only (does not affect API data)
+ * Use this to fix quota exceeded errors
+ */
+export function clearLocalStorageCache(): void {
+  localStorage.removeItem(ORDERS_KEY);
+  console.log("🧹 localStorage cache cleared");
 }
 
 export async function exportOrdersToCSV(): Promise<string> {
