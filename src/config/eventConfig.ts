@@ -143,8 +143,8 @@ export const EventConfig = {
     },
     {
       id: "phase-ii",
-      name: "Phase II",
-      price: 22,
+      name: "Phase III",
+      price: 25,
       description: "The heart of the masquerade experience. Mask included.",
       locked: false, // Set to true to lock this phase
     },
