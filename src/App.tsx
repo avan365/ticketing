@@ -19,6 +19,7 @@ export interface TicketType {
   description: string;
   available: number;
   locked?: boolean;
+  showOnDashboard?: boolean;
 }
 
 export interface CartItem {
@@ -275,7 +276,7 @@ export default function App() {
         />
         <ConcertDetails />
         <TicketSelection
-          tickets={tickets}
+          tickets={tickets.filter((t) => t.showOnDashboard !== false)}
           onAddToCart={addToCart}
           onViewCart={handleViewCart}
           cartItemCount={getTotalItems()}

@@ -22,6 +22,7 @@ const DEFAULT_QUANTITIES: { [key: string]: number } = {
   "phase-i": 100,
   "phase-ii": 200,
   "phase-iii": 200,
+  "group-bundle": 50,
 };
 
 // Export helper to get base quantity for a ticket type
